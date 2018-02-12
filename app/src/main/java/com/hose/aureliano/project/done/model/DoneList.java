@@ -2,6 +2,7 @@ package com.hose.aureliano.project.done.model;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -10,12 +11,21 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * Created by evere on 11.02.2018.
  */
 
-@Entity
+@Entity(tableName = "lists")
 public class DoneList {
 
     @PrimaryKey
+    @NonNull
     private String id;
     private String name;
+
+    public DoneList() {
+    }
+
+    public DoneList(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public String getId() {
         return id;

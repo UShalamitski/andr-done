@@ -1,4 +1,4 @@
-package com.hose.aureliano.project.done;
+package com.hose.aureliano.project.done.activity.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+
+import com.hose.aureliano.project.done.R;
 
 /**
  * Created by evere on 05.02.2018.

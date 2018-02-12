@@ -1,10 +1,12 @@
-package com.hose.aureliano.project.done;
+package com.hose.aureliano.project.done.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+
+import com.hose.aureliano.project.done.R;
 
 /**
  * Created by everest on 11.02.2018.

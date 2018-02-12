@@ -1,6 +1,5 @@
-package com.hose.aureliano.project.done;
+package com.hose.aureliano.project.done.activity;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,23 +11,26 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.hose.aureliano.project.done.repository.DbHelper;
-import com.hose.aureliano.project.done.repository.impl.ListsRepository;
+import com.hose.aureliano.project.done.activity.dialog.AddListModal;
+import com.hose.aureliano.project.done.activity.adapter.ListsAdapter;
+import com.hose.aureliano.project.done.R;
+import com.hose.aureliano.project.done.model.DoneList;
+import com.hose.aureliano.project.done.repository.DatabaseCreator;
+import com.hose.aureliano.project.done.repository.dao.DoneListDao;
 
 import java.util.UUID;
 
 public class ListsActivity extends AppCompatActivity implements AddListModal.NoticeDialogListener {
 
     private ListsAdapter listsAdapter;
-    private ListsRepository listsRepository = new ListsRepository(new DbHelper(this));
+    private DoneListDao doneListDao = DatabaseCreator.getDatabase(this).getDoneListDao();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lists);
-        //setSupportActionBar(findViewById(R.id.toolbar));
 
-        listsAdapter = new ListsAdapter(this, listsRepository, getSupportFragmentManager());
+        listsAdapter = new ListsAdapter(this, getSupportFragmentManager());
         ListView petListView = findViewById(R.id.lists);
         petListView.setAdapter(listsAdapter);
         petListView.setOnItemClickListener((parent, view, position, id) -> {
@@ -43,7 +45,6 @@ public class ListsActivity extends AppCompatActivity implements AddListModal.Not
         });
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_lists, menu);
@@ -52,10 +53,11 @@ public class ListsActivity extends AppCompatActivity implements AddListModal.Not
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        int deletedCount = 0;
         int id = item.getItemId();
         if (id == R.id.delete_all) {
-            int deletedCount = listsRepository.delete();
-            listsAdapter.swapCursor(listsRepository.read());
+            deletedCount = doneListDao.delete();
+            listsAdapter.refresh();
             Toast.makeText(this, "Removed " + deletedCount, Toast.LENGTH_LONG).show();
             return true;
         }
@@ -67,20 +69,20 @@ public class ListsActivity extends AppCompatActivity implements AddListModal.Not
         long result = 0;
         EditText name = fragment.getDialog().findViewById(R.id.list_name);
 
-        ContentValues values = new ContentValues(2);
-        values.put("name", name.getText().toString());
+        DoneList doneList = new DoneList();
+        doneList.setName(name.getText().toString());
 
         Bundle bundle = fragment.getArguments();
         if (null != bundle) {
-            values.put("_id", bundle.getString("_id"));
-            result = listsRepository.update(values);
+            doneList.setId(bundle.getString("id"));
+            result = doneListDao.update(doneList);
         } else {
-            values.put("_id", UUID.randomUUID().toString());
-            result = listsRepository.insert(values);
+            doneList.setId(UUID.randomUUID().toString());
+            result = doneListDao.insert(doneList);
         }
 
         if (result != -1) {
-            listsAdapter.swapCursor(listsRepository.read());
+            listsAdapter.refresh();
             Toast.makeText(fragment.getContext(), "yeap : " + name.getText(), Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(fragment.getContext(), "Oops! Something went wrong!", Toast.LENGTH_LONG).show();

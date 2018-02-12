@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ListsActivity"
+            android:name=".activity.ListsActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,9 +18,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ItemsActivity"
+            android:name=".activity.ItemsActivity"
             android:label="@string/app_name"
-            android:parentActivityName=".ListsActivity" />
+            android:parentActivityName=".activity.ListsActivity" />
     </application>
 
 </manifest>
