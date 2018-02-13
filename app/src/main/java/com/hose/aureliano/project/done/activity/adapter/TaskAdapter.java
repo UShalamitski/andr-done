@@ -1,10 +1,8 @@
 package com.hose.aureliano.project.done.activity.adapter;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,10 +13,9 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.hose.aureliano.project.done.R;
-import com.hose.aureliano.project.done.activity.dialog.ListModal;
-import com.hose.aureliano.project.done.model.DoneList;
+import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
-import com.hose.aureliano.project.done.repository.dao.DoneListDao;
+import com.hose.aureliano.project.done.repository.dao.TaskDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -31,33 +28,33 @@ import java.util.List;
  *
  * @author evere
  */
-public class ListsAdapter extends BaseAdapter {
+public class TaskAdapter extends BaseAdapter {
 
     private FragmentManager fragmentManager;
-    private DoneListDao doneListDao;
-    private List<DoneList> doneLists;
+    private TaskDao taskDao;
+    private List<Task> taskList;
     private Context context;
 
-    public ListsAdapter(Context context, FragmentManager fragmentManager) {
-        doneListDao = DatabaseCreator.getDatabase(context).getDoneListDao();
-        doneLists = doneListDao.read();
+    public TaskAdapter(Context context, FragmentManager fragmentManager) {
+        taskDao = DatabaseCreator.getDatabase(context).getTaskDao();
+        taskList = taskDao.read();
         this.fragmentManager = fragmentManager;
         this.context = context;
     }
 
     public void refresh() {
-        this.doneLists = doneListDao.read();
+        this.taskList = taskDao.read();
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return CollectionUtils.size(doneLists);
+        return CollectionUtils.size(taskList);
     }
 
     @Override
-    public DoneList getItem(int position) {
-        return doneLists.get(position);
+    public Task getItem(int position) {
+        return taskList.get(position);
     }
 
     @Override
@@ -69,12 +66,12 @@ public class ListsAdapter extends BaseAdapter {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         if (null == convertView) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.done_list_layout, parent, false);
+            convertView = LayoutInflater.from(context).inflate(R.layout.done_list_item_layout, parent, false);
         }
 
-        TextView name = convertView.findViewById(R.id.name);
-        TextView id = convertView.findViewById(R.id.summary);
-        ImageView itemMenu = convertView.findViewById(R.id.more);
+        TextView name = convertView.findViewById(R.id.task_name);
+        TextView id = convertView.findViewById(R.id.task_summary);
+        ImageView itemMenu = convertView.findViewById(R.id.task_more);
 
         name.setText(getItem(position).getName());
         id.setText(getItem(position).getId());
@@ -84,16 +81,16 @@ public class ListsAdapter extends BaseAdapter {
             popupMenu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.menu_delete:
-                        doneListDao.delete(id.getText().toString());
+                        taskDao.delete(id.getText().toString());
                         refresh();
                         break;
                     case R.id.menu_edit:
-                        Bundle bundle = new Bundle();
+/*                        Bundle bundle = new Bundle();
                         bundle.putString("name", name.getText().toString());
                         bundle.putString("id", id.getText().toString());
                         DialogFragment dialog = new ListModal();
                         dialog.setArguments(bundle);
-                        dialog.show(fragmentManager, "list_edit");
+                        dialog.show(fragmentManager, "list_edit");*/
                         break;
                 }
                 return true;

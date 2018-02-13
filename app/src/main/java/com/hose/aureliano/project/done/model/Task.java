@@ -8,27 +8,35 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * Entity represents a list of items to do.
+ * Entity represents an item to do.
  * <p>
  * Date: 11.02.2018.
  *
  * @author evere
  */
-@Entity(tableName = "lists")
-public class DoneList {
+@Entity(tableName = "tasks")
+public class Task {
 
     @NonNull
     @PrimaryKey
     private String id;
+    private String listId;
     private String name;
 
-    @NonNull
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getListId() {
+        return listId;
+    }
+
+    public void setListId(String listId) {
+        this.listId = listId;
     }
 
     public String getName() {
@@ -43,10 +51,11 @@ public class DoneList {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DoneList doneList = (DoneList) o;
+        Task item = (Task) o;
         return new EqualsBuilder()
-                .append(id, doneList.id)
-                .append(name, doneList.name)
+                .append(id, item.id)
+                .append(listId, item.listId)
+                .append(name, item.name)
                 .isEquals();
     }
 
@@ -54,6 +63,7 @@ public class DoneList {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(id)
+                .append(listId)
                 .append(name)
                 .toHashCode();
     }

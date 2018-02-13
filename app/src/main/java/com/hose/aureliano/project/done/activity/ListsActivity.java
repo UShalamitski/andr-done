@@ -7,40 +7,50 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.hose.aureliano.project.done.activity.dialog.AddListModal;
-import com.hose.aureliano.project.done.activity.adapter.ListsAdapter;
 import com.hose.aureliano.project.done.R;
+import com.hose.aureliano.project.done.activity.adapter.ListsAdapter;
+import com.hose.aureliano.project.done.activity.dialog.ListModal;
 import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.DoneListDao;
+import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 import java.util.UUID;
 
-public class ListsActivity extends AppCompatActivity implements AddListModal.NoticeDialogListener {
+/**
+ * Activity fot displaying all users lists of TODOs.
+ * <p>
+ * Date: 12.02.2018.
+ *
+ * @author evere
+ */
+public class ListsActivity extends AppCompatActivity implements ListModal.NoticeDialogListener {
 
     private ListsAdapter listsAdapter;
     private DoneListDao doneListDao = DatabaseCreator.getDatabase(this).getDoneListDao();
+    View coordinator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lists);
 
+        coordinator = findViewById(R.id.coordinator_layout);
         listsAdapter = new ListsAdapter(this, getSupportFragmentManager());
-        ListView petListView = findViewById(R.id.lists);
+        ListView petListView = findViewById(R.id.list_view_lists);
         petListView.setAdapter(listsAdapter);
         petListView.setOnItemClickListener((parent, view, position, id) -> {
-            Intent intent = new Intent(this, ItemsActivity.class);
+            Intent intent = new Intent(this, TasksActivity.class);
             startActivity(intent);
         });
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
-            DialogFragment dialogFragment = new AddListModal();
+            DialogFragment dialogFragment = new ListModal();
             dialogFragment.show(getSupportFragmentManager(), "tag");
         });
     }
@@ -58,7 +68,7 @@ public class ListsActivity extends AppCompatActivity implements AddListModal.Not
         if (id == R.id.delete_all) {
             deletedCount = doneListDao.delete();
             listsAdapter.refresh();
-            Toast.makeText(this, "Removed " + deletedCount, Toast.LENGTH_LONG).show();
+            ActivityUtils.showSnackBar(coordinator, String.format("Deleted: %s", deletedCount));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -83,15 +93,13 @@ public class ListsActivity extends AppCompatActivity implements AddListModal.Not
 
         if (result != -1) {
             listsAdapter.refresh();
-            Toast.makeText(fragment.getContext(), "yeap : " + name.getText(), Toast.LENGTH_LONG).show();
+            ActivityUtils.showSnackBar(coordinator, String.format("done: %s", name.getText()));
         } else {
-            Toast.makeText(fragment.getContext(), "Oops! Something went wrong!", Toast.LENGTH_LONG).show();
+            ActivityUtils.showSnackBar(coordinator, "Oops! Something went wrong!");
         }
     }
 
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
-        EditText name = dialog.getDialog().findViewById(R.id.list_name);
-        Toast.makeText(dialog.getContext(), "nope : " + name.getText(), Toast.LENGTH_SHORT).show();
     }
 }

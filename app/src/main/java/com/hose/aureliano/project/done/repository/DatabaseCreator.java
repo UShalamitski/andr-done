@@ -4,9 +4,12 @@ import android.arch.persistence.room.Room;
 import android.content.Context;
 
 /**
- * Created by evere on 12.02.2018.
+ * Database creator.
+ * <p>
+ * Date: 12.02.2018.
+ *
+ * @author evere
  */
-
 public class DatabaseCreator {
 
     private static final Object LOCK = new Object();

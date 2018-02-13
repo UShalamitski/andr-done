@@ -6,31 +6,32 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 import com.hose.aureliano.project.done.model.DoneList;
+import com.hose.aureliano.project.done.model.Task;
 
 import java.util.List;
 
 /**
- * DAO for {@link DoneList}.
+ * DAO for {@link Task}.
  * <p>
  * Date: 12.02.2018.
  *
  * @author evere
  */
 @Dao
-public interface DoneListDao {
+public interface TaskDao {
 
     @Insert
-    long insert(DoneList doneList);
+    long insert(Task item);
 
     @Update
-    int update(DoneList doneList);
+    int update(Task item);
 
-    @Query("DELETE FROM lists")
-    int delete();
-
-    @Query("DELETE FROM lists WHERE id = :id")
+    @Query("DELETE FROM tasks WHERE id = :id")
     int delete(String id);
 
-    @Query("SELECT id, name FROM lists")
-    List<DoneList> read();
+    @Query("DELETE FROM tasks WHERE listId = :listId")
+    int deleteByListId(String listId);
+
+    @Query("SELECT id, name FROM tasks")
+    List<Task> read();
 }

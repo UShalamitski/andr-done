@@ -18,7 +18,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.ItemsActivity"
+            android:name=".activity.TasksActivity"
             android:label="@string/app_name"
             android:parentActivityName=".activity.ListsActivity" />
     </application>

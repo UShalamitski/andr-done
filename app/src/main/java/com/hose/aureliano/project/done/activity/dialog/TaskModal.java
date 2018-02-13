@@ -16,9 +16,9 @@ import com.hose.aureliano.project.done.R;
  * Created by evere on 05.02.2018.
  */
 
-public class AddListModal extends DialogFragment {
+public class TaskModal extends DialogFragment {
 
-    private NoticeDialogListener listener;
+    private ListModal.NoticeDialogListener listener;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -45,15 +45,9 @@ public class AddListModal extends DialogFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            listener = (NoticeDialogListener) context;
+            listener = (ListModal.NoticeDialogListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + " must implement NoticeDialogListener");
         }
-    }
-
-    public interface NoticeDialogListener {
-        void onDialogPositiveClick(DialogFragment dialog);
-
-        void onDialogNegativeClick(DialogFragment dialog);
     }
 }
