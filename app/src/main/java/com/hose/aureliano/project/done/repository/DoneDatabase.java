@@ -4,6 +4,7 @@ import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
 
 import com.hose.aureliano.project.done.model.DoneList;
+import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.repository.dao.DoneListDao;
 import com.hose.aureliano.project.done.repository.dao.TaskDao;
 
@@ -14,7 +15,7 @@ import com.hose.aureliano.project.done.repository.dao.TaskDao;
  *
  * @author evere
  */
-@Database(entities = {DoneList.class}, version = 1)
+@Database(entities = {DoneList.class, Task.class}, version = 1)
 public abstract class DoneDatabase extends RoomDatabase {
 
     public abstract DoneListDao getDoneListDao();

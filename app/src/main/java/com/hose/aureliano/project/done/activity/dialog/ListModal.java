@@ -27,7 +27,7 @@ public class ListModal extends DialogFragment {
         builder.setTitle("Title");
         View view = LayoutInflater
                 .from(getActivity())
-                .inflate(R.layout.modal_add_list, (ViewGroup) getView(), false);
+                .inflate(R.layout.modal_list, (ViewGroup) getView(), false);
 
         Bundle bundle = getArguments();
         if (null != bundle) {

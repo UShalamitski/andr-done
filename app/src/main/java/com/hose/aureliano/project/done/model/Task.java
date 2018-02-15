@@ -1,6 +1,7 @@
 package com.hose.aureliano.project.done.model;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
@@ -14,7 +15,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  *
  * @author evere
  */
-@Entity(tableName = "tasks")
+@Entity(tableName = "tasks",
+        foreignKeys = @ForeignKey(entity = DoneList.class, parentColumns = "id", childColumns = "listId"))
 public class Task {
 
     @NonNull

@@ -5,7 +5,6 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.model.Task;
 
 import java.util.List;
@@ -32,6 +31,6 @@ public interface TaskDao {
     @Query("DELETE FROM tasks WHERE listId = :listId")
     int deleteByListId(String listId);
 
-    @Query("SELECT id, name FROM tasks")
-    List<Task> read();
+    @Query("SELECT id, name FROM tasks WHERE listId = :listId")
+    List<Task> read(String listId);
 }

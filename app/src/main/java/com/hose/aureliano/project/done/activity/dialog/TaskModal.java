@@ -27,11 +27,11 @@ public class TaskModal extends DialogFragment {
         builder.setTitle("Title");
         View view = LayoutInflater
                 .from(getActivity())
-                .inflate(R.layout.modal_add_list, (ViewGroup) getView(), false);
+                .inflate(R.layout.modal_task, (ViewGroup) getView(), false);
 
         Bundle bundle = getArguments();
         if (null != bundle) {
-            EditText name = view.findViewById(R.id.list_name);
+            EditText name = view.findViewById(R.id.tasks_modal_name);
             name.setText((String) bundle.get("name"));
         }
 

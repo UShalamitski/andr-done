@@ -10,9 +10,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.hose.aureliano.project.done.R;
-import com.hose.aureliano.project.done.activity.adapter.ListsAdapter;
+import com.hose.aureliano.project.done.activity.adapter.ListAdapter;
 import com.hose.aureliano.project.done.activity.dialog.ListModal;
 import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
@@ -30,7 +31,7 @@ import java.util.UUID;
  */
 public class ListsActivity extends AppCompatActivity implements ListModal.NoticeDialogListener {
 
-    private ListsAdapter listsAdapter;
+    private ListAdapter listsAdapter;
     private DoneListDao doneListDao = DatabaseCreator.getDatabase(this).getDoneListDao();
     View coordinator;
 
@@ -40,15 +41,16 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
         setContentView(R.layout.activity_lists);
 
         coordinator = findViewById(R.id.coordinator_layout);
-        listsAdapter = new ListsAdapter(this, getSupportFragmentManager());
-        ListView petListView = findViewById(R.id.list_view_lists);
+        listsAdapter = new ListAdapter(this, getSupportFragmentManager());
+        ListView petListView = findViewById(R.id.activity_lists_list_view);
         petListView.setAdapter(listsAdapter);
         petListView.setOnItemClickListener((parent, view, position, id) -> {
             Intent intent = new Intent(this, TasksActivity.class);
+            intent.putExtra("listId", ((TextView) view.findViewById(R.id.summary)).getText().toString());
             startActivity(intent);
         });
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.activity_lists_fab);
         fab.setOnClickListener(view -> {
             DialogFragment dialogFragment = new ListModal();
             dialogFragment.show(getSupportFragmentManager(), "tag");

@@ -19,6 +19,7 @@ import com.hose.aureliano.project.done.activity.dialog.ListModal;
 import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.DoneListDao;
+import com.hose.aureliano.project.done.repository.dao.TaskDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -31,15 +32,17 @@ import java.util.List;
  *
  * @author evere
  */
-public class ListsAdapter extends BaseAdapter {
+public class ListAdapter extends BaseAdapter {
 
     private FragmentManager fragmentManager;
     private DoneListDao doneListDao;
+    private TaskDao taskDao;
     private List<DoneList> doneLists;
     private Context context;
 
-    public ListsAdapter(Context context, FragmentManager fragmentManager) {
+    public ListAdapter(Context context, FragmentManager fragmentManager) {
         doneListDao = DatabaseCreator.getDatabase(context).getDoneListDao();
+        taskDao = DatabaseCreator.getDatabase(context).getTaskDao();
         doneLists = doneListDao.read();
         this.fragmentManager = fragmentManager;
         this.context = context;
@@ -69,7 +72,7 @@ public class ListsAdapter extends BaseAdapter {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         if (null == convertView) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.done_list_layout, parent, false);
+            convertView = LayoutInflater.from(context).inflate(R.layout.item_list_layout, parent, false);
         }
 
         TextView name = convertView.findViewById(R.id.name);
@@ -79,18 +82,22 @@ public class ListsAdapter extends BaseAdapter {
         name.setText(getItem(position).getName());
         id.setText(getItem(position).getId());
         itemMenu.setOnClickListener(v -> {
+            String idString = id.getText().toString();
             PopupMenu popupMenu = new PopupMenu(context, v);
             popupMenu.inflate(R.menu.menu_list_more);
             popupMenu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.menu_delete:
-                        doneListDao.delete(id.getText().toString());
+                        DatabaseCreator.getDatabase(context).runInTransaction(() -> {
+                            taskDao.deleteByListId(idString);
+                            doneListDao.delete(idString);
+                        });
                         refresh();
                         break;
                     case R.id.menu_edit:
                         Bundle bundle = new Bundle();
                         bundle.putString("name", name.getText().toString());
-                        bundle.putString("id", id.getText().toString());
+                        bundle.putString("id", idString);
                         DialogFragment dialog = new ListModal();
                         dialog.setArguments(bundle);
                         dialog.show(fragmentManager, "list_edit");

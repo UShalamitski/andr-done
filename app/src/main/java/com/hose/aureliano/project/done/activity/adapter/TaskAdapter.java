@@ -1,8 +1,11 @@
 package com.hose.aureliano.project.done.activity.adapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +16,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.hose.aureliano.project.done.R;
+import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.TaskDao;
@@ -34,16 +38,19 @@ public class TaskAdapter extends BaseAdapter {
     private TaskDao taskDao;
     private List<Task> taskList;
     private Context context;
+    private String listId;
 
-    public TaskAdapter(Context context, FragmentManager fragmentManager) {
+    public TaskAdapter(Context context, FragmentManager fragmentManager, String listId) {
         taskDao = DatabaseCreator.getDatabase(context).getTaskDao();
-        taskList = taskDao.read();
+        taskList = taskDao.read(listId);
         this.fragmentManager = fragmentManager;
         this.context = context;
+        //((Activity)context).getIntent()
+        this.listId = listId;
     }
 
     public void refresh() {
-        this.taskList = taskDao.read();
+        this.taskList = taskDao.read(listId);
         notifyDataSetChanged();
     }
 
@@ -66,7 +73,7 @@ public class TaskAdapter extends BaseAdapter {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         if (null == convertView) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.done_list_item_layout, parent, false);
+            convertView = LayoutInflater.from(context).inflate(R.layout.item_task_layout, parent, false);
         }
 
         TextView name = convertView.findViewById(R.id.task_name);
@@ -85,12 +92,12 @@ public class TaskAdapter extends BaseAdapter {
                         refresh();
                         break;
                     case R.id.menu_edit:
-/*                        Bundle bundle = new Bundle();
+                        Bundle bundle = new Bundle();
                         bundle.putString("name", name.getText().toString());
                         bundle.putString("id", id.getText().toString());
-                        DialogFragment dialog = new ListModal();
+                        DialogFragment dialog = new TaskModal();
                         dialog.setArguments(bundle);
-                        dialog.show(fragmentManager, "list_edit");*/
+                        dialog.show(fragmentManager, "task_modal");
                         break;
                 }
                 return true;
