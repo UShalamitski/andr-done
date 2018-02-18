@@ -3,7 +3,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="75dp"
+    android:layout_height="80dp"
     android:padding="16dp">
 
     <TextView
@@ -39,5 +39,20 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:src="@drawable/ic_icon_more" />
+
+    <ProgressBar
+        android:id="@+id/list_item_progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/summary"
+        android:layout_marginEnd="50dp"
+        android:max="100"
+        android:minWidth="10dp"
+        android:progress="50"
+        android:visibility="visible"
+        tools:visibility="visible" />
 
 </RelativeLayout>

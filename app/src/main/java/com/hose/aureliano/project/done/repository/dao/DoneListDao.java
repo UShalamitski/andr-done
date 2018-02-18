@@ -31,6 +31,6 @@ public interface DoneListDao {
     @Query("DELETE FROM lists WHERE id = :id")
     int delete(String id);
 
-    @Query("SELECT id, name FROM lists")
+    @Query("SELECT * FROM lists")
     List<DoneList> read();
 }

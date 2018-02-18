@@ -1,6 +1,5 @@
 package com.hose.aureliano.project.done.activity.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -79,22 +79,30 @@ public class TaskAdapter extends BaseAdapter {
         TextView name = convertView.findViewById(R.id.task_name);
         TextView id = convertView.findViewById(R.id.task_summary);
         ImageView itemMenu = convertView.findViewById(R.id.task_more);
+        CheckBox done = convertView.findViewById(R.id.task_checkbox);
 
-        name.setText(getItem(position).getName());
-        id.setText(getItem(position).getId());
+        Task task = getItem(position);
+        done.setChecked(getItem(position).getDone());
+        done.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            task.setDone(isChecked);
+            taskDao.update(task);
+        });
+        name.setText(task.getName());
+        id.setText(task.getId());
         itemMenu.setOnClickListener(v -> {
             PopupMenu popupMenu = new PopupMenu(context, v);
             popupMenu.inflate(R.menu.menu_list_more);
             popupMenu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.menu_delete:
-                        taskDao.delete(id.getText().toString());
+                        taskDao.delete(task.getId());
                         refresh();
                         break;
                     case R.id.menu_edit:
                         Bundle bundle = new Bundle();
-                        bundle.putString("name", name.getText().toString());
-                        bundle.putString("id", id.getText().toString());
+                        bundle.putString("name", task.getName());
+                        bundle.putString("id", task.getId());
+                        bundle.putString("done", String.valueOf(task.getDone()));
                         DialogFragment dialog = new TaskModal();
                         dialog.setArguments(bundle);
                         dialog.show(fragmentManager, "task_modal");

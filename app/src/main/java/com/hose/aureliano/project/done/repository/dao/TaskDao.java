@@ -31,6 +31,6 @@ public interface TaskDao {
     @Query("DELETE FROM tasks WHERE listId = :listId")
     int deleteByListId(String listId);
 
-    @Query("SELECT id, name FROM tasks WHERE listId = :listId")
+    @Query("SELECT * FROM tasks WHERE listId = :listId")
     List<Task> read(String listId);
 }

@@ -7,6 +7,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -45,6 +46,10 @@ public class TasksActivity extends AppCompatActivity implements ListModal.Notice
         taskAdapter = new TaskAdapter(this, getSupportFragmentManager(), listId);
         ListView listView = findViewById(R.id.activity_tasks_list_view);
         listView.setAdapter(taskAdapter);
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            CheckBox checkBox = view.findViewById(R.id.task_checkbox);
+            checkBox.setChecked(!checkBox.isChecked());
+        });
 
         FloatingActionButton fab = findViewById(R.id.activity_tasks_fab);
         fab.setOnClickListener(view -> {
@@ -70,6 +75,7 @@ public class TasksActivity extends AppCompatActivity implements ListModal.Notice
         Bundle bundle = fragment.getArguments();
         if (null != bundle) {
             task.setId(bundle.getString("id"));
+            task.setDone(Boolean.valueOf(bundle.getString("done")));
             result = taskDao.update(task);
         } else {
             task.setId(UUID.randomUUID().toString());

@@ -24,6 +24,17 @@ public class Task {
     private String id;
     private String listId;
     private String name;
+    private boolean done;
+
+    public Task() {
+    }
+
+    public Task(String taskId, String listId, String name, boolean done) {
+        this.id = taskId;
+        this.listId = listId;
+        this.name = name;
+        this.done = done;
+    }
 
     public String getId() {
         return id;
@@ -49,15 +60,28 @@ public class Task {
         this.name = name;
     }
 
+    public boolean getDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
+    }
+
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Task item = (Task) o;
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Task that = (Task) obj;
         return new EqualsBuilder()
-                .append(id, item.id)
-                .append(listId, item.listId)
-                .append(name, item.name)
+                .append(id, that.id)
+                .append(listId, that.listId)
+                .append(name, that.name)
+                .append(done, that.done)
                 .isEquals();
     }
 
