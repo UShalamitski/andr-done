@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.hose.aureliano.project.done.R;
@@ -78,9 +79,14 @@ public class ListAdapter extends BaseAdapter {
         TextView name = convertView.findViewById(R.id.name);
         TextView id = convertView.findViewById(R.id.summary);
         ImageView itemMenu = convertView.findViewById(R.id.more);
+        ProgressBar progressBar = convertView.findViewById(R.id.list_item_progressBar);
 
-        name.setText(getItem(position).getName());
-        id.setText(getItem(position).getId());
+        DoneList doneList = getItem(position);
+
+        id.setText(doneList.getId());
+        name.setText(doneList.getName());
+        progressBar.setMax(doneList.getTasksCount());
+        progressBar.setProgress(doneList.getDoneTasksCount());
         itemMenu.setOnClickListener(v -> {
             String idString = id.getText().toString();
             PopupMenu popupMenu = new PopupMenu(context, v);

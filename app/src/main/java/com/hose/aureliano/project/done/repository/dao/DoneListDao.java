@@ -31,6 +31,8 @@ public interface DoneListDao {
     @Query("DELETE FROM lists WHERE id = :id")
     int delete(String id);
 
-    @Query("SELECT * FROM lists")
+    @Query("SELECT id, name, (SELECT COUNT(*) FROM tasks t WHERE t.listId = l.id) AS tasksCount, " +
+            "(SELECT COUNT(*) FROM tasks t WHERE t.listId = l.id AND t.done) AS doneTasksCount " +
+            "FROM lists l")
     List<DoneList> read();
 }

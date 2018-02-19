@@ -21,6 +21,8 @@ public class DoneList {
     @PrimaryKey
     private String id;
     private String name;
+    private int tasksCount;
+    private int doneTasksCount;
 
     @NonNull
     public String getId() {
@@ -37,6 +39,22 @@ public class DoneList {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getTasksCount() {
+        return tasksCount;
+    }
+
+    public void setTasksCount(int tasksCount) {
+        this.tasksCount = tasksCount;
+    }
+
+    public int getDoneTasksCount() {
+        return doneTasksCount;
+    }
+
+    public void setDoneTasksCount(int doneTasksCount) {
+        this.doneTasksCount = doneTasksCount;
     }
 
     @Override

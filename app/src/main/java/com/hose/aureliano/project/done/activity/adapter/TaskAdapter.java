@@ -14,6 +14,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.dialog.TaskModal;
@@ -45,7 +46,6 @@ public class TaskAdapter extends BaseAdapter {
         taskList = taskDao.read(listId);
         this.fragmentManager = fragmentManager;
         this.context = context;
-        //((Activity)context).getIntent()
         this.listId = listId;
     }
 
@@ -72,47 +72,61 @@ public class TaskAdapter extends BaseAdapter {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        Task task = getItem(position);
+        ViewHolder viewHolder;
         if (null == convertView) {
             convertView = LayoutInflater.from(context).inflate(R.layout.item_task_layout, parent, false);
+            viewHolder = new ViewHolder();
+            viewHolder.id = convertView.findViewById(R.id.task_summary);
+            viewHolder.name = convertView.findViewById(R.id.task_name);
+            viewHolder.itemMenu = convertView.findViewById(R.id.task_more);
+            viewHolder.done = convertView.findViewById(R.id.task_checkbox);
+            viewHolder.done.setTag(position);
+
+            viewHolder.itemMenu.setOnClickListener(v -> {
+                PopupMenu popupMenu = new PopupMenu(context, v);
+                popupMenu.inflate(R.menu.menu_list_more);
+                popupMenu.setOnMenuItemClickListener(item -> {
+                    switch (item.getItemId()) {
+                        case R.id.menu_delete:
+                            taskDao.delete(task.getId());
+                            refresh();
+                            break;
+                        case R.id.menu_edit:
+                            Bundle bundle = new Bundle();
+                            bundle.putString("name", task.getName());
+                            bundle.putString("id", task.getId());
+                            bundle.putString("done", String.valueOf(task.getDone()));
+                            DialogFragment dialog = new TaskModal();
+                            dialog.setArguments(bundle);
+                            dialog.show(fragmentManager, "task_modal");
+                            break;
+                    }
+                    return true;
+                });
+                popupMenu.show();
+            });
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        TextView name = convertView.findViewById(R.id.task_name);
-        TextView id = convertView.findViewById(R.id.task_summary);
-        ImageView itemMenu = convertView.findViewById(R.id.task_more);
-        CheckBox done = convertView.findViewById(R.id.task_checkbox);
-
-        Task task = getItem(position);
-        done.setChecked(getItem(position).getDone());
-        done.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            task.setDone(isChecked);
+        viewHolder.id.setText(task.getId());
+        viewHolder.name.setText(task.getName());
+        viewHolder.done.setChecked(task.getDone());
+        viewHolder.done.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            taskList.get((int) buttonView.getTag()).setDone(isChecked);
             taskDao.update(task);
+            Toast.makeText(context, viewHolder.name.getText(), Toast.LENGTH_SHORT).show();
         });
-        name.setText(task.getName());
-        id.setText(task.getId());
-        itemMenu.setOnClickListener(v -> {
-            PopupMenu popupMenu = new PopupMenu(context, v);
-            popupMenu.inflate(R.menu.menu_list_more);
-            popupMenu.setOnMenuItemClickListener(item -> {
-                switch (item.getItemId()) {
-                    case R.id.menu_delete:
-                        taskDao.delete(task.getId());
-                        refresh();
-                        break;
-                    case R.id.menu_edit:
-                        Bundle bundle = new Bundle();
-                        bundle.putString("name", task.getName());
-                        bundle.putString("id", task.getId());
-                        bundle.putString("done", String.valueOf(task.getDone()));
-                        DialogFragment dialog = new TaskModal();
-                        dialog.setArguments(bundle);
-                        dialog.show(fragmentManager, "task_modal");
-                        break;
-                }
-                return true;
-            });
-            popupMenu.show();
-        });
-
+        viewHolder.done.setTag(position);
         return convertView;
+    }
+
+    private static class ViewHolder {
+        private TextView id;
+        private TextView name;
+        private ImageView itemMenu;
+        private CheckBox done;
     }
 }
