@@ -81,24 +81,20 @@ public class TaskAdapter extends BaseAdapter {
             viewHolder.name = convertView.findViewById(R.id.task_name);
             viewHolder.itemMenu = convertView.findViewById(R.id.task_more);
             viewHolder.done = convertView.findViewById(R.id.task_checkbox);
-            viewHolder.done.setTag(position);
 
             viewHolder.itemMenu.setOnClickListener(v -> {
+                Task currentTask = getCurrentTask(v);
                 PopupMenu popupMenu = new PopupMenu(context, v);
                 popupMenu.inflate(R.menu.menu_list_more);
                 popupMenu.setOnMenuItemClickListener(item -> {
                     switch (item.getItemId()) {
                         case R.id.menu_delete:
-                            taskDao.delete(task.getId());
+                            taskDao.delete(currentTask.getId());
                             refresh();
                             break;
                         case R.id.menu_edit:
-                            Bundle bundle = new Bundle();
-                            bundle.putString("name", task.getName());
-                            bundle.putString("id", task.getId());
-                            bundle.putString("done", String.valueOf(task.getDone()));
                             DialogFragment dialog = new TaskModal();
-                            dialog.setArguments(bundle);
+                            dialog.setArguments(buildBundle(currentTask));
                             dialog.show(fragmentManager, "task_modal");
                             break;
                     }
@@ -111,16 +107,33 @@ public class TaskAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
+        viewHolder.done.setTag(position);
+        viewHolder.itemMenu.setTag(position);
         viewHolder.id.setText(task.getId());
         viewHolder.name.setText(task.getName());
         viewHolder.done.setChecked(task.getDone());
+
         viewHolder.done.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            taskList.get((int) buttonView.getTag()).setDone(isChecked);
-            taskDao.update(task);
-            Toast.makeText(context, viewHolder.name.getText(), Toast.LENGTH_SHORT).show();
+            Task currentTask = getCurrentTask(buttonView);
+            if (currentTask.getDone() != buttonView.isChecked()) {
+                currentTask.setDone(buttonView.isChecked());
+                taskDao.update(currentTask);
+                Toast.makeText(context, viewHolder.name.getText(), Toast.LENGTH_SHORT).show();
+            }
         });
-        viewHolder.done.setTag(position);
         return convertView;
+    }
+
+    private Bundle buildBundle(Task task) {
+        Bundle bundle = new Bundle();
+        bundle.putString("name", task.getName());
+        bundle.putString("id", task.getId());
+        bundle.putString("done", String.valueOf(task.getDone()));
+        return bundle;
+    }
+
+    private Task getCurrentTask(View view) {
+        return getItem((int) view.getTag());
     }
 
     private static class ViewHolder {
