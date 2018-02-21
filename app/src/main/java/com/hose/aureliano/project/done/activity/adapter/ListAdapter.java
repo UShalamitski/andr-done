@@ -1,21 +1,21 @@
 package com.hose.aureliano.project.done.activity.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.hose.aureliano.project.done.R;
+import com.hose.aureliano.project.done.activity.TasksActivity;
 import com.hose.aureliano.project.done.activity.dialog.ListModal;
 import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author evere
  */
-public class ListAdapter extends BaseAdapter {
+public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     private FragmentManager fragmentManager;
     private DoneListDao doneListDao;
@@ -49,61 +49,35 @@ public class ListAdapter extends BaseAdapter {
         this.context = context;
     }
 
+    /**
+     * Refreshes data on UI.
+     */
     public void refresh() {
         this.doneLists = doneListDao.read();
         notifyDataSetChanged();
     }
 
     @Override
-    public int getCount() {
-        return CollectionUtils.size(doneLists);
-    }
-
-    @Override
-    public DoneList getItem(int position) {
-        return doneLists.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @NonNull
-    @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        if (null == convertView) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.item_list_layout, parent, false);
-        }
-
-        TextView name = convertView.findViewById(R.id.name);
-        TextView id = convertView.findViewById(R.id.summary);
-        ImageView itemMenu = convertView.findViewById(R.id.more);
-        ProgressBar progressBar = convertView.findViewById(R.id.list_item_progressBar);
-
-        DoneList doneList = getItem(position);
-
-        id.setText(doneList.getId());
-        name.setText(doneList.getName());
-        progressBar.setMax(doneList.getTasksCount());
-        progressBar.setProgress(doneList.getDoneTasksCount());
-        itemMenu.setOnClickListener(v -> {
-            String idString = id.getText().toString();
-            PopupMenu popupMenu = new PopupMenu(context, v);
+    public ListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_list_layout, parent, false);
+        ViewHolder viewHolder = new ViewHolder(view);
+        viewHolder.menu.setOnClickListener(itemView -> {
+            DoneList doneList = getItem(itemView);
+            PopupMenu popupMenu = new PopupMenu(context, itemView);
             popupMenu.inflate(R.menu.menu_list_more);
             popupMenu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.menu_delete:
                         DatabaseCreator.getDatabase(context).runInTransaction(() -> {
-                            taskDao.deleteByListId(idString);
-                            doneListDao.delete(idString);
+                            taskDao.deleteByListId(doneList.getId());
+                            doneListDao.delete(doneList.getId());
                         });
                         refresh();
                         break;
                     case R.id.menu_edit:
                         Bundle bundle = new Bundle();
-                        bundle.putString("name", name.getText().toString());
-                        bundle.putString("id", idString);
+                        bundle.putString("name", doneList.getName());
+                        bundle.putString("id", doneList.getId());
                         DialogFragment dialog = new ListModal();
                         dialog.setArguments(bundle);
                         dialog.show(fragmentManager, "list_edit");
@@ -113,7 +87,58 @@ public class ListAdapter extends BaseAdapter {
             });
             popupMenu.show();
         });
+        view.setOnClickListener(itemView -> {
+            Intent intent = new Intent(context, TasksActivity.class);
+            intent.putExtra("listId", viewHolder.id.getText().toString());
+            context.startActivity(intent);
+        });
+        view.setTag(viewHolder);
+        return viewHolder;
+    }
 
-        return convertView;
+    @Override
+    public void onBindViewHolder(ListAdapter.ViewHolder holder, int position) {
+        DoneList doneList = getItem(position);
+        holder.id.setText(doneList.getId());
+        holder.name.setText(doneList.getName());
+        holder.menu.setTag(position);
+        holder.progressBar.setMax(doneList.getTasksCount());
+        holder.progressBar.setProgress(doneList.getDoneTasksCount());
+    }
+
+    @Override
+    public int getItemCount() {
+        return CollectionUtils.size(doneLists);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    private DoneList getItem(int position) {
+        return doneLists.get(position);
+    }
+
+    private DoneList getItem(View view) {
+        return getItem((int) view.getTag());
+    }
+
+    /**
+     * Provides a reference to the views for each data item.
+     */
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        private TextView id;
+        private TextView name;
+        private ImageView menu;
+        private ProgressBar progressBar;
+
+        ViewHolder(View view) {
+            super(view);
+            this.id = view.findViewById(R.id.list_id);
+            this.name = view.findViewById(R.id.name);
+            this.menu = view.findViewById(R.id.list_menu);
+            this.progressBar = view.findViewById(R.id.list_progress_bar);
+        }
     }
 }

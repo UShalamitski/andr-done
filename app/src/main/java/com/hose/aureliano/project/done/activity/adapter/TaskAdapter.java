@@ -2,14 +2,12 @@ package com.hose.aureliano.project.done.activity.adapter;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -33,7 +31,7 @@ import java.util.List;
  *
  * @author evere
  */
-public class TaskAdapter extends BaseAdapter {
+public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     private FragmentManager fragmentManager;
     private TaskDao taskDao;
@@ -49,79 +47,72 @@ public class TaskAdapter extends BaseAdapter {
         this.listId = listId;
     }
 
+    /**
+     * Refreshes data on UI.
+     */
     public void refresh() {
         this.taskList = taskDao.read(listId);
         notifyDataSetChanged();
     }
 
     @Override
-    public int getCount() {
-        return CollectionUtils.size(taskList);
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_task_layout, parent, false);
+        ViewHolder viewHolder = new ViewHolder(view);
+        viewHolder.menu.setOnClickListener(v -> {
+            Task currentTask = getItem(v);
+            PopupMenu popupMenu = new PopupMenu(context, v);
+            popupMenu.inflate(R.menu.menu_list_more);
+            popupMenu.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.menu_delete:
+                        taskDao.delete(currentTask.getId());
+                        refresh();
+                        break;
+                    case R.id.menu_edit:
+                        DialogFragment dialog = new TaskModal();
+                        dialog.setArguments(buildBundle(currentTask));
+                        dialog.show(fragmentManager, "task_modal");
+                        break;
+                }
+                return true;
+            });
+            popupMenu.show();
+        });
+        view.setOnClickListener(itemView -> {
+            viewHolder.done.setChecked(!viewHolder.done.isChecked());
+        });
+        view.setTag(viewHolder);
+        return viewHolder;
     }
 
     @Override
-    public Task getItem(int position) {
-        return taskList.get(position);
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        Task task = getItem(position);
+        holder.done.setTag(position);
+        holder.menu.setTag(position);
+        holder.id.setText(task.getId());
+        holder.name.setText(task.getName());
+        holder.done.setChecked(task.getDone());
+
+        holder.done.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            Task currentTask = getItem(buttonView);
+            if (currentTask.getDone() != buttonView.isChecked()) {
+                currentTask.setDone(buttonView.isChecked());
+                taskDao.update(currentTask);
+                Toast.makeText(context, holder.name.getText(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return CollectionUtils.size(taskList);
     }
 
     @Override
     public long getItemId(int position) {
         return position;
-    }
-
-    @NonNull
-    @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        Task task = getItem(position);
-        ViewHolder viewHolder;
-        if (null == convertView) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.item_task_layout, parent, false);
-            viewHolder = new ViewHolder();
-            viewHolder.id = convertView.findViewById(R.id.task_summary);
-            viewHolder.name = convertView.findViewById(R.id.task_name);
-            viewHolder.itemMenu = convertView.findViewById(R.id.task_more);
-            viewHolder.done = convertView.findViewById(R.id.task_checkbox);
-
-            viewHolder.itemMenu.setOnClickListener(v -> {
-                Task currentTask = getCurrentTask(v);
-                PopupMenu popupMenu = new PopupMenu(context, v);
-                popupMenu.inflate(R.menu.menu_list_more);
-                popupMenu.setOnMenuItemClickListener(item -> {
-                    switch (item.getItemId()) {
-                        case R.id.menu_delete:
-                            taskDao.delete(currentTask.getId());
-                            refresh();
-                            break;
-                        case R.id.menu_edit:
-                            DialogFragment dialog = new TaskModal();
-                            dialog.setArguments(buildBundle(currentTask));
-                            dialog.show(fragmentManager, "task_modal");
-                            break;
-                    }
-                    return true;
-                });
-                popupMenu.show();
-            });
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
-
-        viewHolder.done.setTag(position);
-        viewHolder.itemMenu.setTag(position);
-        viewHolder.id.setText(task.getId());
-        viewHolder.name.setText(task.getName());
-        viewHolder.done.setChecked(task.getDone());
-
-        viewHolder.done.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            Task currentTask = getCurrentTask(buttonView);
-            if (currentTask.getDone() != buttonView.isChecked()) {
-                currentTask.setDone(buttonView.isChecked());
-                taskDao.update(currentTask);
-                Toast.makeText(context, viewHolder.name.getText(), Toast.LENGTH_SHORT).show();
-            }
-        });
-        return convertView;
     }
 
     private Bundle buildBundle(Task task) {
@@ -132,14 +123,29 @@ public class TaskAdapter extends BaseAdapter {
         return bundle;
     }
 
-    private Task getCurrentTask(View view) {
+    private Task getItem(int position) {
+        return taskList.get(position);
+    }
+
+    private Task getItem(View view) {
         return getItem((int) view.getTag());
     }
 
-    private static class ViewHolder {
+    /**
+     * Provides a reference to the views for each data item.
+     */
+    static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView id;
         private TextView name;
-        private ImageView itemMenu;
+        private ImageView menu;
         private CheckBox done;
+
+        ViewHolder(View view) {
+            super(view);
+            this.id = view.findViewById(R.id.task_id);
+            this.name = view.findViewById(R.id.task_name);
+            this.menu = view.findViewById(R.id.task_menu);
+            this.done = view.findViewById(R.id.task_checkbox);
+        }
     }
 }

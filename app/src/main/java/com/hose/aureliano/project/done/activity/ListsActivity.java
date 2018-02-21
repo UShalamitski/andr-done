@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,13 +43,13 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
 
         coordinator = findViewById(R.id.coordinator_layout);
         listsAdapter = new ListAdapter(this, getSupportFragmentManager());
-        ListView petListView = findViewById(R.id.activity_lists_list_view);
-        petListView.setAdapter(listsAdapter);
-        petListView.setOnItemClickListener((parent, view, position, id) -> {
+        RecyclerView recyclerView = findViewById(R.id.activity_lists_list_view);
+        recyclerView.setAdapter(listsAdapter);
+/*        petListView.setOnItemClickListener((parent, view, position, id) -> {
             Intent intent = new Intent(this, TasksActivity.class);
             intent.putExtra("listId", ((TextView) view.findViewById(R.id.summary)).getText().toString());
             startActivity(intent);
-        });
+        });*/
 
         FloatingActionButton fab = findViewById(R.id.activity_lists_fab);
         fab.setOnClickListener(view -> {

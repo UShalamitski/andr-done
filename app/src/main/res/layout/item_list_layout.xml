@@ -20,7 +20,7 @@
         tools:text="text" />
 
     <TextView
-        android:id="@+id/summary"
+        android:id="@+id/list_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="50dp"
@@ -33,7 +33,7 @@
         tools:text="text" />
 
     <ImageView
-        android:id="@+id/more"
+        android:id="@+id/list_menu"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentEnd="true"
@@ -41,13 +41,13 @@
         android:src="@drawable/ic_icon_more" />
 
     <ProgressBar
-        android:id="@+id/list_item_progressBar"
+        android:id="@+id/list_progress_bar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/summary"
+        android:layout_below="@+id/list_id"
         android:layout_marginEnd="50dp"
         android:max="100"
         android:minWidth="10dp"

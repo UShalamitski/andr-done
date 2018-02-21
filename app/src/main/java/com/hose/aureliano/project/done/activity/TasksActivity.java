@@ -5,10 +5,9 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.hose.aureliano.project.done.R;
@@ -44,13 +43,8 @@ public class TasksActivity extends AppCompatActivity implements ListModal.Notice
         listId = getIntent().getExtras().get("listId").toString();
         coordinator = findViewById(R.id.tasks_coordinator_layout);
         taskAdapter = new TaskAdapter(this, getSupportFragmentManager(), listId);
-        ListView listView = findViewById(R.id.activity_tasks_list_view);
+        RecyclerView listView = findViewById(R.id.activity_tasks_list_view);
         listView.setAdapter(taskAdapter);
-        listView.setOnItemClickListener((parent, view, position, id) -> {
-            CheckBox checkBox = view.findViewById(R.id.task_checkbox);
-            checkBox.setChecked(!checkBox.isChecked());
-        });
-
         FloatingActionButton fab = findViewById(R.id.activity_tasks_fab);
         fab.setOnClickListener(view -> {
             DialogFragment dialogFragment = new TaskModal();

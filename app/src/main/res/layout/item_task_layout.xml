@@ -21,7 +21,7 @@
         tools:text="text" />
 
     <TextView
-        android:id="@+id/task_summary"
+        android:id="@+id/task_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="50dp"
@@ -35,7 +35,7 @@
         tools:text="text" />
 
     <ImageView
-        android:id="@+id/task_more"
+        android:id="@+id/task_menu"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentEnd="true"
