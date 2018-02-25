@@ -6,13 +6,13 @@
     <item
         android:id="@+id/menu_edit"
         android:orderInCategory="10"
-        android:title="Edit"
+        android:title="@string/edit"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_delete"
         android:orderInCategory="20"
-        android:title="Delete"
+        android:title="@string/delete"
         app:showAsAction="never" />
 
 </menu>

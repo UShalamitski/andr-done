@@ -1,17 +1,16 @@
 package com.hose.aureliano.project.done.activity;
 
-import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.ListAdapter;
@@ -45,11 +44,6 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
         listsAdapter = new ListAdapter(this, getSupportFragmentManager());
         RecyclerView recyclerView = findViewById(R.id.activity_lists_list_view);
         recyclerView.setAdapter(listsAdapter);
-/*        petListView.setOnItemClickListener((parent, view, position, id) -> {
-            Intent intent = new Intent(this, TasksActivity.class);
-            intent.putExtra("listId", ((TextView) view.findViewById(R.id.summary)).getText().toString());
-            startActivity(intent);
-        });*/
 
         FloatingActionButton fab = findViewById(R.id.activity_lists_fab);
         fab.setOnClickListener(view -> {
@@ -105,4 +99,22 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
     }
+
+    ItemTouchHelper.SimpleCallback touchHelper = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+        }
+
+        @Override
+        public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        }
+    };
 }
