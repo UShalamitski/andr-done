@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Done.iml" filepath="$PROJECT_DIR$/Done.iml" />
+      <module fileurl="file://D:\work\android\andr-done\Done.iml" filepath="D:\work\android\andr-done\Done.iml" />
+      <module fileurl="file://$PROJECT_DIR$/andr-done.iml" filepath="$PROJECT_DIR$/andr-done.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
