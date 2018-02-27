@@ -24,16 +24,11 @@ public class Task {
     private String id;
     private String listId;
     private String name;
+    private Long dueDate;
+    private Long remindDate;
     private boolean done;
 
     public Task() {
-    }
-
-    public Task(String taskId, String listId, String name, boolean done) {
-        this.id = taskId;
-        this.listId = listId;
-        this.name = name;
-        this.done = done;
     }
 
     public String getId() {
@@ -68,6 +63,22 @@ public class Task {
         this.done = done;
     }
 
+    public Long getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(Long dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public Long getRemindDate() {
+        return remindDate;
+    }
+
+    public void setRemindDate(Long remindDate) {
+        this.remindDate = remindDate;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -82,6 +93,8 @@ public class Task {
                 .append(listId, that.listId)
                 .append(name, that.name)
                 .append(done, that.done)
+                .append(dueDate, that.dueDate)
+                .append(remindDate, that.remindDate)
                 .isEquals();
     }
 
@@ -91,6 +104,9 @@ public class Task {
                 .append(id)
                 .append(listId)
                 .append(name)
+                .append(done)
+                .append(dueDate)
+                .append(remindDate)
                 .toHashCode();
     }
 }

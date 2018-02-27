@@ -1,4 +1,4 @@
-package com.hose.aureliano.project.done.activity;
+package com.hose.aureliano.project.done.activity.helper;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -85,12 +85,12 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                 }
                 taskViewHolder.getBackgroundLeftIcon().setVisibility(View.VISIBLE);
                 taskViewHolder.getBackgroundLeftText().setVisibility(View.VISIBLE);
-                taskViewHolder.getBackgroundRightIcon().setVisibility(View.INVISIBLE);
-                taskViewHolder.getBackgroundRightText().setVisibility(View.INVISIBLE);
+                taskViewHolder.getBackgroundRightIcon().setVisibility(View.GONE);
+                taskViewHolder.getBackgroundRightText().setVisibility(View.GONE);
             } else if (dX < 0) {
                 taskViewHolder.getViewBackground().setBackgroundColor(COLOR_RED);
-                taskViewHolder.getBackgroundLeftIcon().setVisibility(View.INVISIBLE);
-                taskViewHolder.getBackgroundLeftText().setVisibility(View.INVISIBLE);
+                taskViewHolder.getBackgroundLeftIcon().setVisibility(View.GONE);
+                taskViewHolder.getBackgroundLeftText().setVisibility(View.GONE);
                 taskViewHolder.getBackgroundRightIcon().setVisibility(View.VISIBLE);
                 taskViewHolder.getBackgroundRightText().setVisibility(View.VISIBLE);
             }

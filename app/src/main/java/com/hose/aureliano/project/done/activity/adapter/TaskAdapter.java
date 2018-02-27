@@ -23,6 +23,7 @@ import com.hose.aureliano.project.done.repository.dao.TaskDao;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -94,9 +95,25 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         Task task = getItem(position);
         holder.checkBox.setTag(task.getId());
         holder.menu.setTag(task.getId());
-        holder.id.setText(task.getId());
         holder.name.setText(task.getName());
         holder.checkBox.setChecked(task.getDone());
+
+        StringBuilder stringBuilder = new StringBuilder();
+        if (null != task.getDueDate()) {
+            stringBuilder.append(ActivityUtils.getStringDate(context, task.getDueDate()));
+        }
+        if (null != task.getRemindDate()) {
+            if (StringUtils.isNoneBlank(stringBuilder.toString())) {
+                stringBuilder.append(" | ");
+            }
+            stringBuilder.append(ActivityUtils.getStringDate(context, task.getRemindDate()));
+        }
+        if (StringUtils.isNoneBlank(stringBuilder.toString())) {
+            holder.information.setVisibility(View.VISIBLE);
+            holder.information.setText(stringBuilder.toString());
+        } else {
+            holder.information.setVisibility(View.GONE);
+        }
 
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Task currentTask = getItem(buttonView);
@@ -137,7 +154,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     }
 
     /**
-     * Restore task in the list.
+     * Restore task information the list.
      *
      * @param position position of the {@link Task} to restore
      * @param task     instance of {@link Task} to restore
@@ -148,10 +165,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     }
 
     /**
-     * Retrieves {@link Task} in specified position.
+     * Retrieves {@link Task} information specified position.
      *
      * @param position position of the {@link Task} to retrieve
-     * @return instance of {@link Task} in specified position
+     * @return instance of {@link Task} information specified position
      */
     public Task getItem(int position) {
         return taskList.get(position);
@@ -175,6 +192,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         bundle.putString("name", task.getName());
         bundle.putString("id", task.getId());
         bundle.putString("checkBox", String.valueOf(task.getDone()));
+        if (null != task.getDueDate()) {
+            bundle.putLong("dueDate", task.getDueDate());
+        }
+        if (null != task.getRemindDate()) {
+            bundle.putLong("remindDate", task.getRemindDate());
+        }
         return bundle;
     }
 
@@ -190,13 +213,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         private ImageView backgroundRightIcon;
         private ImageView backgroundLeftIcon;
         private CheckBox checkBox;
-        private TextView id;
+        private TextView information;
         private TextView name;
         private ImageView menu;
 
         ViewHolder(View view) {
             super(view);
-            this.id = view.findViewById(R.id.task_id);
+            this.information = view.findViewById(R.id.task_id);
             this.name = view.findViewById(R.id.task_name);
             this.menu = view.findViewById(R.id.task_menu);
             this.checkBox = view.findViewById(R.id.task_checkbox);
@@ -264,12 +287,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             this.checkBox = checkBox;
         }
 
-        public TextView getId() {
-            return id;
+        public TextView getInformation() {
+            return information;
         }
 
-        public void setId(TextView id) {
-            this.id = id;
+        public void setInformation(TextView id) {
+            this.information = id;
         }
 
         public TextView getName() {

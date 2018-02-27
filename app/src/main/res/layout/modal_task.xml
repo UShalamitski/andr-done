@@ -21,7 +21,10 @@
         android:id="@+id/task_modal_layout_calendar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_below="@+id/tasks_modal_name_label">
+        android:layout_below="@+id/tasks_modal_name_label"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
 
         <ImageView
             android:id="@+id/task_modal_calendar_icon"
@@ -35,7 +38,7 @@
             android:tint="@android:color/black" />
 
         <TextView
-            android:id="@+id/tasks_modal_calendar_text"
+            android:id="@+id/task_modal_calendar_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -49,6 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@+id/task_modal_layout_calendar"
+        android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true">
 
@@ -64,7 +68,7 @@
             android:tint="@android:color/black" />
 
         <TextView
-            android:id="@+id/tasks_modal_alarm_text"
+            android:id="@+id/task_modal_alarm_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"

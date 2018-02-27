@@ -14,12 +14,14 @@ import android.widget.TextView;
 
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.TaskAdapter;
-import com.hose.aureliano.project.done.activity.dialog.ListModal;
 import com.hose.aureliano.project.done.activity.dialog.TaskModal;
+import com.hose.aureliano.project.done.activity.helper.TaskItemTouchHelper;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.TaskDao;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author evere
  */
-public class TasksActivity extends AppCompatActivity implements ListModal.NoticeDialogListener {
+public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDialogListener {
 
     private String listId;
     private View coordinator;
@@ -72,15 +74,14 @@ public class TasksActivity extends AppCompatActivity implements ListModal.Notice
                         Task task = taskAdapter.getItem(position);
                         taskAdapter.removeItem(position);
 
-                        ScheduledFuture scheduledFuture = executorService.schedule(
-                                () -> {
-                                    taskDao.delete(task.getId());
-                                    itemsToRemoveMap.remove(task);
-                                }, 2, TimeUnit.SECONDS);
+                        ScheduledFuture scheduledFuture = executorService.schedule(() -> {
+                            taskDao.delete(task.getId());
+                            itemsToRemoveMap.remove(task);
+                        }, 3, TimeUnit.SECONDS);
                         itemsToRemoveMap.put(task, scheduledFuture);
 
-                        ActivityUtils.showSnackBar(coordinator, "Item removed " + task.getName(),
-                                R.string.undo, v -> {
+                        ActivityUtils.showSnackBar(coordinator, "Item removed " + task.getName(), R.string.undo,
+                                snackBarView -> {
                                     taskAdapter.restoreItem(position, task);
                                     itemsToRemoveMap.remove(task).cancel(false);
                                 });
@@ -101,18 +102,13 @@ public class TasksActivity extends AppCompatActivity implements ListModal.Notice
     }
 
     @Override
-    public void onDialogPositiveClick(DialogFragment fragment) {
+    public void onDialogPositiveClick(DialogFragment fragment, Task task) {
         long result = 0;
         TextView name = fragment.getDialog().findViewById(R.id.tasks_modal_name);
-
-        Task task = new Task();
-        task.setListId(listId);
         task.setName(name.getText().toString());
+        task.setListId(listId);
 
-        Bundle bundle = fragment.getArguments();
-        if (null != bundle) {
-            task.setId(bundle.getString("id"));
-            task.setDone(Boolean.valueOf(bundle.getString("done")));
+        if (StringUtils.isNoneBlank(task.getId())) {
             result = taskDao.update(task);
         } else {
             task.setId(UUID.randomUUID().toString());
@@ -125,9 +121,5 @@ public class TasksActivity extends AppCompatActivity implements ListModal.Notice
         } else {
             ActivityUtils.showSnackBar(coordinator, "Oops! Something went wrong!");
         }
-    }
-
-    @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {
     }
 }

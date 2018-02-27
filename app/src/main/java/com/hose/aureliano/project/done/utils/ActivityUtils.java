@@ -1,9 +1,15 @@
 package com.hose.aureliano.project.done.utils;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.os.Vibrator;
 import android.support.design.widget.Snackbar;
+import android.text.format.DateUtils;
 import android.view.View;
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Objects;
 
 /**
  * Header.
@@ -59,5 +65,37 @@ public final class ActivityUtils {
         if (null != vibrator) {
             vibrator.vibrate(milliseconds);
         }
+    }
+
+    /**
+     * Shows {@link DatePickerDialog} with current date on UI.
+     *
+     * @param context  context
+     * @param listener instance of {@link DatePickerDialog.OnDateSetListener}
+     * @return {@link DatePickerDialog} on UI
+     */
+    public static DatePickerDialog showDatePickerDialog(Context context, DatePickerDialog.OnDateSetListener listener,
+                                                        Long timeInMilliseconds) {
+        GregorianCalendar calendar = new GregorianCalendar();
+        if (timeInMilliseconds != null) {
+            calendar.setTimeInMillis(timeInMilliseconds);
+        }
+        DatePickerDialog datePickerDialog = new DatePickerDialog(context, listener, calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        datePickerDialog.show();
+        return datePickerDialog;
+    }
+
+    /**
+     * Convert instance of {@link Calendar} into String.
+     *
+     * @param context      context
+     * @param dateInMillis date in milliseconds
+     * @return converted date
+     */
+    public static String getStringDate(Context context, Long dateInMillis) {
+        Objects.requireNonNull(dateInMillis);
+        return DateUtils.formatDateTime(context, dateInMillis, DateUtils.FORMAT_SHOW_DATE
+                | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_ALL);
     }
 }
