@@ -68,8 +68,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             popupMenu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.menu_delete:
-                        taskDao.delete(currentTask.getId());
-                        refresh();
+                        ActivityUtils.showConfirmationDialog(context, R.string.task_delete_confirmation,
+                                (dialog, which) -> {
+                                    taskDao.delete(currentTask.getId());
+                                    removeItem(getPosition(menuView));
+                                });
                         break;
                     case R.id.menu_edit:
                         DialogFragment dialog = new TaskModal();
@@ -181,6 +184,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             if (task.getId().equals(listId)) {
                 return task;
             }
+        }
+        throw new NoSuchElementException();
+    }
+
+    private int getPosition(View view) {
+        int position = 0;
+        for (Task task : taskList) {
+            if (task.getId().equals(view.getTag())) {
+                return position;
+            }
+            position++;
         }
         throw new NoSuchElementException();
     }

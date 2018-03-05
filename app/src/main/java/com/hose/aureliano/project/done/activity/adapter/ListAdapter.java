@@ -64,7 +64,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         View view = LayoutInflater.from(context).inflate(R.layout.item_list_layout, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         viewHolder.menu.setOnClickListener(itemView -> {
-            int pos = getPosition(itemView);
             DoneList doneList = getItem(itemView);
             PopupMenu popupMenu = new PopupMenu(context, itemView);
             popupMenu.inflate(R.menu.menu_list_more);
@@ -77,8 +76,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                                         taskDao.deleteByListId(doneList.getId());
                                         doneListDao.delete(doneList.getId());
                                     });
-                                    doneLists.remove(pos);
-                                    notifyItemRemoved(pos);
+                                    int position = getPosition(itemView);
+                                    doneLists.remove(position);
+                                    notifyItemRemoved(position);
                                 });
                         break;
                     case R.id.menu_edit:
