@@ -61,6 +61,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_task_layout, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
+        viewHolder.checkBox.setOnClickListener(v -> ActivityUtils.vibrate(context));
         viewHolder.menu.setOnClickListener(menuView -> {
             Task currentTask = getItem(menuView);
             PopupMenu popupMenu = new PopupMenu(context, menuView);
@@ -86,7 +87,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         });
         view.setOnClickListener(itemView -> {
             viewHolder.checkBox.setChecked(!viewHolder.checkBox.isChecked());
-            ActivityUtils.vibrate(context, 50);
+            ActivityUtils.vibrate(context);
         });
         view.setTag(viewHolder);
         return viewHolder;

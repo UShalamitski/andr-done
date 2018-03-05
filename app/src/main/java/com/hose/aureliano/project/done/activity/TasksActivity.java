@@ -85,12 +85,12 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
                                     taskAdapter.restoreItem(position, task);
                                     itemsToRemoveMap.remove(task).cancel(false);
                                 });
-                        ActivityUtils.vibrate(this, 50);
+                        ActivityUtils.vibrate(this);
                     } else if (direction == ItemTouchHelper.RIGHT) {
                         TaskAdapter.ViewHolder holder = ((TaskAdapter.ViewHolder) viewHolder);
                         holder.getCheckBox().setChecked(!holder.getCheckBox().isChecked());
                         taskAdapter.notifyDataSetChanged();
-                        ActivityUtils.vibrate(this, 50);
+                        ActivityUtils.vibrate(this);
                     }
                 });
         new ItemTouchHelper(touchHelper).attachToRecyclerView(listView);

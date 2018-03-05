@@ -28,6 +28,8 @@ public final class ActivityUtils {
         throw new AssertionError();
     }
 
+    private static long VIBRATE_SHORT = 40L;
+
     /**
      * Show a {@link Snackbar}.
      *
@@ -62,12 +64,11 @@ public final class ActivityUtils {
      * Vibrate constantly for the specified period of time.
      *
      * @param context      context
-     * @param milliseconds number of milliseconds to vibrate
      */
-    public static void vibrate(Context context, long milliseconds) {
+    public static void vibrate(Context context) {
         Vibrator vibrator = ((Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE));
         if (null != vibrator) {
-            vibrator.vibrate(milliseconds);
+            vibrator.vibrate(VIBRATE_SHORT);
         }
     }
 
@@ -100,8 +101,8 @@ public final class ActivityUtils {
     public static void showConfirmationDialog(Context context, int message, DialogInterface.OnClickListener listener) {
         AlertDialog.Builder confirmDialogBuilder = new AlertDialog.Builder(context);
         confirmDialogBuilder.setMessage(message);
-        confirmDialogBuilder.setNegativeButton(R.string.cancel, null);
-        confirmDialogBuilder.setPositiveButton(R.string.confirm, listener);
+        confirmDialogBuilder.setNegativeButton(R.string.no, null);
+        confirmDialogBuilder.setPositiveButton(R.string.yes, listener);
         confirmDialogBuilder.show();
     }
 
