@@ -143,7 +143,14 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     }
 
     private int getPosition(View view) {
-        return doneLists.indexOf(view.getTag());
+        int pos = 0;
+        for (DoneList list : doneLists) {
+            if (list.getId().equals(view.getTag())) {
+                return pos;
+            }
+            pos++;
+        }
+        throw new NoSuchElementException();
     }
 
     /**
