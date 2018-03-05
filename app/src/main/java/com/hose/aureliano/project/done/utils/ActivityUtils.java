@@ -1,11 +1,15 @@
 package com.hose.aureliano.project.done.utils;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Vibrator;
 import android.support.design.widget.Snackbar;
 import android.text.format.DateUtils;
 import android.view.View;
+
+import com.hose.aureliano.project.done.R;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -84,6 +88,21 @@ public final class ActivityUtils {
                 calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
         return datePickerDialog;
+    }
+
+    /**
+     * Shows confirmation dialog.
+     *
+     * @param context  context
+     * @param message  message
+     * @param listener listener to handle click on positive button
+     */
+    public static void showConfirmationDialog(Context context, int message, DialogInterface.OnClickListener listener) {
+        AlertDialog.Builder confirmDialogBuilder = new AlertDialog.Builder(context);
+        confirmDialogBuilder.setMessage(message);
+        confirmDialogBuilder.setNegativeButton(R.string.cancel, null);
+        confirmDialogBuilder.setPositiveButton(R.string.confirm, listener);
+        confirmDialogBuilder.show();
     }
 
     /**

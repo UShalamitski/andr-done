@@ -21,10 +21,12 @@ import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.DoneListDao;
 import com.hose.aureliano.project.done.repository.dao.TaskDao;
+import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Adapter for ListView.
@@ -62,17 +64,22 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         View view = LayoutInflater.from(context).inflate(R.layout.item_list_layout, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         viewHolder.menu.setOnClickListener(itemView -> {
+            int pos = getPosition(itemView);
             DoneList doneList = getItem(itemView);
             PopupMenu popupMenu = new PopupMenu(context, itemView);
             popupMenu.inflate(R.menu.menu_list_more);
             popupMenu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.menu_delete:
-                        DatabaseCreator.getDatabase(context).runInTransaction(() -> {
-                            taskDao.deleteByListId(doneList.getId());
-                            doneListDao.delete(doneList.getId());
-                        });
-                        refresh();
+                        ActivityUtils.showConfirmationDialog(context, R.string.list_delete_confirmation,
+                                (dialog, which) -> {
+                                    DatabaseCreator.getDatabase(context).runInTransaction(() -> {
+                                        taskDao.deleteByListId(doneList.getId());
+                                        doneListDao.delete(doneList.getId());
+                                    });
+                                    doneLists.remove(pos);
+                                    notifyItemRemoved(pos);
+                                });
                         break;
                     case R.id.menu_edit:
                         Bundle bundle = new Bundle();
@@ -99,9 +106,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ListAdapter.ViewHolder holder, int position) {
         DoneList doneList = getItem(position);
-        holder.id = (doneList.getId());
+        holder.id = doneList.getId();
+        holder.taskCounts.setText(
+                String.format("%s/%s", doneList.getDoneTasksCount(), doneList.getTasksCount()));
         holder.name.setText(doneList.getName());
-        holder.menu.setTag(position);
+        holder.menu.setTag(doneList.getId());
         holder.progressBar.setMax(doneList.getTasksCount());
         holder.progressBar.setProgress(doneList.getDoneTasksCount());
     }
@@ -121,7 +130,20 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     }
 
     private DoneList getItem(View view) {
-        return getItem((int) view.getTag());
+        return getItem((String) view.getTag());
+    }
+
+    private DoneList getItem(String listId) {
+        for (DoneList list : doneLists) {
+            if (list.getId().equals(listId)) {
+                return list;
+            }
+        }
+        throw new NoSuchElementException();
+    }
+
+    private int getPosition(View view) {
+        return doneLists.indexOf(view.getTag());
     }
 
     /**
@@ -129,15 +151,16 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
      */
     static class ViewHolder extends RecyclerView.ViewHolder {
         private String id;
+        private TextView taskCounts;
         private TextView name;
         private ImageView menu;
         private ProgressBar progressBar;
 
         ViewHolder(View view) {
             super(view);
-            //this.id = view.findViewById(R.id.list_id);
             this.name = view.findViewById(R.id.name);
             this.menu = view.findViewById(R.id.list_menu);
+            this.taskCounts = view.findViewById(R.id.list_item_count);
             this.progressBar = view.findViewById(R.id.list_progress_bar);
         }
     }
