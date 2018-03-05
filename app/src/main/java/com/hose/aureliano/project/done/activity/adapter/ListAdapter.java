@@ -89,7 +89,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         });
         view.setOnClickListener(itemView -> {
             Intent intent = new Intent(context, TasksActivity.class);
-            intent.putExtra("listId", viewHolder.id.getText().toString());
+            intent.putExtra("listId", viewHolder.id);
             context.startActivity(intent);
         });
         view.setTag(viewHolder);
@@ -99,7 +99,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ListAdapter.ViewHolder holder, int position) {
         DoneList doneList = getItem(position);
-        holder.id.setText(doneList.getId());
+        holder.id = (doneList.getId());
         holder.name.setText(doneList.getName());
         holder.menu.setTag(position);
         holder.progressBar.setMax(doneList.getTasksCount());
@@ -128,14 +128,14 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
      * Provides a reference to the views for each data item.
      */
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView id;
+        private String id;
         private TextView name;
         private ImageView menu;
         private ProgressBar progressBar;
 
         ViewHolder(View view) {
             super(view);
-            this.id = view.findViewById(R.id.list_id);
+            //this.id = view.findViewById(R.id.list_id);
             this.name = view.findViewById(R.id.name);
             this.menu = view.findViewById(R.id.list_menu);
             this.progressBar = view.findViewById(R.id.list_progress_bar);

@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.dialog.TaskModal;
@@ -120,7 +119,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             if (currentTask.getDone() != buttonView.isChecked()) {
                 currentTask.setDone(buttonView.isChecked());
                 taskDao.update(currentTask);
-                Toast.makeText(context, holder.name.getText(), Toast.LENGTH_SHORT).show();
             }
         });
     }
