@@ -17,8 +17,6 @@ import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 
-import java.util.GregorianCalendar;
-
 /**
  * Created by everest on 05.02.2018.
  */
@@ -50,8 +48,8 @@ public class TaskModal extends DialogFragment {
         EditText name = view.findViewById(R.id.tasks_modal_name);
         name.setText(task.getName());
 
-        if (task.getDueDate() != null) {
-            changeColorDueDate(blueColor, task.getDueDate());
+        if (task.getDueDateAndTime() != null) {
+            changeColorDueDate(blueColor, task.getDueDateAndTime());
         }
         if (task.getRemindDate() != null) {
             changeColorRemindDate(blueColor, task.getRemindDate());
@@ -59,25 +57,27 @@ public class TaskModal extends DialogFragment {
 
         RelativeLayout relativeLayout = view.findViewById(R.id.task_modal_layout_calendar);
         relativeLayout.setOnClickListener(v -> {
-            ActivityUtils.showDatePickerDialog(getContext(), (datePickerView, year, month, dayOfMonth) -> {
-                GregorianCalendar calendar = new GregorianCalendar(year, month, dayOfMonth);
-                changeColorDueDate(blueColor, calendar.getTimeInMillis());
-                task.setDueDate(calendar.getTimeInMillis());
-            }, task.getDueDate());
+            DateTimePickerDialog pickerDialog = new DateTimePickerDialog(getContext(), task.getDueDateAndTime(),
+                    task.getDueTimeIsSet(), (dateTime, isTimeSet) -> {
+                changeColorDueDate(blueColor, dateTime);
+                task.setDueDateAndTime(dateTime);
+                task.setDueTimeIsSet(isTimeSet);
+            });
+            pickerDialog.show();
         });
-        RelativeLayout relativeLayout3 = view.findViewById(R.id.task_modal_layout_alert);
-        relativeLayout3.setOnClickListener(v -> {
-            ActivityUtils.showDatePickerDialog(getContext(), (datePickerView, year, month, dayOfMonth) -> {
-                GregorianCalendar calendar = new GregorianCalendar(year, month, dayOfMonth);
-                changeColorRemindDate(blueColor, calendar.getTimeInMillis());
-                task.setRemindDate(calendar.getTimeInMillis());
-            }, task.getRemindDate());
+        RelativeLayout layoutAlert = view.findViewById(R.id.task_modal_layout_alert);
+        layoutAlert.setOnClickListener(v -> {
+            DateTimePickerDialog dateTimePickerDialog =
+                    new DateTimePickerDialog(getContext(), task.getRemindDate(), false, (dateTime, isTimeSet) -> {
+                        changeColorRemindDate(blueColor, dateTime);
+                        task.setRemindDate(dateTime);
+                    });
+            dateTimePickerDialog.show();
         });
 
         builder.setView(view);
-        builder.setNegativeButton("No", (dialog, i) -> {
-        });
-        builder.setPositiveButton("Yes", (dialog, i) -> listener.onDialogPositiveClick(this, task));
+        builder.setNegativeButton(R.string.no, null);
+        builder.setPositiveButton(R.string.yes, (dialog, i) -> listener.onDialogPositiveClick(this, task));
         return builder.create();
     }
 
@@ -98,8 +98,9 @@ public class TaskModal extends DialogFragment {
             task.setId((String) bundle.get("id"));
             task.setName((String) bundle.get("name"));
             task.setDone(bundle.getBoolean("done", false));
-            task.setDueDate((Long) bundle.get("dueDate"));
+            task.setDueDateAndTime((Long) bundle.get("dueDate"));
             task.setRemindDate((Long) bundle.get("remindDate"));
+            task.setDueTimeIsSet(bundle.getBoolean("dueTimeIsSet", false));
         }
         return task;
     }

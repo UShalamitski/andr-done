@@ -10,6 +10,10 @@
     <string name="undo">Undo</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="ok">Ok</string>
+
+    <string name="date_time_picker.time">Time</string>
+    <string name="date_time_picker.without_time">Without time</string>
 
     <string name="task.delete.confirmation">Are you sure you want to delete selected task?</string>
     <string name="task.due_date">Due date</string>

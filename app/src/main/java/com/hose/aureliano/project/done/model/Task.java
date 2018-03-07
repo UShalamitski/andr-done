@@ -24,7 +24,8 @@ public class Task {
     private String id;
     private String listId;
     private String name;
-    private Long dueDate;
+    private Long dueDateAndTime;
+    private boolean dueTimeIsSet;
     private Long remindDate;
     private boolean done;
 
@@ -63,12 +64,12 @@ public class Task {
         this.done = done;
     }
 
-    public Long getDueDate() {
-        return dueDate;
+    public Long getDueDateAndTime() {
+        return dueDateAndTime;
     }
 
-    public void setDueDate(Long dueDate) {
-        this.dueDate = dueDate;
+    public void setDueDateAndTime(Long dueDateAndTime) {
+        this.dueDateAndTime = dueDateAndTime;
     }
 
     public Long getRemindDate() {
@@ -77,6 +78,14 @@ public class Task {
 
     public void setRemindDate(Long remindDate) {
         this.remindDate = remindDate;
+    }
+
+    public boolean getDueTimeIsSet() {
+        return dueTimeIsSet;
+    }
+
+    public void setDueTimeIsSet(boolean dueTimeIsSet) {
+        this.dueTimeIsSet = dueTimeIsSet;
     }
 
     @Override
@@ -93,7 +102,8 @@ public class Task {
                 .append(listId, that.listId)
                 .append(name, that.name)
                 .append(done, that.done)
-                .append(dueDate, that.dueDate)
+                .append(dueDateAndTime, that.dueDateAndTime)
+                .append(dueTimeIsSet, that.dueTimeIsSet)
                 .append(remindDate, that.remindDate)
                 .isEquals();
     }
@@ -105,7 +115,8 @@ public class Task {
                 .append(listId)
                 .append(name)
                 .append(done)
-                .append(dueDate)
+                .append(dueDateAndTime)
+                .append(dueTimeIsSet)
                 .append(remindDate)
                 .toHashCode();
     }

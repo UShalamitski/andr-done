@@ -63,7 +63,7 @@ public final class ActivityUtils {
     /**
      * Vibrate constantly for the specified period of time.
      *
-     * @param context      context
+     * @param context context
      */
     public static void vibrate(Context context) {
         Vibrator vibrator = ((Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE));
@@ -116,6 +116,18 @@ public final class ActivityUtils {
     public static String getStringDate(Context context, Long dateInMillis) {
         Objects.requireNonNull(dateInMillis);
         return DateUtils.formatDateTime(context, dateInMillis, DateUtils.FORMAT_SHOW_DATE
-                | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_ALL);
+                | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_TIME);
+    }
+
+    /**
+     * Convert time in milliseconds into String.
+     *
+     * @param context      context
+     * @param dateInMillis time in milliseconds
+     * @return converted time
+     */
+    public static String getStringTime(Context context, Long dateInMillis) {
+        Objects.requireNonNull(dateInMillis);
+        return DateUtils.formatDateTime(context, dateInMillis, DateUtils.FORMAT_SHOW_TIME);
     }
 }

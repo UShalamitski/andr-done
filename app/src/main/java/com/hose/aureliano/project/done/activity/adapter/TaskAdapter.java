@@ -102,8 +102,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         holder.checkBox.setChecked(task.getDone());
 
         StringBuilder stringBuilder = new StringBuilder();
-        if (null != task.getDueDate()) {
-            stringBuilder.append(ActivityUtils.getStringDate(context, task.getDueDate()));
+        if (null != task.getDueDateAndTime()) {
+            stringBuilder.append(ActivityUtils.getStringDate(context, task.getDueDateAndTime()));
         }
         if (null != task.getRemindDate()) {
             if (StringUtils.isNoneBlank(stringBuilder.toString())) {
@@ -204,9 +204,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         Bundle bundle = new Bundle();
         bundle.putString("name", task.getName());
         bundle.putString("id", task.getId());
+        bundle.putBoolean("dueTimeIsSet", task.getDueTimeIsSet());
         bundle.putString("checkBox", String.valueOf(task.getDone()));
-        if (null != task.getDueDate()) {
-            bundle.putLong("dueDate", task.getDueDate());
+        if (null != task.getDueDateAndTime()) {
+            bundle.putLong("dueDate", task.getDueDateAndTime());
         }
         if (null != task.getRemindDate()) {
             bundle.putLong("remindDate", task.getRemindDate());

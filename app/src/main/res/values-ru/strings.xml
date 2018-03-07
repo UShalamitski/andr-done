@@ -10,6 +10,10 @@
     <string name="undo">Вернуть</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+    <string name="ok">Ok</string>
+
+    <string name="date_time_picker.time">Время</string>
+    <string name="date_time_picker.without_time">Без времени</string>
 
     <string name="task.delete.confirmation">Вы уверены, что хотите удалить выбранную задачу?</string>
     <string name="task.due_date">Дата исполнения</string>
