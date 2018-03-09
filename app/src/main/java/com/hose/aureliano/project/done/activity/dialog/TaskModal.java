@@ -48,30 +48,31 @@ public class TaskModal extends DialogFragment {
         EditText name = view.findViewById(R.id.tasks_modal_name);
         name.setText(task.getName());
 
-        if (task.getDueDateAndTime() != null) {
-            changeColorDueDate(blueColor, task.getDueDateAndTime());
+        if (task.getDueDateTime() != null) {
+            changeColorDueDate(blueColor, task.getDueDateTime(), task.getDueTimeIsSet());
         }
-        if (task.getRemindDate() != null) {
-            changeColorRemindDate(blueColor, task.getRemindDate());
+        if (task.getRemindDateTime() != null) {
+            changeColorRemindDate(blueColor, task.getRemindDateTime(), task.getRemindTimeIsSet());
         }
 
         RelativeLayout relativeLayout = view.findViewById(R.id.task_modal_layout_calendar);
         relativeLayout.setOnClickListener(v -> {
-            DateTimePickerDialog pickerDialog = new DateTimePickerDialog(getContext(), task.getDueDateAndTime(),
+            DateTimePickerDialog pickerDialog = new DateTimePickerDialog(getContext(), task.getDueDateTime(),
                     task.getDueTimeIsSet(), (dateTime, isTimeSet) -> {
-                changeColorDueDate(blueColor, dateTime);
-                task.setDueDateAndTime(dateTime);
+                changeColorDueDate(blueColor, dateTime, isTimeSet);
+                task.setDueDateTime(dateTime);
                 task.setDueTimeIsSet(isTimeSet);
             });
             pickerDialog.show();
         });
         RelativeLayout layoutAlert = view.findViewById(R.id.task_modal_layout_alert);
         layoutAlert.setOnClickListener(v -> {
-            DateTimePickerDialog dateTimePickerDialog =
-                    new DateTimePickerDialog(getContext(), task.getRemindDate(), false, (dateTime, isTimeSet) -> {
-                        changeColorRemindDate(blueColor, dateTime);
-                        task.setRemindDate(dateTime);
-                    });
+            DateTimePickerDialog dateTimePickerDialog = new DateTimePickerDialog(getContext(), task.getRemindDateTime(),
+                    task.getRemindTimeIsSet(), (dateTime, isTimeSet) -> {
+                changeColorRemindDate(blueColor, dateTime, isTimeSet);
+                task.setRemindDateTime(dateTime);
+                task.setRemindTimeIsSet(isTimeSet);
+            });
             dateTimePickerDialog.show();
         });
 
@@ -95,24 +96,25 @@ public class TaskModal extends DialogFragment {
         Task task = new Task();
         Bundle bundle = getArguments();
         if (bundle != null) {
-            task.setId((String) bundle.get("id"));
-            task.setName((String) bundle.get("name"));
-            task.setDone(bundle.getBoolean("done", false));
-            task.setDueDateAndTime((Long) bundle.get("dueDate"));
-            task.setRemindDate((Long) bundle.get("remindDate"));
-            task.setDueTimeIsSet(bundle.getBoolean("dueTimeIsSet", false));
+            task.setId(bundle.getString(Task.Fields.ID.getFieldName()));
+            task.setName(bundle.getString(Task.Fields.NAME.getFieldName()));
+            task.setDone(bundle.getBoolean(Task.Fields.DONE.getFieldName(), false));
+            task.setDueDateTime((Long) bundle.get(Task.Fields.DUE_DATE_TIME.getFieldName()));
+            task.setRemindDateTime((Long) bundle.get(Task.Fields.REMIND_DATE_TIME.getFieldName()));
+            task.setDueTimeIsSet(bundle.getBoolean(Task.Fields.DUE_TIME_IS_SET.getFieldName(), false));
+            task.setRemindTimeIsSet(bundle.getBoolean(Task.Fields.REMIND_TIME_IS_SET.getFieldName(), false));
         }
         return task;
     }
 
-    private void changeColorDueDate(int color, long timeInMilliseconds) {
-        dueDateText.setText(ActivityUtils.getStringDate(getContext(), timeInMilliseconds));
+    private void changeColorDueDate(int color, long dateAndTimeInMilliseconds, boolean isTimeSet) {
+        dueDateText.setText(ActivityUtils.getStringDate(getContext(), dateAndTimeInMilliseconds, isTimeSet));
         dueDateText.setTextColor(color);
         dueDateIcon.setColorFilter(color);
     }
 
-    private void changeColorRemindDate(int color, long timeInMilliseconds) {
-        remindDateText.setText(ActivityUtils.getStringDate(getContext(), timeInMilliseconds));
+    private void changeColorRemindDate(int color, long dateAndTimeInMilliseconds, boolean isTimeSet) {
+        remindDateText.setText(ActivityUtils.getStringDate(getContext(), dateAndTimeInMilliseconds, isTimeSet));
         remindDateText.setTextColor(color);
         remindDateIcon.setColorFilter(color);
     }

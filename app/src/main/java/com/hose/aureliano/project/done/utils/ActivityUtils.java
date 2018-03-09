@@ -24,11 +24,11 @@ import java.util.Objects;
  */
 public final class ActivityUtils {
 
+    private static long VIBRATE_SHORT = 40L;
+
     private ActivityUtils() {
         throw new AssertionError();
     }
-
-    private static long VIBRATE_SHORT = 40L;
 
     /**
      * Show a {@link Snackbar}.
@@ -113,10 +113,12 @@ public final class ActivityUtils {
      * @param dateInMillis date in milliseconds
      * @return converted date
      */
-    public static String getStringDate(Context context, Long dateInMillis) {
+    public static String getStringDate(Context context, Long dateInMillis, boolean withTime) {
         Objects.requireNonNull(dateInMillis);
-        return DateUtils.formatDateTime(context, dateInMillis, DateUtils.FORMAT_SHOW_DATE
-                | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_TIME);
+        String date = DateUtils.getRelativeDateTimeString(context, dateInMillis, DateUtils.DAY_IN_MILLIS,
+                DateUtils.DAY_IN_MILLIS * 2, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY
+                        | DateUtils.FORMAT_ABBREV_ALL).toString();
+        return !withTime ? date.substring(0, date.indexOf(',')) : date;
     }
 
     /**

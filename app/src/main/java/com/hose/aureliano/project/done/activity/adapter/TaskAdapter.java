@@ -102,14 +102,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         holder.checkBox.setChecked(task.getDone());
 
         StringBuilder stringBuilder = new StringBuilder();
-        if (null != task.getDueDateAndTime()) {
-            stringBuilder.append(ActivityUtils.getStringDate(context, task.getDueDateAndTime()));
+        if (null != task.getDueDateTime()) {
+            stringBuilder
+                    .append(ActivityUtils.getStringDate(context, task.getDueDateTime(), task.getDueTimeIsSet()));
         }
-        if (null != task.getRemindDate()) {
+        if (null != task.getRemindDateTime()) {
             if (StringUtils.isNoneBlank(stringBuilder.toString())) {
                 stringBuilder.append(" | ");
             }
-            stringBuilder.append(ActivityUtils.getStringDate(context, task.getRemindDate()));
+            stringBuilder.append(
+                    ActivityUtils.getStringDate(context, task.getRemindDateTime(), task.getRemindTimeIsSet()));
         }
         if (StringUtils.isNoneBlank(stringBuilder.toString())) {
             holder.information.setVisibility(View.VISIBLE);
@@ -202,15 +204,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     private Bundle buildBundle(Task task) {
         Bundle bundle = new Bundle();
-        bundle.putString("name", task.getName());
-        bundle.putString("id", task.getId());
-        bundle.putBoolean("dueTimeIsSet", task.getDueTimeIsSet());
-        bundle.putString("checkBox", String.valueOf(task.getDone()));
-        if (null != task.getDueDateAndTime()) {
-            bundle.putLong("dueDate", task.getDueDateAndTime());
+        bundle.putString(Task.Fields.ID.getFieldName(), task.getId());
+        bundle.putString(Task.Fields.NAME.getFieldName(), task.getName());
+        bundle.putBoolean(Task.Fields.DONE.getFieldName(), task.getDone());
+        if (null != task.getDueDateTime()) {
+            bundle.putLong(Task.Fields.DUE_DATE_TIME.getFieldName(), task.getDueDateTime());
+            bundle.putBoolean(Task.Fields.DUE_TIME_IS_SET.getFieldName(), task.getDueTimeIsSet());
         }
-        if (null != task.getRemindDate()) {
-            bundle.putLong("remindDate", task.getRemindDate());
+        if (null != task.getRemindDateTime()) {
+            bundle.putLong(Task.Fields.REMIND_DATE_TIME.getFieldName(), task.getRemindDateTime());
+            bundle.putBoolean(Task.Fields.REMIND_TIME_IS_SET.getFieldName(), task.getRemindTimeIsSet());
         }
         return bundle;
     }

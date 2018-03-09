@@ -24,9 +24,10 @@ public class Task {
     private String id;
     private String listId;
     private String name;
-    private Long dueDateAndTime;
+    private Long dueDateTime;
     private boolean dueTimeIsSet;
-    private Long remindDate;
+    private Long remindDateTime;
+    private boolean remindTimeIsSet;
     private boolean done;
 
     public Task() {
@@ -64,20 +65,20 @@ public class Task {
         this.done = done;
     }
 
-    public Long getDueDateAndTime() {
-        return dueDateAndTime;
+    public Long getDueDateTime() {
+        return dueDateTime;
     }
 
-    public void setDueDateAndTime(Long dueDateAndTime) {
-        this.dueDateAndTime = dueDateAndTime;
+    public void setDueDateTime(Long dueDateTime) {
+        this.dueDateTime = dueDateTime;
     }
 
-    public Long getRemindDate() {
-        return remindDate;
+    public Long getRemindDateTime() {
+        return remindDateTime;
     }
 
-    public void setRemindDate(Long remindDate) {
-        this.remindDate = remindDate;
+    public void setRemindDateTime(Long remindDateTime) {
+        this.remindDateTime = remindDateTime;
     }
 
     public boolean getDueTimeIsSet() {
@@ -86,6 +87,14 @@ public class Task {
 
     public void setDueTimeIsSet(boolean dueTimeIsSet) {
         this.dueTimeIsSet = dueTimeIsSet;
+    }
+
+    public boolean getRemindTimeIsSet() {
+        return remindTimeIsSet;
+    }
+
+    public void setRemindTimeIsSet(boolean remindTimeIsSet) {
+        this.remindTimeIsSet = remindTimeIsSet;
     }
 
     @Override
@@ -102,9 +111,10 @@ public class Task {
                 .append(listId, that.listId)
                 .append(name, that.name)
                 .append(done, that.done)
-                .append(dueDateAndTime, that.dueDateAndTime)
+                .append(dueDateTime, that.dueDateTime)
                 .append(dueTimeIsSet, that.dueTimeIsSet)
-                .append(remindDate, that.remindDate)
+                .append(remindDateTime, that.remindDateTime)
+                .append(remindTimeIsSet, that.remindTimeIsSet)
                 .isEquals();
     }
 
@@ -115,9 +125,31 @@ public class Task {
                 .append(listId)
                 .append(name)
                 .append(done)
-                .append(dueDateAndTime)
+                .append(dueDateTime)
                 .append(dueTimeIsSet)
-                .append(remindDate)
+                .append(remindDateTime)
+                .append(remindTimeIsSet)
                 .toHashCode();
+    }
+
+    public enum Fields {
+        ID("id"),
+        LIST_ID("listId"),
+        NAME("name"),
+        DONE("done"),
+        DUE_DATE_TIME("dueDateTime"),
+        DUE_TIME_IS_SET("dueTimeIsSet"),
+        REMIND_DATE_TIME("remindDateTime"),
+        REMIND_TIME_IS_SET("remindTimeIsSet");
+
+        private String name;
+
+        private Fields(String name) {
+            this.name = name;
+        }
+
+        public String getFieldName() {
+            return name;
+        }
     }
 }
