@@ -18,16 +18,24 @@ import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 /**
- * Created by everest on 05.02.2018.
+ * Modal window for task item.
+ * <p/>
+ * Date: 05.02.2018
+ *
+ * @author Uladzislau Shalamitski
  */
 public class TaskModal extends DialogFragment {
 
     private int blueColor;
+    private int defaultTextColor;
+    private int blackColor;
     private TaskDialogListener listener;
     private TextView dueDateText;
     private ImageView dueDateIcon;
+    private ImageView clearDueDateIcon;
     private TextView remindDateText;
     private ImageView remindDateIcon;
+    private ImageView clearRemindDateIcon;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -40,26 +48,43 @@ public class TaskModal extends DialogFragment {
 
         Task task = buildTaskFromBundle();
         blueColor = getContext().getResources().getColor(R.color.blue);
+        blackColor = getContext().getResources().getColor(R.color.black);
+        defaultTextColor = getContext().getResources().getColor(R.color.text_color);
         dueDateText = view.findViewById(R.id.task_modal_calendar_text);
         dueDateIcon = view.findViewById(R.id.task_modal_calendar_icon);
+        clearDueDateIcon = view.findViewById(R.id.task_modal_calendar_clear_icon);
         remindDateText = view.findViewById(R.id.task_modal_alarm_text);
         remindDateIcon = view.findViewById(R.id.task_modal_alarm_icon);
+        clearRemindDateIcon = view.findViewById(R.id.task_modal_alert_clear_icon);
 
         EditText name = view.findViewById(R.id.tasks_modal_name);
         name.setText(task.getName());
 
+        clearDueDateIcon.setOnClickListener(iconView -> {
+            changeDueDate(defaultTextColor, blackColor, getString(R.string.task_due_date));
+            task.setDueDateTime(null);
+            task.setDueTimeIsSet(false);
+        });
+        clearRemindDateIcon.setOnClickListener(iconView -> {
+            changeRemindDate(defaultTextColor, blackColor, getString(R.string.task_remind_me));
+            task.setRemindDateTime(null);
+            task.setRemindTimeIsSet(false);
+        });
+
         if (task.getDueDateTime() != null) {
-            changeColorDueDate(blueColor, task.getDueDateTime(), task.getDueTimeIsSet());
+            changeDueDate(blueColor, blueColor,
+                    ActivityUtils.getStringDate(getContext(), task.getDueDateTime(), task.getDueTimeIsSet()));
         }
         if (task.getRemindDateTime() != null) {
-            changeColorRemindDate(blueColor, task.getRemindDateTime(), task.getRemindTimeIsSet());
+            changeRemindDate(blueColor, blueColor,
+                    ActivityUtils.getStringDate(getContext(), task.getRemindDateTime(), task.getRemindTimeIsSet()));
         }
 
         RelativeLayout relativeLayout = view.findViewById(R.id.task_modal_layout_calendar);
         relativeLayout.setOnClickListener(v -> {
             DateTimePickerDialog pickerDialog = new DateTimePickerDialog(getContext(), task.getDueDateTime(),
                     task.getDueTimeIsSet(), (dateTime, isTimeSet) -> {
-                changeColorDueDate(blueColor, dateTime, isTimeSet);
+                changeDueDate(blueColor, blueColor, ActivityUtils.getStringDate(getContext(), dateTime, isTimeSet));
                 task.setDueDateTime(dateTime);
                 task.setDueTimeIsSet(isTimeSet);
             });
@@ -69,7 +94,7 @@ public class TaskModal extends DialogFragment {
         layoutAlert.setOnClickListener(v -> {
             DateTimePickerDialog dateTimePickerDialog = new DateTimePickerDialog(getContext(), task.getRemindDateTime(),
                     task.getRemindTimeIsSet(), (dateTime, isTimeSet) -> {
-                changeColorRemindDate(blueColor, dateTime, isTimeSet);
+                changeRemindDate(blueColor, blueColor, ActivityUtils.getStringDate(getContext(), dateTime, isTimeSet));
                 task.setRemindDateTime(dateTime);
                 task.setRemindTimeIsSet(isTimeSet);
             });
@@ -107,16 +132,16 @@ public class TaskModal extends DialogFragment {
         return task;
     }
 
-    private void changeColorDueDate(int color, long dateAndTimeInMilliseconds, boolean isTimeSet) {
-        dueDateText.setText(ActivityUtils.getStringDate(getContext(), dateAndTimeInMilliseconds, isTimeSet));
-        dueDateText.setTextColor(color);
-        dueDateIcon.setColorFilter(color);
+    private void changeDueDate(int textColor, int iconColor, String text) {
+        dueDateText.setText(text);
+        dueDateText.setTextColor(textColor);
+        dueDateIcon.setColorFilter(iconColor);
     }
 
-    private void changeColorRemindDate(int color, long dateAndTimeInMilliseconds, boolean isTimeSet) {
-        remindDateText.setText(ActivityUtils.getStringDate(getContext(), dateAndTimeInMilliseconds, isTimeSet));
+    private void changeRemindDate(int color, int iconColor, String text) {
+        remindDateText.setText(text);
         remindDateText.setTextColor(color);
-        remindDateIcon.setColorFilter(color);
+        remindDateIcon.setColorFilter(iconColor);
     }
 
     public interface TaskDialogListener {

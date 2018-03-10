@@ -43,8 +43,20 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@+id/task_modal_calendar_icon"
+            android:layout_toStartOf="@+id/task_modal_calendar_clear_icon"
             android:text="@string/task.due_date"
             android:textSize="15sp" />
+
+        <ImageView
+            android:id="@+id/task_modal_calendar_clear_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/icon_clear_white"
+            android:tint="@android:color/black" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -69,12 +81,24 @@
 
         <TextView
             android:id="@+id/task_modal_alarm_text"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@+id/task_modal_alarm_icon"
+            android:layout_toStartOf="@+id/task_modal_alert_clear_icon"
             android:text="@string/task.remind_me"
             android:textSize="15sp" />
+
+        <ImageView
+            android:id="@+id/task_modal_alert_clear_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/icon_clear_white"
+            android:tint="@android:color/black" />
     </RelativeLayout>
 
 </RelativeLayout>
