@@ -20,8 +20,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class Task {
 
     @NonNull
-    @PrimaryKey
-    private String id;
+    @PrimaryKey(autoGenerate = true)
+    private Integer id;
     private String listId;
     private String name;
     private Long dueDateTime;
@@ -33,11 +33,11 @@ public class Task {
     public Task() {
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

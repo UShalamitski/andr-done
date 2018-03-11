@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.model.Task;
+import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 /**
@@ -69,6 +70,7 @@ public class TaskModal extends DialogFragment {
             changeRemindDate(defaultTextColor, blackColor, getString(R.string.task_remind_me));
             task.setRemindDateTime(null);
             task.setRemindTimeIsSet(false);
+            AlarmService.cancelAlarm(getContext(), task);
         });
 
         if (task.getDueDateTime() != null) {
@@ -121,7 +123,7 @@ public class TaskModal extends DialogFragment {
         Task task = new Task();
         Bundle bundle = getArguments();
         if (bundle != null) {
-            task.setId(bundle.getString(Task.Fields.ID.getFieldName()));
+            task.setId((Integer) bundle.get(Task.Fields.ID.getFieldName()));
             task.setName(bundle.getString(Task.Fields.NAME.getFieldName()));
             task.setDone(bundle.getBoolean(Task.Fields.DONE.getFieldName(), false));
             task.setDueDateTime((Long) bundle.get(Task.Fields.DUE_DATE_TIME.getFieldName()));

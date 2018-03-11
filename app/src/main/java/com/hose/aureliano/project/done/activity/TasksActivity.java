@@ -19,17 +19,14 @@ import com.hose.aureliano.project.done.activity.helper.TaskItemTouchHelper;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.TaskDao;
+import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Activity fot displaying all TODOs for selected list.
@@ -67,33 +64,9 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
             dialogFragment.show(getSupportFragmentManager(), "tag");
         });
 
-        ItemTouchHelper.SimpleCallback touchHelper = new TaskItemTouchHelper(0,
-                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, this,
-                (viewHolder, direction, position) -> {
-                    if (direction == ItemTouchHelper.LEFT) {
-                        Task task = taskAdapter.getItem(position);
-                        taskAdapter.removeItem(position);
-
-                        ScheduledFuture scheduledFuture = executorService.schedule(() -> {
-                            taskDao.delete(task.getId());
-                            itemsToRemoveMap.remove(task);
-                        }, 3, TimeUnit.SECONDS);
-                        itemsToRemoveMap.put(task, scheduledFuture);
-
-                        ActivityUtils.showSnackBar(coordinator, "Item removed " + task.getName(), R.string.undo,
-                                snackBarView -> {
-                                    taskAdapter.restoreItem(position, task);
-                                    itemsToRemoveMap.remove(task).cancel(false);
-                                });
-                        ActivityUtils.vibrate(this);
-                    } else if (direction == ItemTouchHelper.RIGHT) {
-                        TaskAdapter.ViewHolder holder = ((TaskAdapter.ViewHolder) viewHolder);
-                        holder.getCheckBox().setChecked(!holder.getCheckBox().isChecked());
-                        taskAdapter.notifyDataSetChanged();
-                        ActivityUtils.vibrate(this);
-                    }
-                });
-        new ItemTouchHelper(touchHelper).attachToRecyclerView(listView);
+        int swipeDirs = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
+        new ItemTouchHelper(new TaskItemTouchHelper(this, taskAdapter, coordinator, swipeDirs, 0))
+                .attachToRecyclerView(listView);
     }
 
     @Override
@@ -108,16 +81,14 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
         task.setName(name.getText().toString());
         task.setListId(listId);
 
-        if (StringUtils.isNoneBlank(task.getId())) {
-            result = taskDao.update(task);
-        } else {
-            task.setId(UUID.randomUUID().toString());
-            result = taskDao.insert(task);
-        }
+        result = task.getId() != null ? taskDao.update(task) : taskDao.insert(task);
 
         if (result != -1) {
             taskAdapter.refresh();
             ActivityUtils.showSnackBar(coordinator, String.format("done: %s", name.getText()));
+            if (task.getRemindTimeIsSet()) {
+                AlarmService.setAlarm(this, task);
+            }
         } else {
             ActivityUtils.showSnackBar(coordinator, "Oops! Something went wrong!");
         }

@@ -10,13 +10,25 @@ import android.view.View;
 
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.TaskAdapter;
+import com.hose.aureliano.project.done.model.Task;
+import com.hose.aureliano.project.done.repository.DatabaseCreator;
+import com.hose.aureliano.project.done.repository.dao.TaskDao;
+import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
+import com.hose.aureliano.project.done.utils.ActivityUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Touch helper.
+ * Touch helper for tasks.
  * <p>
  * Date: 12.02.2018.
  *
- * @author evere
+ * @author Uladzislau Shalamitski
  */
 public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
@@ -26,12 +38,20 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     private static Drawable DRAWABLE_CANCEL;
     private static Drawable DRAWABLE_DONE;
 
-    private TaskItemTouchHelperListener listener;
+    private TaskAdapter adapter;
+    private TaskDao taskDao;
+    private Context context;
+    private View coordinator;
 
-    public TaskItemTouchHelper(int dragDirs, int swipeDirs, Context context,
-                               TaskItemTouchHelperListener listener) {
+    private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(5);
+    private Map<Task, ScheduledFuture> itemsToRemoveMap = new HashMap<>();
+
+    public TaskItemTouchHelper(Context context, TaskAdapter adapter, View coordinator, int swipeDirs, int dragDirs) {
         super(dragDirs, swipeDirs);
-        this.listener = listener;
+        this.context = context;
+        this.adapter = adapter;
+        this.coordinator = coordinator;
+        taskDao = DatabaseCreator.getDatabase(context).getTaskDao();
         COLOR_RED = ContextCompat.getColor(context, R.color.red);
         COLOR_GREEN = ContextCompat.getColor(context, R.color.green);
         COLOR_ORANGE = ContextCompat.getColor(context, R.color.orange);
@@ -101,10 +121,28 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        listener.onSwiped(viewHolder, direction, viewHolder.getAdapterPosition());
-    }
+        if (direction == ItemTouchHelper.LEFT) {
+            int position = viewHolder.getAdapterPosition();
+            Task task = adapter.getItem(position);
+            adapter.removeItem(position);
 
-    public interface TaskItemTouchHelperListener {
-        void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position);
+            itemsToRemoveMap.put(task, executorService.schedule(() -> {
+                taskDao.delete(task.getId());
+                itemsToRemoveMap.remove(task);
+                AlarmService.cancelAlarm(context, task);
+            }, 3, TimeUnit.SECONDS));
+
+            ActivityUtils.showSnackBar(coordinator, "Item removed " + task.getName(), R.string.undo,
+                    snackBarView -> {
+                        adapter.restoreItem(position, task);
+                        itemsToRemoveMap.remove(task).cancel(false);
+                    });
+            ActivityUtils.vibrate(context);
+        } else if (direction == ItemTouchHelper.RIGHT) {
+            TaskAdapter.ViewHolder holder = ((TaskAdapter.ViewHolder) viewHolder);
+            holder.getCheckBox().setChecked(!holder.getCheckBox().isChecked());
+            adapter.notifyDataSetChanged();
+            ActivityUtils.vibrate(context);
+        }
     }
 }

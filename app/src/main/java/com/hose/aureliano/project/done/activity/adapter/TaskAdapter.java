@@ -19,6 +19,7 @@ import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.TaskDao;
+import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -73,6 +74,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                                 (dialog, which) -> {
                                     taskDao.delete(currentTask.getId());
                                     removeItem(getPosition(menuView));
+                                    AlarmService.cancelAlarm(context, currentTask);
                                 });
                         break;
                     case R.id.menu_edit:
@@ -179,12 +181,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     }
 
     private Task getItem(View view) {
-        return getItem((String) view.getTag());
+        return getItemById((int) view.getTag());
     }
 
-    private Task getItem(String listId) {
+    private Task getItemById(int taskId) {
         for (Task task : taskList) {
-            if (task.getId().equals(listId)) {
+            if (task.getId().equals(taskId)) {
                 return task;
             }
         }
@@ -204,7 +206,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     private Bundle buildBundle(Task task) {
         Bundle bundle = new Bundle();
-        bundle.putString(Task.Fields.ID.getFieldName(), task.getId());
+        bundle.putInt(Task.Fields.ID.getFieldName(), task.getId());
         bundle.putString(Task.Fields.NAME.getFieldName(), task.getName());
         bundle.putBoolean(Task.Fields.DONE.getFieldName(), task.getDone());
         if (null != task.getDueDateTime()) {

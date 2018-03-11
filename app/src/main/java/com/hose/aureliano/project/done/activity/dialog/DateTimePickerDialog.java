@@ -50,6 +50,7 @@ public class DateTimePickerDialog extends AlertDialog {
         timePicker = view.findViewById(R.id.layoutTimePicker);
         datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH), null);
+        datePicker.setMinDate(System.currentTimeMillis());
         timePicker.setIs24HourView(true);
         setView(view);
 
