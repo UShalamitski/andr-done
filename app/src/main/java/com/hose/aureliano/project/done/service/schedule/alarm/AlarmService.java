@@ -47,8 +47,6 @@ public class AlarmService {
      */
     public static void cancelAlarm(Context context, Task task) {
         Intent intent = new Intent(context, AlarmReceiver.class);
-        intent.putExtra(Task.Fields.NAME.getFieldName(), task.getName());
-        intent.putExtra(Task.Fields.ID.getFieldName(), task.getId());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, task.getId(), intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

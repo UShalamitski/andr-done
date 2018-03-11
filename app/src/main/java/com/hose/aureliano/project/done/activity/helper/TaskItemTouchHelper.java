@@ -13,6 +13,7 @@ import com.hose.aureliano.project.done.activity.adapter.TaskAdapter;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.TaskDao;
+import com.hose.aureliano.project.done.service.schedule.TaskService;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 
@@ -39,7 +40,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     private static Drawable DRAWABLE_DONE;
 
     private TaskAdapter adapter;
-    private TaskDao taskDao;
+    private TaskService taskService;
     private Context context;
     private View coordinator;
 
@@ -51,7 +52,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
         this.context = context;
         this.adapter = adapter;
         this.coordinator = coordinator;
-        taskDao = DatabaseCreator.getDatabase(context).getTaskDao();
+        taskService = new TaskService(context);
         COLOR_RED = ContextCompat.getColor(context, R.color.red);
         COLOR_GREEN = ContextCompat.getColor(context, R.color.green);
         COLOR_ORANGE = ContextCompat.getColor(context, R.color.orange);
@@ -127,9 +128,8 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
             adapter.removeItem(position);
 
             itemsToRemoveMap.put(task, executorService.schedule(() -> {
-                taskDao.delete(task.getId());
+                taskService.deleteTask(task);
                 itemsToRemoveMap.remove(task);
-                AlarmService.cancelAlarm(context, task);
             }, 3, TimeUnit.SECONDS));
 
             ActivityUtils.showSnackBar(coordinator, "Item removed " + task.getName(), R.string.undo,

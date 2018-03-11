@@ -20,7 +20,7 @@ import com.hose.aureliano.project.done.activity.dialog.ListModal;
 import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.DoneListDao;
-import com.hose.aureliano.project.done.repository.dao.TaskDao;
+import com.hose.aureliano.project.done.service.schedule.TaskService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -39,13 +39,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     private FragmentManager fragmentManager;
     private DoneListDao doneListDao;
-    private TaskDao taskDao;
+    private TaskService taskService;
     private List<DoneList> doneLists;
     private Context context;
 
     public ListAdapter(Context context, FragmentManager fragmentManager) {
         doneListDao = DatabaseCreator.getDatabase(context).getDoneListDao();
-        taskDao = DatabaseCreator.getDatabase(context).getTaskDao();
+        taskService = new TaskService(context);
         doneLists = doneListDao.read();
         this.fragmentManager = fragmentManager;
         this.context = context;
@@ -73,7 +73,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                         ActivityUtils.showConfirmationDialog(context, R.string.list_delete_confirmation,
                                 (dialog, which) -> {
                                     DatabaseCreator.getDatabase(context).runInTransaction(() -> {
-                                        taskDao.deleteByListId(doneList.getId());
+                                        taskService.deleteTasks(doneList.getId());
                                         doneListDao.delete(doneList.getId());
                                     });
                                     int position = getPosition(itemView);

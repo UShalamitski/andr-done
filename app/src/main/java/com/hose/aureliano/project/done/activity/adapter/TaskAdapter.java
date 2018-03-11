@@ -19,7 +19,7 @@ import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.TaskDao;
-import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
+import com.hose.aureliano.project.done.service.schedule.TaskService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -38,6 +38,7 @@ import java.util.NoSuchElementException;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     private FragmentManager fragmentManager;
+    private TaskService taskService;
     private TaskDao taskDao;
     private List<Task> taskList;
     private Context context;
@@ -52,6 +53,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
      */
     public TaskAdapter(Context context, FragmentManager fragmentManager, String listId) {
         taskDao = DatabaseCreator.getDatabase(context).getTaskDao();
+        taskService = new TaskService(context);
         taskList = taskDao.read(listId);
         this.fragmentManager = fragmentManager;
         this.context = context;
@@ -72,9 +74,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                     case R.id.menu_delete:
                         ActivityUtils.showConfirmationDialog(context, R.string.task_delete_confirmation,
                                 (dialog, which) -> {
-                                    taskDao.delete(currentTask.getId());
+                                    taskService.deleteTask(currentTask);
                                     removeItem(getPosition(menuView));
-                                    AlarmService.cancelAlarm(context, currentTask);
                                 });
                         break;
                     case R.id.menu_edit:
