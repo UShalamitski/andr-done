@@ -13,6 +13,7 @@ import android.support.v4.app.NotificationCompat;
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.ListsActivity;
 import com.hose.aureliano.project.done.model.Task;
+import com.hose.aureliano.project.done.service.schedule.TaskService;
 
 /**
  * Class that receives and handles broadcast intents sent by
@@ -24,11 +25,14 @@ import com.hose.aureliano.project.done.model.Task;
  */
 public class AlarmReceiver extends BroadcastReceiver {
 
+    TaskService taskService;
+
     @Override
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
         if (extras != null) {
+            taskService = new TaskService(context);
             int taskId = extras.getInt(Task.Fields.ID.getFieldName());
 
             Intent contentIntent = new Intent(context, ListsActivity.class);
@@ -50,6 +54,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             if (notificationManager != null) {
                 notificationManager.notify(taskId, notificationBuilder.build());
             }
+            taskService.deleteReminderDate(taskId);
         }
     }
 }

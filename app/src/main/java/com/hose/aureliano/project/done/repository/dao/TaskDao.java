@@ -25,6 +25,9 @@ public interface TaskDao {
     @Update
     int update(Task item);
 
+    @Query("UPDATE tasks SET remindTimeIsSet = 'false', remindDateTime = null WHERE id = :taskId")
+    int deleteReminderDate(int taskId);
+
     @Query("DELETE FROM tasks WHERE id = :id")
     int delete(int id);
 

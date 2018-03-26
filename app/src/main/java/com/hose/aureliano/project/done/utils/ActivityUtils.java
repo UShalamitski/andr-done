@@ -132,4 +132,26 @@ public final class ActivityUtils {
         Objects.requireNonNull(dateInMillis);
         return DateUtils.formatDateTime(context, dateInMillis, DateUtils.FORMAT_SHOW_TIME);
     }
+
+    /**
+     * Handles the result of interaction with db.
+     *
+     * @param result  result of interaction with db
+     * @param handlew instance of {@link DbInteractionPositiveResultHandler} that handle positive result
+     * @param view    the view to find a parent from
+     */
+    public static void handleDbInteractionResult(long result, View view, DbInteractionPositiveResultHandler handlew) {
+        if (result != -1) {
+            handlew.handle();
+        } else {
+            showSnackBar(view, "Oops! Something went wrong!");
+        }
+    }
+
+    /**
+     * Handles positive result of interaction with db.
+     */
+    public interface DbInteractionPositiveResultHandler {
+        void handle();
+    }
 }

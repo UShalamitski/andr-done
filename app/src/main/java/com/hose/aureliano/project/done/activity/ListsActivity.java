@@ -1,24 +1,36 @@
 package com.hose.aureliano.project.done.activity;
 
-import android.graphics.Canvas;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.ListAdapter;
+import com.hose.aureliano.project.done.activity.component.CustomEditText;
 import com.hose.aureliano.project.done.activity.dialog.ListModal;
 import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.DoneListDao;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
+import com.hose.aureliano.project.done.utils.AnimationUtil;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 
@@ -45,10 +57,72 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
         RecyclerView recyclerView = findViewById(R.id.activity_lists_list_view);
         recyclerView.setAdapter(listsAdapter);
 
-        FloatingActionButton fab = findViewById(R.id.activity_lists_fab);
-        fab.setOnClickListener(view -> {
-            DialogFragment dialogFragment = new ListModal();
-            dialogFragment.show(getSupportFragmentManager(), "tag");
+        InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+        FloatingActionButton floatingActionButton = findViewById(R.id.activity_lists_fab);
+        CustomEditText editText = findViewById(R.id.activity_lists_new_edit_text);
+        View bottomView = findViewById(R.id.activity_lists_new);
+        ViewGroup decorView = getWindow().getDecorView().findViewById(R.id.qwer);
+        ImageView newIcon = findViewById(R.id.activity_list_new_icon);
+        View background = LayoutInflater.from(this).inflate(R.layout.decor_view_layout, null);
+
+        bottomView.setOnClickListener(view -> {
+        });
+        background.setOnClickListener(view -> {
+            inputManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
+            editText.onKeyPreIme(1, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
+        });
+        bottomView.setVisibility(View.GONE);
+        editText.setListener(() -> {
+            bottomView.setVisibility(View.GONE);
+            AnimationUtil.animateAlphaFadeOut(background, () -> {
+                decorView.removeView(background);
+                floatingActionButton.show();
+            });
+        });
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (StringUtils.isNoneBlank(s)) {
+                    newIcon.setColorFilter(getResources().getColor(R.color.green));
+                } else if (StringUtils.isBlank(s)) {
+                    newIcon.setColorFilter(getResources().getColor(R.color.darker_gray));
+                }
+            }
+        });
+        editText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                DoneList list = new DoneList();
+                list.setName(editText.getText().toString());
+                list.setId(UUID.randomUUID().toString());
+                ActivityUtils.handleDbInteractionResult(doneListDao.insert(list), coordinator, () -> {
+                    listsAdapter.refresh();
+                    editText.setText("");
+                    Intent intent = new Intent(this, TasksActivity.class);
+                    intent.putExtra("listId", list.getId());
+                    intent.putExtra("name", list.getName());
+                    this.startActivity(intent);
+                });
+                return true;
+            }
+            return false;
+        });
+        floatingActionButton.setOnClickListener(view -> {
+            bottomView.setVisibility(View.VISIBLE);
+            editText.requestFocus();
+            if (null != inputManager) {
+                floatingActionButton.hide();
+                inputManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+                AnimationUtil.animateAlphaFadeIn(background);
+                decorView.addView(background);
+            }
         });
     }
 
@@ -99,22 +173,4 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
     }
-
-    ItemTouchHelper.SimpleCallback touchHelper = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-
-        @Override
-        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-            return false;
-        }
-
-        @Override
-        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-
-        }
-
-        @Override
-        public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-        }
-    };
 }

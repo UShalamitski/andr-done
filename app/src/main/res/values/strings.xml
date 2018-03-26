@@ -15,10 +15,12 @@
     <string name="date_time_picker.time">Time</string>
     <string name="date_time_picker.without_time">Without time</string>
 
+    <string name="task.add_new">Add new task</string>
     <string name="task.delete.confirmation">Are you sure you want to delete selected task?</string>
     <string name="task.due_date">Due date</string>
     <string name="task.notification.title">Reminder</string>
     <string name="task.remind_me">Remind me</string>
 
     <string name="list.delete.confirmation">Are you sure you want to delete selected list?</string>
+    <string name="list.add_new">Add new list</string>
 </resources>

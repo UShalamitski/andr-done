@@ -48,4 +48,14 @@ public class TaskService {
         AlarmService.cancelAlarm(context, task);
         taskDao.delete(task.getId());
     }
+
+
+    /**
+     * Removes reminder date from {@link Task} by given identifier.
+     *
+     * @param taskId identifier of {@link Task}
+     */
+    public void deleteReminderDate(int taskId) {
+        taskDao.deleteReminderDate(taskId);
+    }
 }

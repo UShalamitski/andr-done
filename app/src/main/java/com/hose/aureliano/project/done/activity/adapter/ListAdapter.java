@@ -97,6 +97,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         view.setOnClickListener(itemView -> {
             Intent intent = new Intent(context, TasksActivity.class);
             intent.putExtra("listId", viewHolder.id);
+            intent.putExtra("name", viewHolder.name.getText().toString());
             context.startActivity(intent);
         });
         view.setTag(viewHolder);

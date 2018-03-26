@@ -15,10 +15,12 @@
     <string name="date_time_picker.time">Время</string>
     <string name="date_time_picker.without_time">Без времени</string>
 
+    <string name="task.add_new">Добавить задачу</string>
     <string name="task.delete.confirmation">Вы уверены, что хотите удалить выбранную задачу?</string>
     <string name="task.due_date">Дата исполнения</string>
     <string name="task.notification.title">Напоминание</string>
     <string name="task.remind_me">Напомнить</string>
 
     <string name="list.delete.confirmation">Вы уверены, что хотите удалить выбранный список?</string>
+    <string name="list.add_new">Добавить список</string>
 </resources>
