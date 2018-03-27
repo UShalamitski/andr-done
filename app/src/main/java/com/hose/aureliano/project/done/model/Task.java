@@ -29,6 +29,7 @@ public class Task {
     private Long remindDateTime;
     private boolean remindTimeIsSet;
     private boolean done;
+    private int position;
 
     public Task() {
     }
@@ -97,6 +98,14 @@ public class Task {
         this.remindTimeIsSet = remindTimeIsSet;
     }
 
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -115,6 +124,7 @@ public class Task {
                 .append(dueTimeIsSet, that.dueTimeIsSet)
                 .append(remindDateTime, that.remindDateTime)
                 .append(remindTimeIsSet, that.remindTimeIsSet)
+                .append(position, that.position)
                 .isEquals();
     }
 
@@ -129,6 +139,7 @@ public class Task {
                 .append(dueTimeIsSet)
                 .append(remindDateTime)
                 .append(remindTimeIsSet)
+                .append(position)
                 .toHashCode();
     }
 
@@ -137,6 +148,7 @@ public class Task {
         LIST_ID("listId"),
         NAME("name"),
         DONE("done"),
+        POSITION("position"),
         DUE_DATE_TIME("dueDateTime"),
         DUE_TIME_IS_SET("dueTimeIsSet"),
         REMIND_DATE_TIME("remindDateTime"),

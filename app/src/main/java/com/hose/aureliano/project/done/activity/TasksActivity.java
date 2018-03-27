@@ -137,9 +137,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
             }
         });
 
-        int swipeDirs = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
-        new ItemTouchHelper(new TaskItemTouchHelper(this, taskAdapter, coordinator, swipeDirs, 0))
-                .attachToRecyclerView(listView);
+        new ItemTouchHelper(new TaskItemTouchHelper(this, taskAdapter, coordinator)).attachToRecyclerView(listView);
     }
 
     @Override

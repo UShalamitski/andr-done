@@ -11,13 +11,11 @@ import android.view.View;
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.TaskAdapter;
 import com.hose.aureliano.project.done.model.Task;
-import com.hose.aureliano.project.done.repository.DatabaseCreator;
-import com.hose.aureliano.project.done.repository.dao.TaskDao;
 import com.hose.aureliano.project.done.service.schedule.TaskService;
-import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -44,11 +42,14 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     private Context context;
     private View coordinator;
 
+    private Integer fromPosition = null;
+    private Integer toPosition = null;
+
     private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(5);
     private Map<Task, ScheduledFuture> itemsToRemoveMap = new HashMap<>();
 
-    public TaskItemTouchHelper(Context context, TaskAdapter adapter, View coordinator, int swipeDirs, int dragDirs) {
-        super(dragDirs, swipeDirs);
+    public TaskItemTouchHelper(Context context, TaskAdapter adapter, View coordinator) {
+        super(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
         this.context = context;
         this.adapter = adapter;
         this.coordinator = coordinator;
@@ -63,28 +64,25 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                           RecyclerView.ViewHolder target) {
+        int oldPosition = viewHolder.getAdapterPosition();
+        int newPosition = target.getAdapterPosition();
+        List<Task> tasks = adapter.getTasks();
+        tasks.add(newPosition, tasks.remove(oldPosition));
+        adapter.notifyItemMoved(oldPosition, newPosition);
         return true;
     }
 
     @Override
-    public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-        if (viewHolder != null) {
-            View foregroundView = ((TaskAdapter.ViewHolder) viewHolder).getViewForeground();
-            getDefaultUIUtil().onSelected(foregroundView);
-        }
-    }
-
-    @Override
-    public void onChildDrawOver(Canvas c, RecyclerView recyclerView,
-                                RecyclerView.ViewHolder viewHolder, float dX, float dY,
-                                int actionState, boolean isCurrentlyActive) {
-        final View foregroundView = ((TaskAdapter.ViewHolder) viewHolder).getViewForeground();
-        getDefaultUIUtil().onDrawOver(c, recyclerView, foregroundView, dX, dY,
-                actionState, isCurrentlyActive);
-    }
-
-    @Override
     public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+        if (fromPosition != null && toPosition != null) {
+            int i = 0;
+            for (Task task : adapter.getTasks()) {
+                task.setPosition(i++);
+                taskService.update(task);
+            }
+        }
+        fromPosition = null;
+        toPosition = null;
         final View foregroundView = ((TaskAdapter.ViewHolder) viewHolder).getViewForeground();
         getDefaultUIUtil().clearView(foregroundView);
     }
@@ -93,7 +91,9 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                             float dX, float dY, int actionState, boolean isCurrentlyActive) {
         TaskAdapter.ViewHolder taskViewHolder = (TaskAdapter.ViewHolder) viewHolder;
+        View view = null;
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+            view = ((TaskAdapter.ViewHolder) viewHolder).getViewForeground();
             if (dX > 0) {
                 if (taskViewHolder.getCheckBox().isChecked()) {
                     taskViewHolder.getViewBackground().setBackgroundColor(COLOR_ORANGE);
@@ -115,9 +115,20 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                 taskViewHolder.getBackgroundRightIcon().setVisibility(View.VISIBLE);
                 taskViewHolder.getBackgroundRightText().setVisibility(View.VISIBLE);
             }
+        } else if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+            view = ((TaskAdapter.ViewHolder) viewHolder).getView();
         }
-        getDefaultUIUtil().onDraw(c, recyclerView, taskViewHolder.getViewForeground(), dX, dY,
-                actionState, isCurrentlyActive);
+        getDefaultUIUtil().onDraw(c, recyclerView, view, dX, dY, actionState, isCurrentlyActive);
+    }
+
+    @Override
+    public void onMoved(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, int fromPos,
+                        RecyclerView.ViewHolder target, int toPos, int x, int y) {
+        if (fromPosition == null) {
+            fromPosition = fromPos;
+        }
+        toPosition = toPos;
+        super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y);
     }
 
     @Override
@@ -128,7 +139,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
             adapter.removeItem(position);
 
             itemsToRemoveMap.put(task, executorService.schedule(() -> {
-                taskService.deleteTask(task);
+                taskService.delete(task);
                 itemsToRemoveMap.remove(task);
             }, 3, TimeUnit.SECONDS));
 

@@ -27,11 +27,20 @@ public class TaskService {
     }
 
     /**
+     * Updates instance of {@link Task}.
+     *
+     * @param task instance of {@link Task} to update
+     */
+    public void update(Task task) {
+        taskDao.update(task);
+    }
+
+    /**
      * Removes all tasks for specified list and reminders for that tasks.
      *
      * @param listId identifier of list
      */
-    public void deleteTasks(String listId) {
+    public void deleteByListId(String listId) {
         List<Task> tasks = taskDao.read(listId);
         for (Task task : tasks) {
             AlarmService.cancelAlarm(context, task);
@@ -44,11 +53,10 @@ public class TaskService {
      *
      * @param task instance of {@link Task} to remove
      */
-    public void deleteTask(Task task) {
+    public void delete(Task task) {
         AlarmService.cancelAlarm(context, task);
         taskDao.delete(task.getId());
     }
-
 
     /**
      * Removes reminder date from {@link Task} by given identifier.

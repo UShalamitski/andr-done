@@ -73,7 +73,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                         ActivityUtils.showConfirmationDialog(context, R.string.list_delete_confirmation,
                                 (dialog, which) -> {
                                     DatabaseCreator.getDatabase(context).runInTransaction(() -> {
-                                        taskService.deleteTasks(doneList.getId());
+                                        taskService.deleteByListId(doneList.getId());
                                         doneListDao.delete(doneList.getId());
                                     });
                                     int position = getPosition(itemView);

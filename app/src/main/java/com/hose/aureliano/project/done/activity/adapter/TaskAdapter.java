@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
@@ -74,7 +75,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                     case R.id.menu_delete:
                         ActivityUtils.showConfirmationDialog(context, R.string.task_delete_confirmation,
                                 (dialog, which) -> {
-                                    taskService.deleteTask(currentTask);
+                                    taskService.delete(currentTask);
                                     removeItem(getPosition(menuView));
                                 });
                         break;
@@ -140,6 +141,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    public List<Task> getTasks() {
+        return taskList;
     }
 
     /**
@@ -226,6 +231,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        private FrameLayout view;
         private RelativeLayout viewForeground;
         private RelativeLayout viewBackground;
         private TextView backgroundRightText;
@@ -243,12 +249,21 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             this.name = view.findViewById(R.id.task_name);
             this.menu = view.findViewById(R.id.task_menu);
             this.checkBox = view.findViewById(R.id.task_checkbox);
+            this.view = view.findViewById(R.id.task_item_layout);
             this.viewForeground = view.findViewById(R.id.item_view_foreground);
             this.viewBackground = view.findViewById(R.id.item_view_background);
             this.backgroundRightIcon = view.findViewById(R.id.task_background_delete_icon);
             this.backgroundLeftIcon = view.findViewById(R.id.task_background_done_icon);
             this.backgroundRightText = view.findViewById(R.id.task_background_delete_text);
             this.backgroundLeftText = view.findViewById(R.id.task_background_done_text);
+        }
+
+        public FrameLayout getView() {
+            return view;
+        }
+
+        public void setView(FrameLayout view) {
+            this.view = view;
         }
 
         public RelativeLayout getViewForeground() {
