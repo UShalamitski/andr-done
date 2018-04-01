@@ -29,7 +29,7 @@ public class Task {
     private Long remindDateTime;
     private boolean remindTimeIsSet;
     private boolean done;
-    private int position;
+    private Integer position;
 
     public Task() {
     }
@@ -98,11 +98,11 @@ public class Task {
         this.remindTimeIsSet = remindTimeIsSet;
     }
 
-    public int getPosition() {
+    public Integer getPosition() {
         return position;
     }
 
-    public void setPosition(int position) {
+    public void setPosition(Integer position) {
         this.position = position;
     }
 

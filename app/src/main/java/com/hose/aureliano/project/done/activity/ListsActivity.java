@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -24,6 +25,8 @@ import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.ListAdapter;
 import com.hose.aureliano.project.done.activity.component.CustomEditText;
 import com.hose.aureliano.project.done.activity.dialog.ListModal;
+import com.hose.aureliano.project.done.activity.helper.ListItemTouchHelper;
+import com.hose.aureliano.project.done.activity.helper.TaskItemTouchHelper;
 import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.DoneListDao;
@@ -124,6 +127,8 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
                 decorView.addView(background);
             }
         });
+
+        new ItemTouchHelper(new ListItemTouchHelper(this, listsAdapter)).attachToRecyclerView(recyclerView);
     }
 
     @Override

@@ -21,6 +21,7 @@ public class DoneList {
     @PrimaryKey
     private String id;
     private String name;
+    private Integer position;
     private int tasksCount;
     private int doneTasksCount;
 
@@ -57,6 +58,14 @@ public class DoneList {
         this.doneTasksCount = doneTasksCount;
     }
 
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -65,6 +74,7 @@ public class DoneList {
         return new EqualsBuilder()
                 .append(id, doneList.id)
                 .append(name, doneList.name)
+                .append(position, doneList.position)
                 .isEquals();
     }
 
@@ -73,6 +83,7 @@ public class DoneList {
         return new HashCodeBuilder(17, 37)
                 .append(id)
                 .append(name)
+                .append(position)
                 .toHashCode();
     }
 }

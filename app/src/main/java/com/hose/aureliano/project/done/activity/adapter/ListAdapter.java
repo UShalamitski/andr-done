@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -126,6 +127,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         return position;
     }
 
+    public List<DoneList> getLists() {
+        return doneLists;
+    }
+
     private DoneList getItem(int position) {
         return doneLists.get(position);
     }
@@ -157,12 +162,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     /**
      * Provides a reference to the views for each data item.
      */
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private String id;
         private TextView taskCounts;
         private TextView name;
         private ImageView menu;
         private ProgressBar progressBar;
+        private View view;
 
         ViewHolder(View view) {
             super(view);
@@ -170,6 +176,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             this.menu = view.findViewById(R.id.list_menu);
             this.taskCounts = view.findViewById(R.id.list_item_count);
             this.progressBar = view.findViewById(R.id.list_progress_bar);
+            this.view = view;
+        }
+
+        public View getView() {
+            return view;
         }
     }
 }

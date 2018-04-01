@@ -33,6 +33,6 @@ public interface DoneListDao {
 
     @Query("SELECT id, name, (SELECT COUNT(*) FROM tasks t WHERE t.listId = l.id) AS tasksCount, " +
             "(SELECT COUNT(*) FROM tasks t WHERE t.listId = l.id AND t.done) AS doneTasksCount " +
-            "FROM lists l")
+            "FROM lists l ORDER BY CASE WHEN position IS NULL THEN 1 ELSE 0 END, position")
     List<DoneList> read();
 }
