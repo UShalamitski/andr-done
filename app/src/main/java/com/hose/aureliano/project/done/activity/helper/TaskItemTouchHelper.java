@@ -56,7 +56,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
         taskService = new TaskService(context);
         COLOR_RED = ContextCompat.getColor(context, R.color.red);
         COLOR_GREEN = ContextCompat.getColor(context, R.color.green);
-        COLOR_ORANGE = ContextCompat.getColor(context, R.color.orange);
+        COLOR_ORANGE = ContextCompat.getColor(context, R.color.gray);
         DRAWABLE_CANCEL = ContextCompat.getDrawable(context, R.drawable.icon_cancel_white);
         DRAWABLE_DONE = ContextCompat.getDrawable(context, R.drawable.icon_done_white);
     }

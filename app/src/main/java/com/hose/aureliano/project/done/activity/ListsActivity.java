@@ -26,7 +26,6 @@ import com.hose.aureliano.project.done.activity.adapter.ListAdapter;
 import com.hose.aureliano.project.done.activity.component.CustomEditText;
 import com.hose.aureliano.project.done.activity.dialog.ListModal;
 import com.hose.aureliano.project.done.activity.helper.ListItemTouchHelper;
-import com.hose.aureliano.project.done.activity.helper.TaskItemTouchHelper;
 import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.DoneListDao;
@@ -101,21 +100,20 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
             }
         });
         editText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
+            if (actionId == EditorInfo.IME_ACTION_DONE && StringUtils.isNotBlank(editText.getText().toString())) {
                 DoneList list = new DoneList();
                 list.setName(editText.getText().toString());
                 list.setId(UUID.randomUUID().toString());
                 ActivityUtils.handleDbInteractionResult(doneListDao.insert(list), coordinator, () -> {
-                    listsAdapter.refresh();
-                    editText.setText("");
+                    editText.setText(StringUtils.EMPTY);
+                    editText.onKeyPreIme(1, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
                     Intent intent = new Intent(this, TasksActivity.class);
                     intent.putExtra("listId", list.getId());
                     intent.putExtra("name", list.getName());
                     this.startActivity(intent);
                 });
-                return true;
             }
-            return false;
+            return true;
         });
         floatingActionButton.setOnClickListener(view -> {
             bottomView.setVisibility(View.VISIBLE);
@@ -132,6 +130,12 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        listsAdapter.refresh();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_lists, menu);
         return true;
@@ -139,10 +143,8 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int deletedCount = 0;
-        int id = item.getItemId();
-        if (id == R.id.delete_all) {
-            deletedCount = doneListDao.delete();
+        if (item.getItemId() == R.id.delete_all) {
+            int deletedCount = doneListDao.delete();
             listsAdapter.refresh();
             ActivityUtils.showSnackBar(coordinator, String.format("Deleted: %s", deletedCount));
             return true;

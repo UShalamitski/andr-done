@@ -17,6 +17,7 @@
             android:id="@+id/activity_lists_list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#f2f2f2"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
     </FrameLayout>
 

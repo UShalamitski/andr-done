@@ -113,17 +113,16 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
             }
         });
         editText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
+            if (actionId == EditorInfo.IME_ACTION_DONE && StringUtils.isNotBlank(editText.getText().toString())) {
                 Task task = new Task();
                 task.setName(editText.getText().toString());
                 task.setListId(listId);
                 ActivityUtils.handleDbInteractionResult(taskDao.insert(task), coordinator, () -> {
                     taskAdapter.refresh();
-                    editText.setText("");
+                    editText.setText(StringUtils.EMPTY);
                 });
-                return true;
             }
-            return false;
+            return true;
         });
 
         floatingActionButton.setOnClickListener(view -> {

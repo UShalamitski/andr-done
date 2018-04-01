@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_view"
     android:layout_width="match_parent"
@@ -10,14 +11,15 @@
     android:layout_marginStart="10dp"
     android:layout_marginTop="10dp"
     android:background="@android:color/white"
-    card_view:cardCornerRadius="2dp">
+    card_view:cardCornerRadius="0dp">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/list_item_top_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="14dp"
-        android:paddingBottom="10dp"
+        android:paddingBottom="20dp"
         android:paddingEnd="16dp"
         android:paddingTop="12dp">
 
@@ -45,13 +47,11 @@
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginBottom="17dp"
             android:layout_marginEnd="40dp"
+            android:layout_centerVertical="true"
+            android:textAppearance="?android:textAppearanceMedium"
             android:layout_toEndOf="@+id/list_item_count_layout"
             android:fontFamily="sans-serif-medium"
-            android:textAppearance="?android:textAppearanceMedium"
             android:textColor="#2B3D4D"
             tools:text="text" />
 
@@ -63,18 +63,21 @@
             android:layout_centerVertical="true"
             android:src="@drawable/icon_more_vert_white"
             android:tint="@color/cardview_dark_background" />
+    </RelativeLayout>
 
-        <ProgressBar
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_gravity="bottom">
+
+        <ProgressBar style="?android:attr/progressBarStyleHorizontal"
             android:id="@+id/list_progress_bar"
-            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="3dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="40dp"
-            android:layout_marginTop="10dp"
-            android:layout_toEndOf="@+id/list_item_count_layout"
             android:max="100"
+            android:progressTint="@color/green"
             android:progress="25" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>
