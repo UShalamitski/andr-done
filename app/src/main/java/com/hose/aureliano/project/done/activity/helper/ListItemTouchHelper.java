@@ -7,9 +7,8 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 
 import com.hose.aureliano.project.done.activity.adapter.ListAdapter;
-import com.hose.aureliano.project.done.activity.adapter.TaskAdapter;
 import com.hose.aureliano.project.done.model.DoneList;
-import com.hose.aureliano.project.done.service.schedule.ListService;
+import com.hose.aureliano.project.done.service.ListService;
 
 import java.util.List;
 

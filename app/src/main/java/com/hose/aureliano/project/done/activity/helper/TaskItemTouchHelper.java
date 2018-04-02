@@ -11,7 +11,7 @@ import android.view.View;
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.TaskAdapter;
 import com.hose.aureliano.project.done.model.Task;
-import com.hose.aureliano.project.done.service.schedule.TaskService;
+import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 import java.util.HashMap;
@@ -33,7 +33,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     private static int COLOR_RED;
     private static int COLOR_GREEN;
-    private static int COLOR_ORANGE;
+    private static int COLOR_GRAY;
     private static Drawable DRAWABLE_CANCEL;
     private static Drawable DRAWABLE_DONE;
 
@@ -56,7 +56,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
         taskService = new TaskService(context);
         COLOR_RED = ContextCompat.getColor(context, R.color.red);
         COLOR_GREEN = ContextCompat.getColor(context, R.color.green);
-        COLOR_ORANGE = ContextCompat.getColor(context, R.color.gray);
+        COLOR_GRAY = ContextCompat.getColor(context, R.color.gray);
         DRAWABLE_CANCEL = ContextCompat.getDrawable(context, R.drawable.icon_cancel_white);
         DRAWABLE_DONE = ContextCompat.getDrawable(context, R.drawable.icon_done_white);
     }
@@ -96,7 +96,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
             view = ((TaskAdapter.ViewHolder) viewHolder).getViewForeground();
             if (dX > 0) {
                 if (taskViewHolder.getCheckBox().isChecked()) {
-                    taskViewHolder.getViewBackground().setBackgroundColor(COLOR_ORANGE);
+                    taskViewHolder.getViewBackground().setBackgroundColor(COLOR_GRAY);
                     taskViewHolder.getBackgroundLeftIcon().setImageDrawable(DRAWABLE_CANCEL);
                     taskViewHolder.getBackgroundLeftText().setText(R.string.cancel);
                 } else {
@@ -143,7 +143,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                 itemsToRemoveMap.remove(task);
             }, 3, TimeUnit.SECONDS));
 
-            ActivityUtils.showSnackBar(coordinator, "Item removed " + task.getName(), R.string.undo,
+            ActivityUtils.showSnackBar(coordinator, context.getString(R.string.task_removed), R.string.undo,
                     snackBarView -> {
                         adapter.restoreItem(position, task);
                         itemsToRemoveMap.remove(task).cancel(false);

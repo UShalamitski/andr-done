@@ -20,6 +20,7 @@
     <string name="task.due_date">Дата исполнения</string>
     <string name="task.notification.title">Напоминание</string>
     <string name="task.remind_me">Напомнить</string>
+    <string name="task.removed">Задача удалена</string>
 
     <string name="list.delete.confirmation">Вы уверены, что хотите удалить выбранный список?</string>
     <string name="list.add_new">Добавить список</string>

@@ -1,6 +1,7 @@
 package com.hose.aureliano.project.done.activity.adapter;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -20,7 +21,7 @@ import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.TaskDao;
-import com.hose.aureliano.project.done.service.schedule.TaskService;
+import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -103,6 +104,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         holder.checkBox.setTag(task.getId());
         holder.menu.setTag(task.getId());
         holder.name.setText(task.getName());
+        crossOutText(holder, task.getDone());
         holder.checkBox.setChecked(task.getDone());
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -125,6 +127,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         }
 
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            crossOutText(holder, isChecked);
             Task currentTask = getItem(buttonView);
             if (currentTask.getDone() != buttonView.isChecked()) {
                 currentTask.setDone(buttonView.isChecked());
@@ -208,6 +211,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             position++;
         }
         throw new NoSuchElementException();
+    }
+
+    private void crossOutText(ViewHolder holder, boolean checked) {
+        holder.name.setPaintFlags(checked
+                ? holder.name.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
+                : holder.name.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
     }
 
     private Bundle buildBundle(Task task) {

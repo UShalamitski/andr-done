@@ -83,7 +83,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:maxLines="1"
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="#2B3D4D"
+                android:textColor="#2b3d4d"
                 tools:text="text" />
 
             <TextView

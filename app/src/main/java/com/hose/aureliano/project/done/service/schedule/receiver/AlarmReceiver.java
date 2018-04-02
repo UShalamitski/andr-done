@@ -13,7 +13,7 @@ import android.support.v4.app.NotificationCompat;
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.ListsActivity;
 import com.hose.aureliano.project.done.model.Task;
-import com.hose.aureliano.project.done.service.schedule.TaskService;
+import com.hose.aureliano.project.done.service.TaskService;
 
 /**
  * Class that receives and handles broadcast intents sent by

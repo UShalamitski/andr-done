@@ -1,4 +1,4 @@
-package com.hose.aureliano.project.done.service.schedule;
+package com.hose.aureliano.project.done.service;
 
 import android.content.Context;
 
