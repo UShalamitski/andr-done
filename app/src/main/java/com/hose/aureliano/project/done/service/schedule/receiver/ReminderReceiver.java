@@ -23,7 +23,7 @@ import com.hose.aureliano.project.done.service.TaskService;
  *
  * @author Uladzislau Shalamitski
  */
-public class AlarmReceiver extends BroadcastReceiver {
+public class ReminderReceiver extends BroadcastReceiver {
 
     TaskService taskService;
 

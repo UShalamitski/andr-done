@@ -36,4 +36,7 @@ public interface TaskDao {
 
     @Query("SELECT * FROM tasks WHERE listId = :listId ORDER BY CASE WHEN position IS NULL THEN 1 ELSE 0 END, position")
     List<Task> read(String listId);
+
+    @Query("SELECT * FROM tasks WHERE remindDateTime IS NOT null")
+    List<Task> readAllWithReminder();
 }

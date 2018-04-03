@@ -1,0 +1,44 @@
+package com.hose.aureliano.project.done.service.schedule.receiver;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+
+import com.hose.aureliano.project.done.model.Task;
+import com.hose.aureliano.project.done.service.TaskService;
+import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.GregorianCalendar;
+
+/**
+ * Broadcast receiver, starts when the device gets starts.
+ * Resets the reminders for tasks.
+ * <p/>
+ * Date: 10.03.2018
+ *
+ * @author Uladzislau Shalamitski
+ */
+public class DeviceBootReceiver extends BroadcastReceiver {
+
+    private static final String[] ACTIONS = {
+            "android.intent.action.BOOT_COMPLETED",
+            "android.intent.action.QUICKBOOT_POWERON",
+            "com.htc.intent.action.QUICKBOOT_POWERON"};
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if (StringUtils.equalsAny(intent.getAction(), ACTIONS)) {
+            TaskService taskService = new TaskService(context);
+            Long currentDateTime = new GregorianCalendar().getTimeInMillis();
+            for (Task task : taskService.getTasksWithReminder()) {
+                if (task.getRemindDateTime() > currentDateTime) {
+                    AlarmService.setAlarm(context, task);
+                } else {
+                    taskService.deleteReminderDate(task.getId());
+                }
+            }
+        }
+    }
+}

@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.hose.aureliano.project.done.model.Task;
-import com.hose.aureliano.project.done.service.schedule.receiver.AlarmReceiver;
+import com.hose.aureliano.project.done.service.schedule.receiver.ReminderReceiver;
 
 /**
  * Service that manages an alarms.
@@ -28,7 +28,7 @@ public class AlarmService {
      * @param task    instance of {@link Task}
      */
     public static void setAlarm(Context context, Task task) {
-        Intent intent = new Intent(context, AlarmReceiver.class);
+        Intent intent = new Intent(context, ReminderReceiver.class);
         intent.putExtra(Task.Fields.NAME.getFieldName(), task.getName());
         intent.putExtra(Task.Fields.ID.getFieldName(), task.getId());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, task.getId(), intent,
@@ -46,7 +46,7 @@ public class AlarmService {
      * @param task    instance of {@link Task}
      */
     public static void cancelAlarm(Context context, Task task) {
-        Intent intent = new Intent(context, AlarmReceiver.class);
+        Intent intent = new Intent(context, ReminderReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, task.getId(), intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

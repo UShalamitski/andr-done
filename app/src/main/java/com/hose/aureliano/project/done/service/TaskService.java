@@ -66,4 +66,11 @@ public class TaskService {
     public void deleteReminderDate(int taskId) {
         taskDao.deleteReminderDate(taskId);
     }
+
+    /**
+     * @return list of {@link Task}s which have a reminder.
+     */
+    public List<Task> getTasksWithReminder() {
+        return taskDao.readAllWithReminder();
+    }
 }

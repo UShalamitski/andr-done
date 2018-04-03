@@ -120,5 +120,4 @@
             android:buttonTint="@color/green"
             android:focusable="false" />
     </RelativeLayout>
-
 </FrameLayout>
