@@ -54,11 +54,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
         this.adapter = adapter;
         this.coordinator = coordinator;
         taskService = new TaskService(context);
-        COLOR_RED = ContextCompat.getColor(context, R.color.red);
-        COLOR_GREEN = ContextCompat.getColor(context, R.color.green);
-        COLOR_GRAY = ContextCompat.getColor(context, R.color.gray);
-        DRAWABLE_CANCEL = ContextCompat.getDrawable(context, R.drawable.icon_cancel_white);
-        DRAWABLE_DONE = ContextCompat.getDrawable(context, R.drawable.icon_done_white);
+        initStaticVariables();
     }
 
     @Override
@@ -154,6 +150,24 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
             holder.getCheckBox().setChecked(!holder.getCheckBox().isChecked());
             adapter.notifyDataSetChanged();
             ActivityUtils.vibrate(context);
+        }
+    }
+
+    private void initStaticVariables() {
+        if (0 == COLOR_RED) {
+            COLOR_RED = ContextCompat.getColor(context, R.color.red);
+        }
+        if (0 == COLOR_GREEN) {
+            COLOR_GREEN = ContextCompat.getColor(context, R.color.green);
+        }
+        if (0 == COLOR_GRAY) {
+            COLOR_GRAY = ContextCompat.getColor(context, R.color.gray);
+        }
+        if (null == DRAWABLE_CANCEL) {
+            DRAWABLE_CANCEL = ContextCompat.getDrawable(context, R.drawable.icon_cancel_white);
+        }
+        if (null == DRAWABLE_DONE) {
+            DRAWABLE_DONE = ContextCompat.getDrawable(context, R.drawable.icon_done_white);
         }
     }
 }

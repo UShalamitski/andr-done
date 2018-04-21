@@ -80,26 +80,66 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginEnd="40dp"
                 android:layout_marginStart="45dp"
-                android:fontFamily="sans-serif-medium"
                 android:maxLines="1"
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="#2b3d4d"
-                tools:text="text" />
+                android:textColor="@color/black_primary" />
 
-            <TextView
-                android:id="@+id/task_id"
+            <RelativeLayout
+                android:id="@+id/task_info_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/task_name"
                 android:layout_marginEnd="40dp"
-                android:layout_marginStart="45dp"
-                android:fontFamily="sans-serif"
-                android:maxLines="1"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:textColor="#AEB6BD"
-                tools:text="text" />
+                android:layout_marginStart="45dp">
+
+                <ImageView
+                    android:id="@+id/task_info_due_icon"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/icon_calendar_white" />
+
+                <TextView
+                    android:id="@+id/task_info_due_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_toEndOf="@+id/task_info_due_icon"
+                    android:fontFamily="sans-serif"
+                    android:maxLines="1"
+                    android:textAppearance="?android:textAppearanceSmall" />
+
+                <TextView
+                    android:id="@+id/task_info_delimiter_before_reminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_toEndOf="@+id/task_info_due_text"
+                    android:fontFamily="sans-serif"
+                    android:text="-"
+                    android:textAppearance="?android:textAppearanceSmall" />
+
+                <ImageView
+                    android:id="@+id/task_info_reminder_icon"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@+id/task_info_delimiter_before_reminder"
+                    android:src="@drawable/icon_alarm_white"
+                    android:tint="@color/black_secondary" />
+
+                <TextView
+                    android:id="@+id/task_info_reminder_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_toEndOf="@+id/task_info_reminder_icon"
+                    android:textAppearance="?android:textAppearanceSmall" />
+            </RelativeLayout>
         </RelativeLayout>
 
         <ImageView
@@ -108,8 +148,8 @@
             android:layout_height="25dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:tint="@color/cardview_dark_background"
-            android:src="@drawable/icon_more_vert_white" />
+            android:src="@drawable/icon_more_vert_white"
+            android:tint="@color/cardview_dark_background" />
 
         <CheckBox
             android:id="@+id/task_checkbox"

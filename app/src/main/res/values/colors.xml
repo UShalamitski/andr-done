@@ -4,7 +4,9 @@
     <color name="colorPrimaryDark">#007ac1</color>
     <color name="colorAccent">#039be5</color>
 
-    <color name="black">#111</color>
+    <color name="black">#000</color>
+    <color name="black_primary">#de000000</color>
+    <color name="black_secondary">#8a000000</color>
     <color name="blue">#0288d1</color>
     <color name="darker_gray">#aaa</color>
     <color name="green">#4caf50</color>

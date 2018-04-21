@@ -10,8 +10,6 @@ import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.GregorianCalendar;
-
 /**
  * Broadcast receiver, starts when the device gets starts.
  * Resets the reminders for tasks.
@@ -31,9 +29,9 @@ public class DeviceBootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (StringUtils.equalsAny(intent.getAction(), ACTIONS)) {
             TaskService taskService = new TaskService(context);
-            Long currentDateTime = new GregorianCalendar().getTimeInMillis();
-            for (Task task : taskService.getTasksWithReminder()) {
-                if (task.getRemindDateTime() > currentDateTime) {
+            long currentTime = System.currentTimeMillis();
+            for (Task task : taskService.getNotCompletedTasksWithReminder()) {
+                if (task.getRemindDateTime() > currentTime) {
                     AlarmService.setAlarm(context, task);
                 } else {
                     taskService.deleteReminderDate(task.getId());

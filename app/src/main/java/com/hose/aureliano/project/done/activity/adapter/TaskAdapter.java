@@ -5,6 +5,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,10 +23,10 @@ import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.TaskDao;
 import com.hose.aureliano.project.done.service.TaskService;
+import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -38,6 +39,10 @@ import java.util.NoSuchElementException;
  * @author evere
  */
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
+
+    private static int COLOR_RED_SECONDARY;
+    private static int COLOR_BLACK_PRIMARY;
+    private static int COLOR_BLACK_SECONDARY;
 
     private FragmentManager fragmentManager;
     private TaskService taskService;
@@ -60,6 +65,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         this.fragmentManager = fragmentManager;
         this.context = context;
         this.listId = listId;
+        initStaticResources();
     }
 
     @Override
@@ -107,23 +113,36 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         crossOutText(holder, task.getDone());
         holder.checkBox.setChecked(task.getDone());
 
-        StringBuilder stringBuilder = new StringBuilder();
+        holder.name.setTextColor(task.getDone() ? COLOR_BLACK_SECONDARY : COLOR_BLACK_PRIMARY);
+
         if (null != task.getDueDateTime()) {
-            stringBuilder
-                    .append(ActivityUtils.getStringDate(context, task.getDueDateTime(), task.getDueTimeIsSet()));
+            holder.dueDateText
+                    .setText(ActivityUtils.getStringDate(context, task.getDueDateTime(), task.getDueTimeIsSet()));
         }
         if (null != task.getRemindDateTime()) {
-            if (StringUtils.isNoneBlank(stringBuilder.toString())) {
-                stringBuilder.append(" | ");
-            }
-            stringBuilder.append(
-                    ActivityUtils.getStringDate(context, task.getRemindDateTime(), task.getRemindTimeIsSet()));
+            holder.reminderText
+                    .setText(ActivityUtils.getStringDate(context, task.getRemindDateTime(), task.getRemindTimeIsSet()));
         }
-        if (StringUtils.isNoneBlank(stringBuilder.toString())) {
-            holder.information.setVisibility(View.VISIBLE);
-            holder.information.setText(stringBuilder.toString());
+
+        if (null != task.getDueDateTime() || null != task.getRemindDateTime() && !task.getDone()) {
+            holder.taskInfoLayout.setVisibility(View.VISIBLE);
+            holder.dueDateIcon.setVisibility(null != task.getDueDateTime() ? View.VISIBLE : View.GONE);
+            holder.dueDateText.setVisibility(null != task.getDueDateTime() ? View.VISIBLE : View.GONE);
+            holder.dueDateAndReminderDelimiter.setVisibility(null != task.getDueDateTime() && !task.getDone()
+                    ? View.VISIBLE : View.GONE);
+            holder.reminderIcon.setVisibility(null != task.getRemindDateTime() && !task.getDone()
+                    ? View.VISIBLE : View.GONE);
+            holder.reminderText.setVisibility(null == task.getDueDateTime()
+                    ? View.VISIBLE : View.GONE);
+            if (null != task.getDueDateTime()) {
+                long currentTime = System.currentTimeMillis();
+                holder.dueDateIcon.setColorFilter(currentTime > task.getDueDateTime() && !task.getDone()
+                        ? COLOR_RED_SECONDARY : COLOR_BLACK_SECONDARY);
+                holder.dueDateText.setTextColor(currentTime > task.getDueDateTime() && !task.getDone()
+                        ? COLOR_RED_SECONDARY : COLOR_BLACK_SECONDARY);
+            }
         } else {
-            holder.information.setVisibility(View.GONE);
+            holder.taskInfoLayout.setVisibility(View.GONE);
         }
 
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -133,6 +152,35 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                 currentTask.setDone(buttonView.isChecked());
                 taskDao.update(currentTask);
             }
+            if (isChecked && currentTask.getRemindTimeIsSet()) {
+                holder.reminderIcon.setVisibility(View.GONE);
+                holder.reminderText.setVisibility(View.GONE);
+                holder.dueDateAndReminderDelimiter.setVisibility(View.GONE);
+                AlarmService.cancelAlarm(context, currentTask);
+            } else if (!isChecked && currentTask.getRemindTimeIsSet()) {
+                if (currentTask.getRemindDateTime() > System.currentTimeMillis()) {
+                    AlarmService.setAlarm(context, currentTask);
+                    holder.reminderIcon.setVisibility(View.VISIBLE);
+                    holder.reminderText.setVisibility(null == currentTask.getDueDateTime() ? View.VISIBLE : View.GONE);
+                    holder.dueDateAndReminderDelimiter.setVisibility(null == currentTask.getDueDateTime()
+                            ? View.GONE : View.VISIBLE);
+                } else {
+                    taskService.deleteReminderDate(currentTask.getId());
+                    currentTask.setRemindDateTime(null);
+                    currentTask.setRemindTimeIsSet(false);
+                    holder.reminderIcon.setVisibility(View.GONE);
+                    holder.reminderText.setVisibility(View.GONE);
+                    holder.dueDateAndReminderDelimiter.setVisibility(View.GONE);
+                }
+            }
+            if (null != currentTask.getDueDateTime()) {
+                long currentTime = System.currentTimeMillis();
+                holder.dueDateIcon.setColorFilter(currentTime > currentTask.getDueDateTime() && !isChecked
+                        ? COLOR_RED_SECONDARY : COLOR_BLACK_SECONDARY);
+                holder.dueDateText.setTextColor(currentTime > currentTask.getDueDateTime() && !isChecked
+                        ? COLOR_RED_SECONDARY : COLOR_BLACK_SECONDARY);
+            }
+            holder.name.setTextColor(isChecked ? COLOR_BLACK_SECONDARY : COLOR_BLACK_PRIMARY);
         });
     }
 
@@ -235,6 +283,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         return bundle;
     }
 
+    private void initStaticResources() {
+        if (0 == COLOR_RED_SECONDARY) {
+            COLOR_RED_SECONDARY = ContextCompat.getColor(context, R.color.red);
+        }
+        if (0 == COLOR_BLACK_PRIMARY) {
+            COLOR_BLACK_PRIMARY = ContextCompat.getColor(context, R.color.black_primary);
+        }
+        if (0 == COLOR_BLACK_SECONDARY) {
+            COLOR_BLACK_SECONDARY = ContextCompat.getColor(context, R.color.black_secondary);
+        }
+    }
+
     /**
      * Provides a reference to the views for each data item.
      */
@@ -247,14 +307,24 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         private TextView backgroundLeftText;
         private ImageView backgroundRightIcon;
         private ImageView backgroundLeftIcon;
-        private CheckBox checkBox;
-        private TextView information;
         private TextView name;
         private ImageView menu;
+        private CheckBox checkBox;
+        private RelativeLayout taskInfoLayout;
+        private ImageView dueDateIcon;
+        private TextView dueDateText;
+        private TextView dueDateAndReminderDelimiter;
+        private ImageView reminderIcon;
+        private TextView reminderText;
 
         ViewHolder(View view) {
             super(view);
-            this.information = view.findViewById(R.id.task_id);
+            this.taskInfoLayout = view.findViewById(R.id.task_info_layout);
+            this.dueDateIcon = view.findViewById(R.id.task_info_due_icon);
+            this.dueDateText = view.findViewById(R.id.task_info_due_text);
+            this.dueDateAndReminderDelimiter = view.findViewById(R.id.task_info_delimiter_before_reminder);
+            this.reminderIcon = view.findViewById(R.id.task_info_reminder_icon);
+            this.reminderText = view.findViewById(R.id.task_info_reminder_text);
             this.name = view.findViewById(R.id.task_name);
             this.menu = view.findViewById(R.id.task_menu);
             this.checkBox = view.findViewById(R.id.task_checkbox);
@@ -271,88 +341,40 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             return view;
         }
 
-        public void setView(FrameLayout view) {
-            this.view = view;
-        }
-
         public RelativeLayout getViewForeground() {
             return viewForeground;
-        }
-
-        public void setViewForeground(RelativeLayout viewForeground) {
-            this.viewForeground = viewForeground;
         }
 
         public RelativeLayout getViewBackground() {
             return viewBackground;
         }
 
-        public void setViewBackground(RelativeLayout viewBackground) {
-            this.viewBackground = viewBackground;
-        }
-
         public TextView getBackgroundRightText() {
             return backgroundRightText;
-        }
-
-        public void setBackgroundRightText(TextView backgroundRightText) {
-            this.backgroundRightText = backgroundRightText;
         }
 
         public TextView getBackgroundLeftText() {
             return backgroundLeftText;
         }
 
-        public void setBackgroundLeftText(TextView backgroundLeftText) {
-            this.backgroundLeftText = backgroundLeftText;
-        }
-
         public ImageView getBackgroundRightIcon() {
             return backgroundRightIcon;
-        }
-
-        public void setBackgroundRightIcon(ImageView backgroundRightIcon) {
-            this.backgroundRightIcon = backgroundRightIcon;
         }
 
         public ImageView getBackgroundLeftIcon() {
             return backgroundLeftIcon;
         }
 
-        public void setBackgroundLeftIcon(ImageView backgroundLeftIcon) {
-            this.backgroundLeftIcon = backgroundLeftIcon;
-        }
-
         public CheckBox getCheckBox() {
             return checkBox;
-        }
-
-        public void setCheckBox(CheckBox checkBox) {
-            this.checkBox = checkBox;
-        }
-
-        public TextView getInformation() {
-            return information;
-        }
-
-        public void setInformation(TextView id) {
-            this.information = id;
         }
 
         public TextView getName() {
             return name;
         }
 
-        public void setName(TextView name) {
-            this.name = name;
-        }
-
         public ImageView getMenu() {
             return menu;
-        }
-
-        public void setMenu(ImageView menu) {
-            this.menu = menu;
         }
     }
 }

@@ -68,9 +68,9 @@ public class TaskService {
     }
 
     /**
-     * @return list of {@link Task}s which have a reminder.
+     * @return list of incompleted {@link Task}s which have a reminder.
      */
-    public List<Task> getTasksWithReminder() {
-        return taskDao.readAllWithReminder();
+    public List<Task> getNotCompletedTasksWithReminder() {
+        return taskDao.readNotCompletedWithReminder();
     }
 }
