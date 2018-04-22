@@ -130,6 +130,7 @@ public class TaskModal extends DialogFragment {
             task.setRemindDateTime((Long) bundle.get(Task.Fields.REMIND_DATE_TIME.getFieldName()));
             task.setDueTimeIsSet(bundle.getBoolean(Task.Fields.DUE_TIME_IS_SET.getFieldName(), false));
             task.setRemindTimeIsSet(bundle.getBoolean(Task.Fields.REMIND_TIME_IS_SET.getFieldName(), false));
+            task.setPosition((Integer) bundle.get(Task.Fields.POSITION.getFieldName()));
         }
         return task;
     }

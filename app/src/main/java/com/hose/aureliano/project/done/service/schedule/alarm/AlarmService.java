@@ -31,6 +31,7 @@ public class AlarmService {
         Intent intent = new Intent(context, ReminderReceiver.class);
         intent.putExtra(Task.Fields.NAME.getFieldName(), task.getName());
         intent.putExtra(Task.Fields.ID.getFieldName(), task.getId());
+        intent.putExtra(Task.Fields.LIST_ID.getFieldName(), task.getListId());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, task.getId(), intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

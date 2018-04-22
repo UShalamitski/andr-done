@@ -30,6 +30,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * Adapter for {@link RecyclerView} of the {@link Task}s.
@@ -110,10 +111,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         holder.checkBox.setTag(task.getId());
         holder.menu.setTag(task.getId());
         holder.name.setText(task.getName());
+        holder.name.setTextColor(task.getDone() ? COLOR_BLACK_SECONDARY : COLOR_BLACK_PRIMARY);
         crossOutText(holder, task.getDone());
         holder.checkBox.setChecked(task.getDone());
-
-        holder.name.setTextColor(task.getDone() ? COLOR_BLACK_SECONDARY : COLOR_BLACK_PRIMARY);
 
         if (null != task.getDueDateTime()) {
             holder.dueDateText
@@ -160,6 +160,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             } else if (!isChecked && currentTask.getRemindTimeIsSet()) {
                 if (currentTask.getRemindDateTime() > System.currentTimeMillis()) {
                     AlarmService.setAlarm(context, currentTask);
+                    holder.taskInfoLayout.setVisibility(View.VISIBLE);
                     holder.reminderIcon.setVisibility(View.VISIBLE);
                     holder.reminderText.setVisibility(null == currentTask.getDueDateTime() ? View.VISIBLE : View.GONE);
                     holder.dueDateAndReminderDelimiter.setVisibility(null == currentTask.getDueDateTime()
@@ -272,6 +273,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         bundle.putInt(Task.Fields.ID.getFieldName(), task.getId());
         bundle.putString(Task.Fields.NAME.getFieldName(), task.getName());
         bundle.putBoolean(Task.Fields.DONE.getFieldName(), task.getDone());
+        bundle.putInt(Task.Fields.POSITION.getFieldName(), task.getPosition());
         if (null != task.getDueDateTime()) {
             bundle.putLong(Task.Fields.DUE_DATE_TIME.getFieldName(), task.getDueDateTime());
             bundle.putBoolean(Task.Fields.DUE_TIME_IS_SET.getFieldName(), task.getDueTimeIsSet());

@@ -1,6 +1,7 @@
 package com.hose.aureliano.project.done.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -62,9 +63,9 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
-        setTitle(getIntent().getExtras().getString("name"));
+        setTitle(getIntent().getStringExtra("name"));
 
-        listId = getIntent().getExtras().getString("listId");
+        listId = getIntent().getStringExtra("listId");
         coordinator = findViewById(R.id.tasks_coordinator_layout);
         taskAdapter = new TaskAdapter(this, getSupportFragmentManager(), listId);
 

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +12,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
 import com.hose.aureliano.project.done.R;
-import com.hose.aureliano.project.done.activity.ListsActivity;
+import com.hose.aureliano.project.done.activity.TasksActivity;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.service.TaskService;
 
@@ -35,10 +36,16 @@ public class ReminderReceiver extends BroadcastReceiver {
             taskService = new TaskService(context);
             int taskId = extras.getInt(Task.Fields.ID.getFieldName());
 
-            Intent contentIntent = new Intent(context, ListsActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, taskId, contentIntent,
-                    PendingIntent.FLAG_ONE_SHOT);
+            Intent contentIntent = new Intent().setClass(context, TasksActivity.class);;
+            contentIntent.putExtra("listId", extras.getString(Task.Fields.LIST_ID.getFieldName()));
+            contentIntent.putExtra("name", extras.getString(Task.Fields.NAME.getFieldName()));
+            contentIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            stackBuilder.addParentStack(TasksActivity.class);
+            stackBuilder.addNextIntent(contentIntent);
+
+            PendingIntent pendingIntent = stackBuilder.getPendingIntent(taskId, PendingIntent.FLAG_ONE_SHOT);
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, "channelId")
                     .setSmallIcon(R.drawable.ic_launcher_foreground)
                     .setContentTitle(context.getString(R.string.task_notification_title))
