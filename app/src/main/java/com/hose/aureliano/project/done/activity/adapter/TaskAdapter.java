@@ -30,7 +30,6 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 /**
  * Adapter for {@link RecyclerView} of the {@link Task}s.
@@ -125,24 +124,15 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         }
 
         if (null != task.getDueDateTime() || null != task.getRemindDateTime() && !task.getDone()) {
-            holder.taskInfoLayout.setVisibility(View.VISIBLE);
-            holder.dueDateIcon.setVisibility(null != task.getDueDateTime() ? View.VISIBLE : View.GONE);
-            holder.dueDateText.setVisibility(null != task.getDueDateTime() ? View.VISIBLE : View.GONE);
-            holder.dueDateAndReminderDelimiter.setVisibility(null != task.getDueDateTime() && !task.getDone()
-                    ? View.VISIBLE : View.GONE);
-            holder.reminderIcon.setVisibility(null != task.getRemindDateTime() && !task.getDone()
-                    ? View.VISIBLE : View.GONE);
-            holder.reminderText.setVisibility(null == task.getDueDateTime()
-                    ? View.VISIBLE : View.GONE);
-            if (null != task.getDueDateTime()) {
-                long currentTime = System.currentTimeMillis();
-                holder.dueDateIcon.setColorFilter(currentTime > task.getDueDateTime() && !task.getDone()
-                        ? COLOR_RED_SECONDARY : COLOR_BLACK_SECONDARY);
-                holder.dueDateText.setTextColor(currentTime > task.getDueDateTime() && !task.getDone()
-                        ? COLOR_RED_SECONDARY : COLOR_BLACK_SECONDARY);
-            }
+            setVisibility(holder.taskInfoLayout, true);
+            setVisibility(holder.dueDateIcon, null != task.getDueDateTime());
+            setVisibility(holder.dueDateText, null != task.getDueDateTime());
+            setVisibility(holder.dueDateAndReminderDelimiter, null != task.getDueDateTime() && !task.getDone());
+            setVisibility(holder.reminderIcon, null != task.getRemindDateTime() && !task.getDone());
+            setVisibility(holder.reminderText, null == task.getDueDateTime());
+            colorDueDate(task, holder, task.getDone());
         } else {
-            holder.taskInfoLayout.setVisibility(View.GONE);
+            setVisibility(holder.taskInfoLayout, false);
         }
 
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -153,34 +143,27 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                 taskDao.update(currentTask);
             }
             if (isChecked && currentTask.getRemindTimeIsSet()) {
-                holder.reminderIcon.setVisibility(View.GONE);
-                holder.reminderText.setVisibility(View.GONE);
-                holder.dueDateAndReminderDelimiter.setVisibility(View.GONE);
+                setVisibility(holder.reminderIcon, false);
+                setVisibility(holder.reminderText, false);
+                setVisibility(holder.dueDateAndReminderDelimiter, false);
                 AlarmService.cancelAlarm(context, currentTask);
             } else if (!isChecked && currentTask.getRemindTimeIsSet()) {
                 if (currentTask.getRemindDateTime() > System.currentTimeMillis()) {
                     AlarmService.setAlarm(context, currentTask);
-                    holder.taskInfoLayout.setVisibility(View.VISIBLE);
-                    holder.reminderIcon.setVisibility(View.VISIBLE);
-                    holder.reminderText.setVisibility(null == currentTask.getDueDateTime() ? View.VISIBLE : View.GONE);
-                    holder.dueDateAndReminderDelimiter.setVisibility(null == currentTask.getDueDateTime()
-                            ? View.GONE : View.VISIBLE);
+                    setVisibility(holder.taskInfoLayout, true);
+                    setVisibility(holder.reminderIcon, true);
+                    setVisibility(holder.reminderText, null == currentTask.getDueDateTime());
+                    setVisibility(holder.dueDateAndReminderDelimiter, null != currentTask.getDueDateTime());
                 } else {
                     taskService.deleteReminderDate(currentTask.getId());
                     currentTask.setRemindDateTime(null);
                     currentTask.setRemindTimeIsSet(false);
-                    holder.reminderIcon.setVisibility(View.GONE);
-                    holder.reminderText.setVisibility(View.GONE);
-                    holder.dueDateAndReminderDelimiter.setVisibility(View.GONE);
+                    setVisibility(holder.reminderIcon, false);
+                    setVisibility(holder.reminderText, false);
+                    setVisibility(holder.dueDateAndReminderDelimiter, false);
                 }
             }
-            if (null != currentTask.getDueDateTime()) {
-                long currentTime = System.currentTimeMillis();
-                holder.dueDateIcon.setColorFilter(currentTime > currentTask.getDueDateTime() && !isChecked
-                        ? COLOR_RED_SECONDARY : COLOR_BLACK_SECONDARY);
-                holder.dueDateText.setTextColor(currentTime > currentTask.getDueDateTime() && !isChecked
-                        ? COLOR_RED_SECONDARY : COLOR_BLACK_SECONDARY);
-            }
+            colorDueDate(currentTask, holder, isChecked);
             holder.name.setTextColor(isChecked ? COLOR_BLACK_SECONDARY : COLOR_BLACK_PRIMARY);
         });
     }
@@ -262,6 +245,20 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         throw new NoSuchElementException();
     }
 
+    private void setVisibility(View view, boolean isVisible) {
+        view.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+    }
+
+    private void colorDueDate(Task task, ViewHolder holder, boolean isChecked) {
+        if (null != task.getDueDateTime()) {
+            long currentTime = System.currentTimeMillis();
+            holder.dueDateIcon.setColorFilter(currentTime > task.getDueDateTime() && !isChecked
+                    ? COLOR_RED_SECONDARY : COLOR_BLACK_SECONDARY);
+            holder.dueDateText.setTextColor(currentTime > task.getDueDateTime() && !isChecked
+                    ? COLOR_RED_SECONDARY : COLOR_BLACK_SECONDARY);
+        }
+    }
+
     private void crossOutText(ViewHolder holder, boolean checked) {
         holder.name.setPaintFlags(checked
                 ? holder.name.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
@@ -298,7 +295,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     }
 
     /**
-     * Provides a reference to the views for each data item.
+     * Provides a reference to the views for each task item.
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -319,6 +316,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         private ImageView reminderIcon;
         private TextView reminderText;
 
+        /**
+         * Controller.
+         *
+         * @param view task view
+         */
         ViewHolder(View view) {
             super(view);
             this.taskInfoLayout = view.findViewById(R.id.task_info_layout);
@@ -369,14 +371,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
         public CheckBox getCheckBox() {
             return checkBox;
-        }
-
-        public TextView getName() {
-            return name;
-        }
-
-        public ImageView getMenu() {
-            return menu;
         }
     }
 }
