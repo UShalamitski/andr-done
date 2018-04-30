@@ -127,7 +127,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             setVisibility(holder.taskInfoLayout, true);
             setVisibility(holder.dueDateIcon, null != task.getDueDateTime());
             setVisibility(holder.dueDateText, null != task.getDueDateTime());
-            setVisibility(holder.dueDateAndReminderDelimiter, null != task.getDueDateTime() && !task.getDone());
+            setVisibility(holder.dueDateAndReminderDelimiter, null != task.getDueDateTime()
+                    && null != task.getRemindDateTime() && !task.getDone());
             setVisibility(holder.reminderIcon, null != task.getRemindDateTime() && !task.getDone());
             setVisibility(holder.reminderText, null == task.getDueDateTime());
             colorDueDate(task, holder, task.getDone());
@@ -339,6 +340,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             this.backgroundLeftIcon = view.findViewById(R.id.task_background_done_icon);
             this.backgroundRightText = view.findViewById(R.id.task_background_delete_text);
             this.backgroundLeftText = view.findViewById(R.id.task_background_done_text);
+
+            this.dueDateIcon.setVisibility(View.GONE);
+            this.dueDateText.setVisibility(View.GONE);
         }
 
         public FrameLayout getView() {
