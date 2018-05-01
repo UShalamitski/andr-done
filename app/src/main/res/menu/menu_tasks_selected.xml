@@ -1,6 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/menu_tasks_selected_due_date"
+        android:icon="@drawable/icon_calendar_white"
+        android:orderInCategory="70"
+        android:showAsAction="always"
+        android:title="@string/menu.select_all" />
+
+
+    <item
         android:id="@+id/menu_tasks_selected_select"
         android:icon="@drawable/icon_delete_white"
         android:orderInCategory="80"

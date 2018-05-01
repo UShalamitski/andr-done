@@ -17,6 +17,8 @@
     <string name="menu.select_all">Выбрать все</string>
     <string name="menu.unselect_all">Очистить все</string>
 
+    <string name="modal.select.list">Выберите список</string>
+
     <string name="date_time_picker.time">Время</string>
     <string name="date_time_picker.without_time">Без времени</string>
 
@@ -24,6 +26,8 @@
     <string name="task.delete.confirmation">Вы уверены, что хотите удалить выбранную задачу?</string>
     <string name="task.delete_selected.confirmation">Вы уверены, что хотите удалить выбранные задачи?</string>
     <string name="task.due_date">Дата исполнения</string>
+    <string name="task.duplicate">Выбранные задачи продублированы</string>
+    <string name="task.move">Выбранные задачи перемещены</string>
     <string name="task.notification.title">Напоминание</string>
     <string name="task.remind_me">Напомнить</string>
     <string name="task.removed">Задача удалена</string>

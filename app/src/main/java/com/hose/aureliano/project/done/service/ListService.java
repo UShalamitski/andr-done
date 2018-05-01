@@ -6,6 +6,8 @@ import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.DoneListDao;
 
+import java.util.List;
+
 /**
  * Service logic for lists.
  * <p/>
@@ -28,5 +30,12 @@ public class ListService {
      */
     public void update(DoneList list) {
         listDao.update(list);
+    }
+
+    /**
+     * Return list with all {@link DoneList}.
+     */
+    public List<DoneList> getLists() {
+        return listDao.read();
     }
 }

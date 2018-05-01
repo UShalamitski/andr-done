@@ -17,6 +17,8 @@
     <string name="menu.select_all">Select all</string>
     <string name="menu.unselect_all">Unselect all</string>
 
+    <string name="modal.select.list">Select list</string>
+
     <string name="date_time_picker.time">Time</string>
     <string name="date_time_picker.without_time">Without time</string>
 
@@ -24,6 +26,8 @@
     <string name="task.delete.confirmation">Are you sure you want to delete selected task?</string>
     <string name="task.delete_selected.confirmation">Are you sure you want to delete selected tasks?</string>
     <string name="task.due_date">Due date</string>
+    <string name="task.duplicate">Selected tasks were duplicated</string>
+    <string name="task.move">Selected tasks were moved</string>
     <string name="task.notification.title">Reminder</string>
     <string name="task.remind_me">Remind me</string>
     <string name="task.removed">Task was removed</string>
