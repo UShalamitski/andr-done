@@ -8,5 +8,4 @@
         android:orderInCategory="100"
         android:title="Delete All"
         app:showAsAction="never" />
-
 </menu>

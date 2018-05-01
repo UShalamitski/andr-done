@@ -21,9 +21,41 @@ public class TaskService {
     private TaskDao taskDao;
     private Context context;
 
+    /**
+     * Constructor.
+     *
+     * @param context application context
+     */
     public TaskService(Context context) {
         this.context = context;
         taskDao = DatabaseCreator.getDatabase(context).getTaskDao();
+    }
+
+    /**
+     * Inserts instance of {@link Task}.
+     *
+     * @param task instance of {@link Task} to insert
+     */
+    public void insert(Task task) {
+        taskDao.insert(task);
+    }
+
+    /**
+     * Inserts {@link Task}s.
+     *
+     * @param tasks list of {@link Task}s to insert
+     */
+    public void duplicate(List<Task> tasks) {
+        for (Task task : tasks) {
+            task.setId(null);
+            task.setPosition(null);
+            task.setDone(false);
+            Integer taskId = (int) taskDao.insert(task);
+            if (null != task.getRemindDateTime() && System.currentTimeMillis() < task.getRemindDateTime()) {
+                task.setId(taskId);
+                AlarmService.setAlarm(context, task);
+            }
+        }
     }
 
     /**
@@ -56,6 +88,17 @@ public class TaskService {
     public void delete(Task task) {
         AlarmService.cancelAlarm(context, task);
         taskDao.delete(task.getId());
+    }
+
+    /**
+     * Removes specified {@link Task}s and reminder for them.
+     *
+     * @param tasks list of {@link Task}s to remove
+     */
+    public void delete(List<Task> tasks) {
+        for (Task task : tasks) {
+            delete(task);
+        }
     }
 
     /**

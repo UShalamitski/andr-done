@@ -1,11 +1,15 @@
 package com.hose.aureliano.project.done.activity.helper;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.hose.aureliano.project.done.R;
@@ -31,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
+    private static int COLOR_PRIMARY;
     private static int COLOR_RED;
     private static int COLOR_GREEN;
     private static int COLOR_GRAY;
@@ -45,6 +50,11 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     private Integer fromPosition = null;
     private Integer toPosition = null;
 
+    private ActionMode actionMode;
+    private TaskAdapter.ViewHolder holder;
+    private boolean isDragged;
+    private boolean isMoved;
+
     private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(5);
     private Map<Task, ScheduledFuture> itemsToRemoveMap = new HashMap<>();
 
@@ -58,14 +68,27 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     }
 
     @Override
+    public boolean isItemViewSwipeEnabled() {
+        return null == actionMode;
+    }
+
+    @Override
+    public boolean isLongPressDragEnabled() {
+        return null == actionMode;
+    }
+
+    @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                           RecyclerView.ViewHolder target) {
-        int oldPosition = viewHolder.getAdapterPosition();
-        int newPosition = target.getAdapterPosition();
-        List<Task> tasks = adapter.getTasks();
-        tasks.add(newPosition, tasks.remove(oldPosition));
-        adapter.notifyItemMoved(oldPosition, newPosition);
-        return true;
+        if (null == actionMode) {
+            isMoved = true;
+            int oldPosition = viewHolder.getAdapterPosition();
+            int newPosition = target.getAdapterPosition();
+            List<Task> tasks = adapter.getTasks();
+            tasks.add(newPosition, tasks.remove(oldPosition));
+            adapter.notifyItemMoved(oldPosition, newPosition);
+        }
+        return null == actionMode;
     }
 
     @Override
@@ -118,6 +141,67 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     }
 
     @Override
+    public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+            isDragged = true;
+            holder = (TaskAdapter.ViewHolder) viewHolder;
+        } else if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
+            if (isDragged && !isMoved) {
+                actionMode = ((Activity) context).startActionMode(new ActionMode.Callback() {
+                    @Override
+                    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                        mode.getMenuInflater().inflate(R.menu.menu_tasks_selected, menu);
+                        adapter.toggleSelection(holder, mode);
+                        ((Activity) context).getWindow().setStatusBarColor(COLOR_GRAY);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.menu_tasks_selected_select:
+                                adapter.selectAll();
+                                break;
+                            case R.id.menu_tasks_selected_duplicate:
+                                taskService.duplicate(adapter.getSelectedTasks());
+                                adapter.refresh();
+                                actionMode.finish();
+                                break;
+                            case R.id.menu_tasks_selected_delete:
+                                ActivityUtils.showConfirmationDialog(context, R.string.task_delete_selected_confirmation,
+                                        (dialog, which) -> {
+                                            List<Task> selectedTasks = adapter.getSelectedTasks();
+                                            taskService.delete(selectedTasks);
+                                            adapter.removeItems(selectedTasks);
+                                            actionMode.finish();
+                                        });
+                                break;
+                        }
+                        return true;
+                    }
+
+                    @Override
+                    public void onDestroyActionMode(ActionMode mode) {
+                        actionMode = null;
+                        adapter.clearSelection();
+                        ((Activity) context).getWindow().setStatusBarColor(COLOR_PRIMARY);
+                    }
+                });
+                adapter.setActionMode(actionMode);
+            }
+            isDragged = false;
+            isMoved = false;
+            holder = null;
+        }
+        super.onSelectedChanged(viewHolder, actionState);
+    }
+
+    @Override
     public void onMoved(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, int fromPos,
                         RecyclerView.ViewHolder target, int toPos, int x, int y) {
         if (fromPosition == null) {
@@ -154,6 +238,9 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     }
 
     private void initStaticVariables() {
+        if (0 == COLOR_PRIMARY) {
+            COLOR_PRIMARY = ContextCompat.getColor(context, R.color.colorPrimary);
+        }
         if (0 == COLOR_RED) {
             COLOR_RED = ContextCompat.getColor(context, R.color.red);
         }

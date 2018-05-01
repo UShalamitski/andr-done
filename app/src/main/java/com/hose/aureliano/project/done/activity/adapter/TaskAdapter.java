@@ -7,6 +7,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,8 +29,11 @@ import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * Adapter for {@link RecyclerView} of the {@link Task}s.
@@ -43,13 +47,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     private static int COLOR_RED_SECONDARY;
     private static int COLOR_BLACK_PRIMARY;
     private static int COLOR_BLACK_SECONDARY;
+    private static int COLOR_WHITE;
+    private static int COLOR_GRAY_LIGHT;
 
+    private Set<Integer> selectedIdsSet;
     private FragmentManager fragmentManager;
     private TaskService taskService;
     private TaskDao taskDao;
     private List<Task> taskList;
     private Context context;
     private String listId;
+    private ActionMode actionMode;
 
     /**
      * Controller.
@@ -65,6 +73,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         this.fragmentManager = fragmentManager;
         this.context = context;
         this.listId = listId;
+        selectedIdsSet = new HashSet<>();
         initStaticResources();
     }
 
@@ -97,9 +106,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             popupMenu.show();
         });
         view.setOnClickListener(itemView -> {
-            viewHolder.checkBox.setChecked(!viewHolder.checkBox.isChecked());
+            if (null != actionMode) {
+                toggleSelection(viewHolder, actionMode);
+            } else {
+                viewHolder.checkBox.setChecked(!viewHolder.checkBox.isChecked());
+            }
             ActivityUtils.vibrate(context);
         });
+        view.setOnLongClickListener(longClickView -> true);
         view.setTag(viewHolder);
         return viewHolder;
     }
@@ -127,10 +141,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             setVisibility(holder.taskInfoLayout, true);
             setVisibility(holder.dueDateIcon, null != task.getDueDateTime());
             setVisibility(holder.dueDateText, null != task.getDueDateTime());
-            setVisibility(holder.dueDateAndReminderDelimiter, null != task.getDueDateTime()
-                    && null != task.getRemindDateTime() && !task.getDone());
-            setVisibility(holder.reminderIcon, null != task.getRemindDateTime() && !task.getDone());
-            setVisibility(holder.reminderText, null == task.getDueDateTime());
+            if (!task.getDone() && null != task.getRemindDateTime()
+                    && System.currentTimeMillis() < task.getRemindDateTime()) {
+                setVisibility(holder.dueDateAndReminderDelimiter, null != task.getDueDateTime());
+                setVisibility(holder.reminderIcon, true);
+                setVisibility(holder.reminderText, null == task.getDueDateTime());
+            } else {
+                setVisibility(holder.dueDateAndReminderDelimiter, false);
+                setVisibility(holder.reminderIcon, false);
+                setVisibility(holder.reminderText, false);
+            }
             colorDueDate(task, holder, task.getDone());
         } else {
             setVisibility(holder.taskInfoLayout, false);
@@ -167,6 +187,52 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             colorDueDate(currentTask, holder, isChecked);
             holder.name.setTextColor(isChecked ? COLOR_BLACK_SECONDARY : COLOR_BLACK_PRIMARY);
         });
+        holder.viewForeground.setBackgroundColor(
+                selectedIdsSet.contains(holder.getAdapterPosition()) ? COLOR_GRAY_LIGHT : COLOR_WHITE);
+    }
+
+    public void setActionMode(ActionMode actionMode) {
+        this.actionMode = actionMode;
+    }
+
+    public List<Task> getSelectedTasks() {
+        List<Task> selectedTasks = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(selectedIdsSet)) {
+            for (Integer position : selectedIdsSet) {
+                selectedTasks.add(taskList.get(position));
+            }
+        }
+        return selectedTasks;
+    }
+
+    public void clearSelection() {
+        setActionMode(null);
+        selectedIdsSet.clear();
+        notifyDataSetChanged();
+    }
+
+    public void selectAll() {
+        for (int i = 0; i < CollectionUtils.size(taskList); i++) {
+            selectedIdsSet.add(i);
+        }
+        notifyDataSetChanged();
+        if (null != actionMode) {
+            actionMode.setTitle(context.getString(R.string.task_selected, CollectionUtils.size(selectedIdsSet)));
+        }
+    }
+
+    public void toggleSelection(TaskAdapter.ViewHolder viewHolder, ActionMode actionMode) {
+        if (selectedIdsSet.contains(viewHolder.getAdapterPosition())) {
+            selectedIdsSet.remove(viewHolder.getAdapterPosition());
+            viewHolder.viewForeground.setBackgroundColor(COLOR_WHITE);
+            if (CollectionUtils.isEmpty(selectedIdsSet)) {
+                actionMode.finish();
+            }
+        } else {
+            selectedIdsSet.add(viewHolder.getAdapterPosition());
+            viewHolder.viewForeground.setBackgroundColor(COLOR_GRAY_LIGHT);
+        }
+        actionMode.setTitle(context.getString(R.string.task_selected, CollectionUtils.size(selectedIdsSet)));
     }
 
     @Override
@@ -199,6 +265,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     public void removeItem(int position) {
         taskList.remove(position);
         notifyItemRemoved(position);
+    }
+
+    /**
+     * Remove {@link Task}s from the list.
+     *
+     * @param tasks list of {@link Task}s to remove
+     */
+    public void removeItems(List<Task> tasks) {
+        for (Task task : tasks) {
+            taskList.remove(task);
+        }
+        notifyDataSetChanged();
     }
 
     /**
@@ -271,7 +349,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         bundle.putInt(Task.Fields.ID.getFieldName(), task.getId());
         bundle.putString(Task.Fields.NAME.getFieldName(), task.getName());
         bundle.putBoolean(Task.Fields.DONE.getFieldName(), task.getDone());
-        bundle.putInt(Task.Fields.POSITION.getFieldName(), task.getPosition());
+        if (null != task.getPosition()) {
+            bundle.putInt(Task.Fields.POSITION.getFieldName(), task.getPosition());
+        }
         if (null != task.getDueDateTime()) {
             bundle.putLong(Task.Fields.DUE_DATE_TIME.getFieldName(), task.getDueDateTime());
             bundle.putBoolean(Task.Fields.DUE_TIME_IS_SET.getFieldName(), task.getDueTimeIsSet());
@@ -292,6 +372,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         }
         if (0 == COLOR_BLACK_SECONDARY) {
             COLOR_BLACK_SECONDARY = ContextCompat.getColor(context, R.color.black_secondary);
+        }
+        if (0 == COLOR_WHITE) {
+            COLOR_WHITE = ContextCompat.getColor(context, R.color.white);
+        }
+        if (0 == COLOR_GRAY_LIGHT) {
+            COLOR_GRAY_LIGHT = ContextCompat.getColor(context, R.color.lightGray);
         }
     }
 

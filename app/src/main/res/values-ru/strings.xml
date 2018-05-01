@@ -7,20 +7,27 @@
     <string name="delete">Удалить</string>
     <string name="done">Выполнить</string>
     <string name="edit">Редактировать</string>
+    <string name="move">Переместить</string>
     <string name="undo">Вернуть</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="ok">Ok</string>
+
+    <string name="menu.duplicate">Дублировать</string>
+    <string name="menu.select_all">Выбрать все</string>
+    <string name="menu.unselect_all">Очистить все</string>
 
     <string name="date_time_picker.time">Время</string>
     <string name="date_time_picker.without_time">Без времени</string>
 
     <string name="task.add_new">Добавить задачу</string>
     <string name="task.delete.confirmation">Вы уверены, что хотите удалить выбранную задачу?</string>
+    <string name="task.delete_selected.confirmation">Вы уверены, что хотите удалить выбранные задачи?</string>
     <string name="task.due_date">Дата исполнения</string>
     <string name="task.notification.title">Напоминание</string>
     <string name="task.remind_me">Напомнить</string>
     <string name="task.removed">Задача удалена</string>
+    <string name="task.selected">Выбрано: %s</string>
 
     <string name="list.delete.confirmation">Вы уверены, что хотите удалить выбранный список?</string>
     <string name="list.add_new">Добавить список</string>

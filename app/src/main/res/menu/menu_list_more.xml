@@ -14,5 +14,4 @@
         android:orderInCategory="20"
         android:title="@string/delete"
         app:showAsAction="never" />
-
 </menu>

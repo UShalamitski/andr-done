@@ -1,12 +1,13 @@
 package com.hose.aureliano.project.done.activity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -54,6 +55,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
     private String listId;
     private View coordinator;
     private TaskAdapter taskAdapter;
+    private FloatingActionButton floatingActionButton;
 
     private TaskDao taskDao = DatabaseCreator.getDatabase(this).getTaskDao();
     private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(5);
@@ -74,7 +76,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
         listView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-        FloatingActionButton floatingActionButton = findViewById(R.id.activity_tasks_fab);
+        floatingActionButton = findViewById(R.id.activity_tasks_fab);
         CustomEditText editText = findViewById(R.id.activity_task_new_edit_text);
         View bottomView = findViewById(R.id.activity_task_new);
         ViewGroup decorView = getWindow().getDecorView().findViewById(R.id.activity_task_to_decor);
@@ -138,6 +140,18 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
         });
 
         new ItemTouchHelper(new TaskItemTouchHelper(this, taskAdapter, coordinator)).attachToRecyclerView(listView);
+    }
+
+    @Override
+    public void onSupportActionModeStarted(@NonNull ActionMode mode) {
+        super.onSupportActionModeStarted(mode);
+        floatingActionButton.hide();
+    }
+
+    @Override
+    public void onSupportActionModeFinished(@NonNull ActionMode mode) {
+        super.onSupportActionModeFinished(mode);
+        floatingActionButton.show();
     }
 
     @Override
