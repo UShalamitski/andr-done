@@ -16,6 +16,11 @@
     <string name="menu.duplicate">Дублировать</string>
     <string name="menu.select_all">Выбрать все</string>
     <string name="menu.unselect_all">Очистить все</string>
+    <string name="menu.due_date.clear">Без даты исполнения</string>
+    <string name="menu.due_date.today">Сегодня</string>
+    <string name="menu.due_date.tomorrow">Завтра</string>
+    <string name="menu.due_date.next_week">Следующая неделя</string>
+    <string name="menu.due_date.select">Выбрать дату исполнения</string>
 
     <string name="modal.select.list">Выберите список</string>
 
@@ -26,6 +31,7 @@
     <string name="task.delete.confirmation">Вы уверены, что хотите удалить выбранную задачу?</string>
     <string name="task.delete_selected.confirmation">Вы уверены, что хотите удалить выбранные задачи?</string>
     <string name="task.due_date">Дата исполнения</string>
+    <string name="task.due_date.changed">Дата исполнения для выбранных задач изменена</string>
     <string name="task.duplicate">Выбранные задачи продублированы</string>
     <string name="task.move">Выбранные задачи перемещены</string>
     <string name="task.notification.title">Напоминание</string>

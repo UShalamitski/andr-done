@@ -20,6 +20,7 @@ import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.service.ListService;
 import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
+import com.hose.aureliano.project.done.utils.CalendarUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -176,8 +177,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                                 break;
                             case R.id.menu_tasks_selected_duplicate:
                                 taskService.duplicate(adapter.getSelectedTasks());
-                                adapter.refresh();
-                                actionMode.finish();
+                                refreshDataAndFinishActionMode();
                                 ActivityUtils.showSnackBar(coordinator, context.getString(R.string.task_duplicate));
                                 break;
                             case R.id.menu_tasks_selected_move:
@@ -191,6 +191,23 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                                             adapter.removeItems(selectedTasks);
                                             actionMode.finish();
                                         });
+                                break;
+                            case R.id.menu_tasks_due_date_today:
+                                updateDueDate(CalendarUtils.getTodayDateTimeInMillis());
+                                break;
+                            case R.id.menu_tasks_due_date_tomorrow:
+                                updateDueDate(CalendarUtils.getTomorrowDateTimeInMillis());
+                                break;
+                            case R.id.menu_tasks_due_date_next_week:
+                                updateDueDate(CalendarUtils.getNextWeekDateTimeInMillis());
+                                break;
+                            case R.id.menu_tasks_without_due_date:
+                                updateDueDate(null);
+                                break;
+                            case R.id.menu_tasks_select_due_date:
+                                ActivityUtils.showDatePickerDialog(context, (view, year, month, dayOfMonth) -> {
+                                    updateDueDate(CalendarUtils.getTimeInMillis(year, month, dayOfMonth));
+                                }, System.currentTimeMillis());
                                 break;
                         }
                         return true;
@@ -246,6 +263,20 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
             adapter.notifyDataSetChanged();
             ActivityUtils.vibrate(context);
         }
+    }
+
+    private void updateDueDate(Long timeInMillis) {
+        for (Task task : adapter.getSelectedTasks()) {
+            task.setDueDateTime(timeInMillis);
+            taskService.update(task);
+        }
+        refreshDataAndFinishActionMode();
+        ActivityUtils.showSnackBar(coordinator, context.getString(R.string.task_due_date_changed));
+    }
+
+    private void refreshDataAndFinishActionMode() {
+        adapter.refresh();
+        actionMode.finish();
     }
 
     private void createDialogToMoveTasks(ActionMode actionMode) {

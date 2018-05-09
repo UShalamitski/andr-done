@@ -5,7 +5,10 @@
     android:id="@+id/task_item_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
 
     <RelativeLayout
         android:id="@+id/item_view_background"

@@ -5,8 +5,35 @@
         android:icon="@drawable/icon_calendar_white"
         android:orderInCategory="70"
         android:showAsAction="always"
-        android:title="@string/menu.select_all" />
-
+        android:title="@string/menu.select_all">
+        <menu xmlns:android="http://schemas.android.com/apk/res/android">
+            <item
+                android:id="@+id/menu_tasks_without_due_date"
+                android:orderInCategory="0"
+                android:showAsAction="never"
+                android:title="@string/menu.due_date.clear" />
+            <item
+                android:id="@+id/menu_tasks_due_date_today"
+                android:orderInCategory="10"
+                android:showAsAction="never"
+                android:title="@string/menu.due_date.today" />
+            <item
+                android:id="@+id/menu_tasks_due_date_tomorrow"
+                android:orderInCategory="20"
+                android:showAsAction="never"
+                android:title="@string/menu.due_date.tomorrow" />
+            <item
+                android:id="@+id/menu_tasks_due_date_next_week"
+                android:orderInCategory="30"
+                android:showAsAction="never"
+                android:title="@string/menu.due_date.next_week" />
+            <item
+                android:id="@+id/menu_tasks_select_due_date"
+                android:orderInCategory="40"
+                android:showAsAction="never"
+                android:title="@string/menu.due_date.select" />
+        </menu>
+    </item>
 
     <item
         android:id="@+id/menu_tasks_selected_select"

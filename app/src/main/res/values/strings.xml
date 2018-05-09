@@ -16,6 +16,11 @@
     <string name="menu.duplicate">Duplicate</string>
     <string name="menu.select_all">Select all</string>
     <string name="menu.unselect_all">Unselect all</string>
+    <string name="menu.due_date.clear">Without due date</string>
+    <string name="menu.due_date.today">Today</string>
+    <string name="menu.due_date.tomorrow">Tomorrow</string>
+    <string name="menu.due_date.next_week">Next week</string>
+    <string name="menu.due_date.select">Select due date</string>
 
     <string name="modal.select.list">Select list</string>
 
@@ -26,6 +31,7 @@
     <string name="task.delete.confirmation">Are you sure you want to delete selected task?</string>
     <string name="task.delete_selected.confirmation">Are you sure you want to delete selected tasks?</string>
     <string name="task.due_date">Due date</string>
+    <string name="task.due_date.changed">Due date for the selected tasks has been changed</string>
     <string name="task.duplicate">Selected tasks were duplicated</string>
     <string name="task.move">Selected tasks were moved</string>
     <string name="task.notification.title">Reminder</string>
