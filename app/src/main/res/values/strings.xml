@@ -8,6 +8,7 @@
     <string name="done">Complete</string>
     <string name="edit">Edit</string>
     <string name="move">Move</string>
+    <string name="sort">Sort</string>
     <string name="undo">Undo</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -15,6 +16,9 @@
 
     <string name="menu.duplicate">Duplicate</string>
     <string name="menu.select_all">Select all</string>
+    <string name="menu.sort.create_date">By name</string>
+    <string name="menu.sort.due_date">By due date</string>
+    <string name="menu.sort.name">By create date</string>
     <string name="menu.unselect_all">Unselect all</string>
     <string name="menu.due_date.clear">Without due date</string>
     <string name="menu.due_date.today">Today</string>

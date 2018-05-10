@@ -8,6 +8,7 @@
     <string name="done">Выполнить</string>
     <string name="edit">Редактировать</string>
     <string name="move">Переместить</string>
+    <string name="sort">Сортировать</string>
     <string name="undo">Вернуть</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
@@ -15,6 +16,9 @@
 
     <string name="menu.duplicate">Дублировать</string>
     <string name="menu.select_all">Выбрать все</string>
+    <string name="menu.sort.create_date">По дате создания</string>
+    <string name="menu.sort.due_date">По дате исполнения</string>
+    <string name="menu.sort.name">По имени</string>
     <string name="menu.unselect_all">Очистить все</string>
     <string name="menu.due_date.clear">Без даты исполнения</string>
     <string name="menu.due_date.today">Сегодня</string>

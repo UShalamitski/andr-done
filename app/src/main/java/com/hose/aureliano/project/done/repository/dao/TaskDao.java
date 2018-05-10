@@ -39,4 +39,7 @@ public interface TaskDao {
 
     @Query("SELECT * FROM tasks WHERE remindDateTime IS NOT null AND NOT done")
     List<Task> readNotCompletedWithReminder();
+
+    @Query("SELECT MAX(position) FROM tasks WHERE listId = :listId")
+    int getMaxPosition(String listId);
 }

@@ -15,6 +15,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,14 +30,15 @@ import com.hose.aureliano.project.done.activity.component.CustomEditText;
 import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.activity.helper.TaskItemTouchHelper;
 import com.hose.aureliano.project.done.model.Task;
-import com.hose.aureliano.project.done.repository.DatabaseCreator;
-import com.hose.aureliano.project.done.repository.dao.TaskDao;
+import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 import com.hose.aureliano.project.done.utils.AnimationUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
@@ -57,7 +59,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
     private TaskAdapter taskAdapter;
     private FloatingActionButton floatingActionButton;
 
-    private TaskDao taskDao = DatabaseCreator.getDatabase(this).getTaskDao();
+    private TaskService taskService = new TaskService(this);
     private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(5);
     private Map<Task, ScheduledFuture> itemsToRemoveMap = new HashMap<>();
 
@@ -118,9 +120,11 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
         editText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE && StringUtils.isNotBlank(editText.getText().toString())) {
                 Task task = new Task();
-                task.setName(editText.getText().toString());
                 task.setListId(listId);
-                ActivityUtils.handleDbInteractionResult(taskDao.insert(task), coordinator, () -> {
+                task.setName(editText.getText().toString());
+                task.setPosition(taskAdapter.getAvailablePosition());
+                task.setCreatedDateTime(new Date().getTime());
+                ActivityUtils.handleDbInteractionResult(taskService.insert(task), coordinator, () -> {
                     taskAdapter.refresh();
                     editText.setText(StringUtils.EMPTY);
                 });
@@ -155,8 +159,50 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_tasks, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.menu_tasks_sort_name:
+                Collections.sort(taskAdapter.getTasks(),
+                        (task1, task2) -> StringUtils.compare(task1.getName(), task2.getName()));
+                applySortChanges();
+                return true;
+            case R.id.menu_tasks_sort_due_date:
+                Collections.sort(taskAdapter.getTasks(), (task1, task2) -> {
+                    if (null == task1.getDueDateTime() && null == task2.getDueDateTime()) {
+                        return 0;
+                    } else if (null == task1.getDueDateTime() && null != task2.getDueDateTime()) {
+                        return 1;
+                    } else if (null != task1.getDueDateTime() && null == task2.getDueDateTime()) {
+                        return -1;
+                    } else {
+                        return task1.getDueDateTime().compareTo(task2.getDueDateTime());
+                    }
+                });
+                applySortChanges();
+                return true;
+            case R.id.menu_tasks_sort_create_date:
+                Collections.sort(taskAdapter.getTasks(), (task1, task2) -> {
+                    if (null == task1.getCreatedDateTime() && null == task2.getCreatedDateTime()) {
+                        return 0;
+                    } else if (null == task1.getCreatedDateTime() && null != task2.getCreatedDateTime()) {
+                        return 1;
+                    } else if (null != task1.getCreatedDateTime() && null == task2.getCreatedDateTime()) {
+                        return -1;
+                    } else {
+                        return task1.getCreatedDateTime().compareTo(task2.getCreatedDateTime());
+                    }
+                });
+                applySortChanges();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -166,7 +212,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
         task.setName(name.getText().toString());
         task.setListId(listId);
 
-        result = task.getId() != null ? taskDao.update(task) : taskDao.insert(task);
+        result = task.getId() != null ? taskService.update(task) : taskService.insert(task);
 
         if (result != -1) {
             taskAdapter.refresh();
@@ -177,5 +223,11 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
         } else {
             ActivityUtils.showSnackBar(coordinator, "Oops! Something went wrong!");
         }
+    }
+
+    private void applySortChanges() {
+        taskAdapter.updatePositions();
+        taskAdapter.notifyDataSetChanged();
+        taskService.update(taskAdapter.getTasks());
     }
 }

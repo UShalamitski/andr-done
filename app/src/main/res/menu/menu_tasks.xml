@@ -1,0 +1,30 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.hose.aureliano.project.done.activity.ListsActivity">
+
+    <item
+        android:id="@+id/menu_tasks_sort"
+        android:icon="@drawable/icon_sort_white_24"
+        android:orderInCategory="10"
+        android:title="@string/sort"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/menu_tasks_sort_name"
+                android:orderInCategory="20"
+                android:title="@string/menu.sort.name"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/menu_tasks_sort_create_date"
+                android:orderInCategory="30"
+                android:title="@string/menu.sort.create_date"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/menu_tasks_sort_due_date"
+                android:orderInCategory="40"
+                android:title="@string/menu.sort.due_date"
+                app:showAsAction="never" />
+        </menu>
+    </item>
+</menu>

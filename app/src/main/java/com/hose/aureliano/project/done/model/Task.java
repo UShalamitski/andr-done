@@ -30,6 +30,7 @@ public class Task {
     private boolean remindTimeIsSet;
     private boolean done;
     private Integer position;
+    private Long createdDateTime;
 
     public Task() {
     }
@@ -106,6 +107,14 @@ public class Task {
         this.position = position;
     }
 
+    public Long getCreatedDateTime() {
+        return createdDateTime;
+    }
+
+    public void setCreatedDateTime(Long createdDateTime) {
+        this.createdDateTime = createdDateTime;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -125,6 +134,7 @@ public class Task {
                 .append(remindDateTime, that.remindDateTime)
                 .append(remindTimeIsSet, that.remindTimeIsSet)
                 .append(position, that.position)
+                .append(createdDateTime, that.createdDateTime)
                 .isEquals();
     }
 
@@ -140,6 +150,7 @@ public class Task {
                 .append(remindDateTime)
                 .append(remindTimeIsSet)
                 .append(position)
+                .append(createdDateTime)
                 .toHashCode();
     }
 
@@ -152,7 +163,8 @@ public class Task {
         DUE_DATE_TIME("dueDateTime"),
         DUE_TIME_IS_SET("dueTimeIsSet"),
         REMIND_DATE_TIME("remindDateTime"),
-        REMIND_TIME_IS_SET("remindTimeIsSet");
+        REMIND_TIME_IS_SET("remindTimeIsSet"),
+        CREATED_DATE_TIME("createdDateTime");
 
         private String name;
 

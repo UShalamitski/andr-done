@@ -290,12 +290,11 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
         }
         builder.setItems(listsNames.toArray(new String[CollectionUtils.size(lists)]),
                 (dialog, which) -> {
-                    adapter.getSelectedTasks();
                     String listId = lists.get(which).getId();
-                    //int position = lists.get(which).getDoneTasksCount();
+                    int position = taskService.getAvailablePosition(listId);
                     for (Task task : adapter.getSelectedTasks()) {
                         task.setListId(listId);
-                        //task.setPosition(++position);
+                        task.setPosition(++position);
                         taskService.update(task);
                     }
                     adapter.refresh();

@@ -245,6 +245,29 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         return position;
     }
 
+    /**
+     * @return available position for new task.
+     */
+    public int getAvailablePosition() {
+        int position = 0;
+        for (Task task : getTasks()) {
+            if (task.getPosition() > position) {
+                position = task.getPosition();
+            }
+        }
+        return position;
+    }
+
+    /**
+     * Sets position for tasks as their index.
+     */
+    public void updatePositions() {
+        int position = 0;
+        for (Task task : getTasks()) {
+            task.setPosition(position++);
+        }
+    }
+
     public List<Task> getTasks() {
         return taskList;
     }
@@ -359,6 +382,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         if (null != task.getRemindDateTime()) {
             bundle.putLong(Task.Fields.REMIND_DATE_TIME.getFieldName(), task.getRemindDateTime());
             bundle.putBoolean(Task.Fields.REMIND_TIME_IS_SET.getFieldName(), task.getRemindTimeIsSet());
+        }
+        if (null != task.getCreatedDateTime()) {
+            bundle.putLong(Task.Fields.CREATED_DATE_TIME.getFieldName(), task.getCreatedDateTime());
         }
         return bundle;
     }

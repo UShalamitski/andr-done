@@ -36,8 +36,8 @@ public class TaskService {
      *
      * @param task instance of {@link Task} to insert
      */
-    public void insert(Task task) {
-        taskDao.insert(task);
+    public long insert(Task task) {
+        return taskDao.insert(task);
     }
 
     /**
@@ -62,9 +62,21 @@ public class TaskService {
      * Updates instance of {@link Task}.
      *
      * @param task instance of {@link Task} to update
+     * @return number of affected rows or -1
      */
-    public void update(Task task) {
-        taskDao.update(task);
+    public int update(Task task) {
+        return taskDao.update(task);
+    }
+
+    /**
+     * Updates {@link Task}s.
+     *
+     * @param tasks list of {@link Task} to update
+     */
+    public void update(List<Task> tasks) {
+        for (Task task : tasks) {
+            update(task);
+        }
     }
 
     /**
@@ -115,5 +127,15 @@ public class TaskService {
      */
     public List<Task> getNotCompletedTasksWithReminder() {
         return taskDao.readNotCompletedWithReminder();
+    }
+
+    /**
+     * Returns next available position for new task in particular list.
+     *
+     * @param listId identifier of list
+     * @return next available position for new task in particular list.
+     */
+    public int getAvailablePosition(String listId) {
+        return taskDao.getMaxPosition(listId);
     }
 }
