@@ -320,10 +320,10 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
             COLOR_GRAY = ContextCompat.getColor(context, R.color.gray);
         }
         if (null == DRAWABLE_CANCEL) {
-            DRAWABLE_CANCEL = ContextCompat.getDrawable(context, R.drawable.icon_cancel_white);
+            DRAWABLE_CANCEL = ContextCompat.getDrawable(context, R.drawable.icon_cancel_white_24dp);
         }
         if (null == DRAWABLE_DONE) {
-            DRAWABLE_DONE = ContextCompat.getDrawable(context, R.drawable.icon_done_white);
+            DRAWABLE_DONE = ContextCompat.getDrawable(context, R.drawable.icon_done_white_24dp);
         }
     }
 }

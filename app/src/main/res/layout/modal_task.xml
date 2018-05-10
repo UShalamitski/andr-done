@@ -34,8 +34,8 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
-            android:src="@drawable/icon_calendar_white"
-            android:tint="@android:color/black" />
+            android:src="@drawable/icon_event_white_24dp"
+            android:tint="@color/black_secondary" />
 
         <TextView
             android:id="@+id/task_modal_calendar_text"
@@ -55,8 +55,8 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
-            android:src="@drawable/icon_clear_white"
-            android:tint="@android:color/black" />
+            android:src="@drawable/icon_clear_white_24dp"
+            android:tint="@color/black_secondary" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -76,8 +76,8 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
-            android:src="@drawable/icon_alarm_white"
-            android:tint="@android:color/black" />
+            android:src="@drawable/icon_alarm_white_24dp"
+            android:tint="@color/black_secondary" />
 
         <TextView
             android:id="@+id/task_modal_alarm_text"
@@ -97,8 +97,8 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
-            android:src="@drawable/icon_clear_white"
-            android:tint="@android:color/black" />
+            android:src="@drawable/icon_clear_white_24dp"
+            android:tint="@color/black_secondary" />
     </RelativeLayout>
 
 </RelativeLayout>

@@ -2,7 +2,7 @@
 
     <item
         android:id="@+id/menu_tasks_selected_due_date"
-        android:icon="@drawable/icon_calendar_white"
+        android:icon="@drawable/icon_event_white_24dp"
         android:orderInCategory="70"
         android:showAsAction="always"
         android:title="@string/menu.select_all">
@@ -37,14 +37,12 @@
 
     <item
         android:id="@+id/menu_tasks_selected_select"
-        android:icon="@drawable/icon_delete_white"
         android:orderInCategory="80"
         android:showAsAction="never"
         android:title="@string/menu.select_all" />
 
     <item
         android:id="@+id/menu_tasks_selected_duplicate"
-        android:icon="@drawable/icon_delete_white"
         android:orderInCategory="90"
         android:showAsAction="never"
         android:title="@string/menu.duplicate" />
@@ -52,14 +50,12 @@
 
     <item
         android:id="@+id/menu_tasks_selected_move"
-        android:icon="@drawable/icon_alarm_white"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/move" />
 
     <item
         android:id="@+id/menu_tasks_selected_delete"
-        android:icon="@drawable/icon_delete_white"
         android:orderInCategory="110"
         android:showAsAction="never"
         android:title="@string/delete" />

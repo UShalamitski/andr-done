@@ -49,7 +49,7 @@ public class TaskModal extends DialogFragment {
 
         Task task = buildTaskFromBundle();
         blueColor = getContext().getResources().getColor(R.color.blue);
-        blackColor = getContext().getResources().getColor(R.color.black);
+        blackColor = getContext().getResources().getColor(R.color.black_secondary);
         defaultTextColor = getContext().getResources().getColor(R.color.text_color);
         dueDateText = view.findViewById(R.id.task_modal_calendar_text);
         dueDateIcon = view.findViewById(R.id.task_modal_calendar_icon);

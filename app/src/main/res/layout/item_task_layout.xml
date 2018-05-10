@@ -23,7 +23,7 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:layout_marginStart="10dp"
-            android:src="@drawable/icon_done_white"
+            android:src="@drawable/icon_done_white_24dp"
             android:tint="@android:color/white" />
 
         <TextView
@@ -44,7 +44,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="10dp"
-            android:src="@drawable/icon_delete_white"
+            android:src="@drawable/icon_delete_white_24dp"
             android:tint="@android:color/white" />
 
         <TextView
@@ -102,7 +102,7 @@
                     android:layout_width="14dp"
                     android:layout_height="14dp"
                     android:layout_centerVertical="true"
-                    android:src="@drawable/icon_calendar_white" />
+                    android:src="@drawable/icon_event_white_24dp" />
 
                 <TextView
                     android:id="@+id/task_info_due_text"
@@ -131,7 +131,7 @@
                     android:layout_height="14dp"
                     android:layout_centerVertical="true"
                     android:layout_toEndOf="@+id/task_info_delimiter_before_reminder"
-                    android:src="@drawable/icon_alarm_white"
+                    android:src="@drawable/icon_alarm_white_24dp"
                     android:tint="@color/black_secondary" />
 
                 <TextView
@@ -151,8 +151,8 @@
             android:layout_height="25dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/icon_more_vert_white"
-            android:tint="@color/cardview_dark_background" />
+            android:src="@drawable/icon_more_vert_white_24dp"
+            android:tint="@color/black_secondary" />
 
         <CheckBox
             android:id="@+id/task_checkbox"
