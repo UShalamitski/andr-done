@@ -85,6 +85,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
                         Bundle bundle = new Bundle();
                         bundle.putString("name", doneList.getName());
                         bundle.putString("id", doneList.getId());
+                        bundle.putLong("createdDateTime", doneList.getCreatedDateTime());
                         DialogFragment dialog = new ListModal();
                         dialog.setArguments(bundle);
                         dialog.show(fragmentManager, "list_edit");
@@ -108,8 +109,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     public void onBindViewHolder(ListAdapter.ViewHolder holder, int position) {
         DoneList doneList = getItem(position);
         holder.id = doneList.getId();
-        holder.taskCounts.setText(
-                String.format("%s/%s", doneList.getDoneTasksCount(), doneList.getTasksCount()));
+        holder.taskCounts.setText(String.format("%s/%s", doneList.getDoneTasksCount(), doneList.getTasksCount()));
         holder.name.setText(doneList.getName());
         holder.menu.setTag(doneList.getId());
         holder.progressBar.setMax(doneList.getTasksCount());
@@ -124,6 +124,16 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    /**
+     * Sets position for tasks as their index.
+     */
+    public void updatePositions() {
+        int position = 0;
+        for (DoneList list : getLists()) {
+            list.setPosition(position++);
+        }
     }
 
     public List<DoneList> getLists() {

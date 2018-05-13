@@ -12,12 +12,42 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
+        <com.hose.aureliano.project.done.activity.component.RecyclerViewEmptySupport
             android:id="@+id/activity_lists_list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#f2f2f2"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+
+        <RelativeLayout
+            android:id="@+id/activity_lists_empty_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true">
+
+                <ImageView
+                    android:id="@+id/activity_lists_empty_view_image"
+                    android:layout_width="170dp"
+                    android:layout_height="170dp"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/icon_list_white_48"
+                    android:tint="@color/gray" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/activity_lists_empty_view_image"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/list.empty_view"
+                    android:textColor="@color/gray"
+                    android:textSize="24sp" />
+            </RelativeLayout>
+        </RelativeLayout>
     </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton

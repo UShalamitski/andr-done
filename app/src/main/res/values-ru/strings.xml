@@ -19,6 +19,7 @@
     <string name="menu.sort.create_date">По дате создания</string>
     <string name="menu.sort.due_date">По дате исполнения</string>
     <string name="menu.sort.name">По имени</string>
+    <string name="menu.sort.progress">По прогрессу</string>
     <string name="menu.unselect_all">Очистить все</string>
     <string name="menu.due_date.clear">Без даты исполнения</string>
     <string name="menu.due_date.today">Сегодня</string>
@@ -37,6 +38,7 @@
     <string name="task.due_date">Дата исполнения</string>
     <string name="task.due_date.changed">Дата исполнения для выбранных задач изменена</string>
     <string name="task.duplicate">Выбранные задачи продублированы</string>
+    <string name="task.empty_view">Задач пока нет</string>
     <string name="task.move">Выбранные задачи перемещены</string>
     <string name="task.notification.title">Напоминание</string>
     <string name="task.remind_me">Напомнить</string>
@@ -45,4 +47,5 @@
 
     <string name="list.delete.confirmation">Вы уверены, что хотите удалить выбранный список?</string>
     <string name="list.add_new">Добавить список</string>
+    <string name="list.empty_view">Списков пока нет</string>
 </resources>

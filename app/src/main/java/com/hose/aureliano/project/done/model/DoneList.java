@@ -24,6 +24,7 @@ public class DoneList {
     private Integer position;
     private int tasksCount;
     private int doneTasksCount;
+    private Long createdDateTime;
 
     @NonNull
     public String getId() {
@@ -66,6 +67,14 @@ public class DoneList {
         this.position = position;
     }
 
+    public Long getCreatedDateTime() {
+        return createdDateTime;
+    }
+
+    public void setCreatedDateTime(Long createdDateTime) {
+        this.createdDateTime = createdDateTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -75,6 +84,7 @@ public class DoneList {
                 .append(id, doneList.id)
                 .append(name, doneList.name)
                 .append(position, doneList.position)
+                .append(createdDateTime, doneList.createdDateTime)
                 .isEquals();
     }
 
@@ -84,6 +94,7 @@ public class DoneList {
                 .append(id)
                 .append(name)
                 .append(position)
+                .append(createdDateTime)
                 .toHashCode();
     }
 }

@@ -137,12 +137,12 @@ public final class ActivityUtils {
      * Handles the result of interaction with db.
      *
      * @param result  result of interaction with db
-     * @param handlew instance of {@link DbInteractionPositiveResultHandler} that handle positive result
+     * @param handler instance of {@link DbInteractionPositiveResultHandler} that handle positive result
      * @param view    the view to find a parent from
      */
-    public static void handleDbInteractionResult(long result, View view, DbInteractionPositiveResultHandler handlew) {
+    public static void handleDbInteractionResult(long result, View view, DbInteractionPositiveResultHandler handler) {
         if (result != -1) {
-            handlew.handle();
+            handler.handle();
         } else {
             showSnackBar(view, "Oops! Something went wrong!");
         }

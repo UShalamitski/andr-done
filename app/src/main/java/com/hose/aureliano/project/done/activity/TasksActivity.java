@@ -9,7 +9,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -27,6 +26,7 @@ import android.widget.TextView;
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.TaskAdapter;
 import com.hose.aureliano.project.done.activity.component.CustomEditText;
+import com.hose.aureliano.project.done.activity.component.RecyclerViewEmptySupport;
 import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.activity.helper.TaskItemTouchHelper;
 import com.hose.aureliano.project.done.model.Task;
@@ -73,7 +73,8 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
         coordinator = findViewById(R.id.tasks_coordinator_layout);
         taskAdapter = new TaskAdapter(this, getSupportFragmentManager(), listId);
 
-        RecyclerView listView = findViewById(R.id.activity_tasks_list_view);
+        RecyclerViewEmptySupport listView = findViewById(R.id.activity_tasks_list_view);
+        listView.setEmptyView(findViewById(R.id.activity_tasks_empty_view));
         listView.setAdapter(taskAdapter);
         listView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
@@ -119,13 +120,19 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
         });
         editText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE && StringUtils.isNotBlank(editText.getText().toString())) {
+                int position = taskAdapter.getAvailablePosition();
                 Task task = new Task();
                 task.setListId(listId);
                 task.setName(editText.getText().toString());
-                task.setPosition(taskAdapter.getAvailablePosition());
+                task.setPosition(position);
                 task.setCreatedDateTime(new Date().getTime());
-                ActivityUtils.handleDbInteractionResult(taskService.insert(task), coordinator, () -> {
-                    taskAdapter.refresh();
+                long id = taskService.insert(task);
+                ActivityUtils.handleDbInteractionResult(id, coordinator, () -> {
+                    task.setId((int) id);
+                    taskAdapter.getTasks().add(task);
+                    int adapterPos = taskAdapter.getTasks().indexOf(task);
+                    taskAdapter.notifyItemInserted(adapterPos);
+                    listView.scrollToPosition(adapterPos);
                     editText.setText(StringUtils.EMPTY);
                 });
             }

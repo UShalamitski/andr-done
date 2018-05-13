@@ -255,7 +255,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                 position = task.getPosition();
             }
         }
-        return position;
+        return ++position;
     }
 
     /**

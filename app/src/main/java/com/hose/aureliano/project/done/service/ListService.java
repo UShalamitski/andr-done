@@ -24,12 +24,33 @@ public class ListService {
     }
 
     /**
+     * Inserts instance of {@link DoneList}.
+     *
+     * @param list instance of {@link DoneList} to insert
+     */
+    public long insert(DoneList list) {
+        return listDao.insert(list);
+    }
+
+    /**
      * Updates instance of {@link DoneList}.
      *
      * @param list instance of {@link DoneList} to update
+     * @return number affected rows
      */
-    public void update(DoneList list) {
-        listDao.update(list);
+    public int update(DoneList list) {
+        return listDao.update(list);
+    }
+
+    /**
+     * Updates {@link DoneList}s.
+     *
+     * @param lists list of {@link DoneList} to update
+     */
+    public void update(List<DoneList> lists) {
+        for (DoneList list : lists) {
+            update(list);
+        }
     }
 
     /**

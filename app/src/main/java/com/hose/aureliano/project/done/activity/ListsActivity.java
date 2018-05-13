@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,16 +23,18 @@ import android.widget.ImageView;
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.ListAdapter;
 import com.hose.aureliano.project.done.activity.component.CustomEditText;
+import com.hose.aureliano.project.done.activity.component.RecyclerViewEmptySupport;
 import com.hose.aureliano.project.done.activity.dialog.ListModal;
 import com.hose.aureliano.project.done.activity.helper.ListItemTouchHelper;
 import com.hose.aureliano.project.done.model.DoneList;
-import com.hose.aureliano.project.done.repository.DatabaseCreator;
-import com.hose.aureliano.project.done.repository.dao.DoneListDao;
+import com.hose.aureliano.project.done.service.ListService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 import com.hose.aureliano.project.done.utils.AnimationUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -46,7 +47,7 @@ import java.util.UUID;
 public class ListsActivity extends AppCompatActivity implements ListModal.NoticeDialogListener {
 
     private ListAdapter listsAdapter;
-    private DoneListDao doneListDao = DatabaseCreator.getDatabase(this).getDoneListDao();
+    private ListService listService = new ListService(this);
     View coordinator;
 
     @Override
@@ -56,7 +57,8 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
 
         coordinator = findViewById(R.id.coordinator_layout);
         listsAdapter = new ListAdapter(this, getSupportFragmentManager());
-        RecyclerView recyclerView = findViewById(R.id.activity_lists_list_view);
+        RecyclerViewEmptySupport recyclerView = findViewById(R.id.activity_lists_list_view);
+        recyclerView.setEmptyView(findViewById(R.id.activity_lists_empty_view));
         recyclerView.setAdapter(listsAdapter);
 
         InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -104,7 +106,8 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
                 DoneList list = new DoneList();
                 list.setName(editText.getText().toString());
                 list.setId(UUID.randomUUID().toString());
-                ActivityUtils.handleDbInteractionResult(doneListDao.insert(list), coordinator, () -> {
+                list.setCreatedDateTime(new Date().getTime());
+                ActivityUtils.handleDbInteractionResult(listService.insert(list), coordinator, () -> {
                     editText.setText(StringUtils.EMPTY);
                     editText.onKeyPreIme(1, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
                     Intent intent = new Intent(this, TasksActivity.class);
@@ -143,13 +146,48 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.delete_all) {
-            int deletedCount = doneListDao.delete();
-            listsAdapter.refresh();
-            ActivityUtils.showSnackBar(coordinator, String.format("Deleted: %s", deletedCount));
-            return true;
+        switch (item.getItemId()) {
+            case R.id.menu_lists_sort_name:
+                Collections.sort(listsAdapter.getLists(),
+                        (list1, list2) -> StringUtils.compare(list1.getName(), list2.getName()));
+                applySortChanges();
+                return true;
+            case R.id.menu_lists_sort_progress:
+                Collections.sort(listsAdapter.getLists(), (list1, list2) -> {
+                    int result;
+                    if (0 == list1.getTasksCount() && 0 == list2.getTasksCount()) {
+                        result = 0;
+                    } else if (0 != list1.getTasksCount() && 0 == list2.getTasksCount()) {
+                        result = 1;
+                    } else if (0 == list1.getTasksCount() && 0 != list2.getTasksCount()) {
+                        result = -1;
+                    } else {
+                        result = Double.compare(list1.getDoneTasksCount() * 100d / list1.getTasksCount(),
+                                list2.getDoneTasksCount() * 100d / list2.getTasksCount());
+                    }
+                    return result;
+                });
+                applySortChanges();
+                return true;
+            case R.id.menu_lists_sort_creation_date:
+                Collections.sort(listsAdapter.getLists(), (list1, list2) -> {
+                    int result;
+                    if (null == list1.getCreatedDateTime() && null == list2.getCreatedDateTime()) {
+                        result = 0;
+                    } else if (null == list1.getCreatedDateTime() && null != list2.getCreatedDateTime()) {
+                        result = 1;
+                    } else if (null != list1.getCreatedDateTime() && null == list2.getCreatedDateTime()) {
+                        result = -1;
+                    } else {
+                        result = list1.getCreatedDateTime().compareTo(list2.getCreatedDateTime());
+                    }
+                    return result;
+                });
+                applySortChanges();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -163,10 +201,11 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
         Bundle bundle = fragment.getArguments();
         if (null != bundle) {
             doneList.setId(bundle.getString("id"));
-            result = doneListDao.update(doneList);
+            doneList.setCreatedDateTime(bundle.getLong("createdDateTime"));
+            result = listService.update(doneList);
         } else {
             doneList.setId(UUID.randomUUID().toString());
-            result = doneListDao.insert(doneList);
+            result = listService.insert(doneList);
         }
 
         if (result != -1) {
@@ -179,5 +218,11 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
 
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
+    }
+
+    private void applySortChanges() {
+        listsAdapter.updatePositions();
+        listsAdapter.notifyDataSetChanged();
+        listService.update(listsAdapter.getLists());
     }
 }
