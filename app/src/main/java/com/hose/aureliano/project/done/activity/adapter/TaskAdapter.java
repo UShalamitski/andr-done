@@ -105,6 +105,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             });
             popupMenu.show();
         });
+
         view.setOnClickListener(itemView -> {
             if (null != actionMode) {
                 toggleSelection(viewHolder, actionMode);
@@ -113,7 +114,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             }
             ActivityUtils.vibrate(context);
         });
-        view.setOnLongClickListener(longClickView -> true);
+
+        view.setOnLongClickListener(longClickView -> {
+            if (null != actionMode) {
+                if (1 == CollectionUtils.size(selectedIdsSet) && selectedIdsSet.contains(viewHolder.getAdapterPosition())) {
+                    return false;
+                } else {
+                    toggleSelection(viewHolder, actionMode);
+                }
+            }
+            return true;
+        });
         view.setTag(viewHolder);
         return viewHolder;
     }

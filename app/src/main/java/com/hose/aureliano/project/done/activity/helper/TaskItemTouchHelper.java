@@ -158,14 +158,20 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                 actionMode = ((Activity) context).startActionMode(new ActionMode.Callback() {
                     @Override
                     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                        mode.getMenuInflater().inflate(R.menu.menu_tasks_selected, menu);
-                        adapter.toggleSelection(holder, mode);
-                        ((Activity) context).getWindow().setStatusBarColor(COLOR_GRAY);
-                        return true;
+                        if (0 <= holder.getAdapterPosition()) {
+                            actionMode = mode;
+                            mode.getMenuInflater().inflate(R.menu.menu_tasks_selected, menu);
+                            adapter.toggleSelection(holder, mode);
+                            ((Activity) context).getWindow().setStatusBarColor(COLOR_GRAY);
+                            return true;
+                        } else {
+                            return false;
+                        }
                     }
 
                     @Override
                     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                        adapter.setActionMode(actionMode);
                         return true;
                     }
 
@@ -220,7 +226,6 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                         ((Activity) context).getWindow().setStatusBarColor(COLOR_PRIMARY);
                     }
                 });
-                adapter.setActionMode(actionMode);
             }
             isDragged = false;
             isMoved = false;
