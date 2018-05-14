@@ -129,8 +129,8 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
                 long id = taskService.insert(task);
                 ActivityUtils.handleDbInteractionResult(id, coordinator, () -> {
                     task.setId((int) id);
-                    taskAdapter.getTasks().add(task);
-                    int adapterPos = taskAdapter.getTasks().indexOf(task);
+                    taskAdapter.getItems().add(task);
+                    int adapterPos = taskAdapter.getItems().indexOf(task);
                     taskAdapter.notifyItemInserted(adapterPos);
                     listView.scrollToPosition(adapterPos);
                     editText.setText(StringUtils.EMPTY);
@@ -175,12 +175,12 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_tasks_sort_name:
-                Collections.sort(taskAdapter.getTasks(),
+                Collections.sort(taskAdapter.getItems(),
                         (task1, task2) -> StringUtils.compare(task1.getName(), task2.getName()));
                 applySortChanges();
                 return true;
             case R.id.menu_tasks_sort_due_date:
-                Collections.sort(taskAdapter.getTasks(), (task1, task2) -> {
+                Collections.sort(taskAdapter.getItems(), (task1, task2) -> {
                     if (null == task1.getDueDateTime() && null == task2.getDueDateTime()) {
                         return 0;
                     } else if (null == task1.getDueDateTime() && null != task2.getDueDateTime()) {
@@ -194,7 +194,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
                 applySortChanges();
                 return true;
             case R.id.menu_tasks_sort_create_date:
-                Collections.sort(taskAdapter.getTasks(), (task1, task2) -> {
+                Collections.sort(taskAdapter.getItems(), (task1, task2) -> {
                     if (null == task1.getCreatedDateTime() && null == task2.getCreatedDateTime()) {
                         return 0;
                     } else if (null == task1.getCreatedDateTime() && null != task2.getCreatedDateTime()) {
@@ -235,6 +235,6 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
     private void applySortChanges() {
         taskAdapter.updatePositions();
         taskAdapter.notifyDataSetChanged();
-        taskService.update(taskAdapter.getTasks());
+        taskService.update(taskAdapter.getItems());
     }
 }

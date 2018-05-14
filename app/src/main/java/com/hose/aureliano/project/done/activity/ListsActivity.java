@@ -148,12 +148,12 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_lists_sort_name:
-                Collections.sort(listsAdapter.getLists(),
+                Collections.sort(listsAdapter.getItems(),
                         (list1, list2) -> StringUtils.compare(list1.getName(), list2.getName()));
                 applySortChanges();
                 return true;
             case R.id.menu_lists_sort_progress:
-                Collections.sort(listsAdapter.getLists(), (list1, list2) -> {
+                Collections.sort(listsAdapter.getItems(), (list1, list2) -> {
                     int result;
                     if (0 == list1.getTasksCount() && 0 == list2.getTasksCount()) {
                         result = 0;
@@ -170,7 +170,7 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
                 applySortChanges();
                 return true;
             case R.id.menu_lists_sort_creation_date:
-                Collections.sort(listsAdapter.getLists(), (list1, list2) -> {
+                Collections.sort(listsAdapter.getItems(), (list1, list2) -> {
                     int result;
                     if (null == list1.getCreatedDateTime() && null == list2.getCreatedDateTime()) {
                         result = 0;
@@ -223,6 +223,6 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
     private void applySortChanges() {
         listsAdapter.updatePositions();
         listsAdapter.notifyDataSetChanged();
-        listService.update(listsAdapter.getLists());
+        listService.update(listsAdapter.getItems());
     }
 }

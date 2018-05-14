@@ -48,4 +48,5 @@
     <string name="list.delete.confirmation">Вы уверены, что хотите удалить выбранный список?</string>
     <string name="list.add_new">Добавить список</string>
     <string name="list.empty_view">Списков пока нет</string>
+    <string name="lists.delete.confirmation">Вы уверены, что хотите удалить выбранные списки?</string>
 </resources>

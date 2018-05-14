@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hose.aureliano.project.done.R;
+import com.hose.aureliano.project.done.activity.adapter.api.Adapter;
 import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
@@ -42,7 +43,7 @@ import java.util.Set;
  *
  * @author evere
  */
-public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
+public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> implements Adapter<Task> {
 
     private static int COLOR_RED_SECONDARY;
     private static int COLOR_BLACK_PRIMARY;
@@ -202,10 +203,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                 selectedIdsSet.contains(holder.getAdapterPosition()) ? COLOR_GRAY_LIGHT : COLOR_WHITE);
     }
 
+    /**
+     * Sets action mode.
+     *
+     * @param actionMode instance of {@link ActionMode}
+     */
     public void setActionMode(ActionMode actionMode) {
         this.actionMode = actionMode;
     }
 
+    /**
+     * @return set of selected {@link Task}s.
+     */
     public List<Task> getSelectedTasks() {
         List<Task> selectedTasks = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(selectedIdsSet)) {
@@ -216,12 +225,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         return selectedTasks;
     }
 
+    /**
+     * Clear set of selected items.
+     */
     public void clearSelection() {
         setActionMode(null);
         selectedIdsSet.clear();
         notifyDataSetChanged();
     }
 
+    /**
+     * Selects all items.
+     */
     public void selectAll() {
         for (int i = 0; i < CollectionUtils.size(taskList); i++) {
             selectedIdsSet.add(i);
@@ -261,7 +276,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
      */
     public int getAvailablePosition() {
         int position = 0;
-        for (Task task : getTasks()) {
+        for (Task task : getItems()) {
             if (task.getPosition() > position) {
                 position = task.getPosition();
             }
@@ -274,12 +289,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
      */
     public void updatePositions() {
         int position = 0;
-        for (Task task : getTasks()) {
+        for (Task task : getItems()) {
             task.setPosition(position++);
         }
     }
 
-    public List<Task> getTasks() {
+    @Override
+    public List<Task> getItems() {
         return taskList;
     }
 
@@ -301,11 +317,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         notifyItemRemoved(position);
     }
 
-    /**
-     * Remove {@link Task}s from the list.
-     *
-     * @param tasks list of {@link Task}s to remove
-     */
+    @Override
     public void removeItems(List<Task> tasks) {
         for (Task task : tasks) {
             taskList.remove(task);

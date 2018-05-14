@@ -92,7 +92,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
             isMoved = true;
             int oldPosition = viewHolder.getAdapterPosition();
             int newPosition = target.getAdapterPosition();
-            List<Task> tasks = adapter.getTasks();
+            List<Task> tasks = adapter.getItems();
             tasks.add(newPosition, tasks.remove(oldPosition));
             adapter.notifyItemMoved(oldPosition, newPosition);
         }
@@ -103,7 +103,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         if (fromPosition != null && toPosition != null) {
             int i = 0;
-            for (Task task : adapter.getTasks()) {
+            for (Task task : adapter.getItems()) {
                 task.setPosition(i++);
                 taskService.update(task);
             }

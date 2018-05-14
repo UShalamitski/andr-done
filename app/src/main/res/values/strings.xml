@@ -48,4 +48,5 @@
     <string name="list.delete.confirmation">Are you sure you want to delete selected list?</string>
     <string name="list.add_new">Add new list</string>
     <string name="list.empty_view">There are no lists yet</string>
+    <string name="lists.delete.confirmation">Are you sure you want to delete selected lists?</string>
 </resources>

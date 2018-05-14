@@ -54,6 +54,27 @@ public class ListService {
     }
 
     /**
+     * Deletes specified {@link DoneList}.
+     *
+     * @param list list to delete
+     * @return number affected rows or -1
+     */
+    public int delete(DoneList list) {
+        return listDao.delete(list);
+    }
+
+    /**
+     * Deletes specified {@link DoneList}s.
+     *
+     * @param lists lists to delete
+     */
+    public void delete(List<DoneList> lists) {
+        for (DoneList list : lists) {
+            delete(list);
+        }
+    }
+
+    /**
      * Return list with all {@link DoneList}.
      */
     public List<DoneList> getLists() {

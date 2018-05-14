@@ -1,6 +1,7 @@
 package com.hose.aureliano.project.done.repository.dao;
 
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
@@ -28,8 +29,8 @@ public interface DoneListDao {
     @Query("DELETE FROM lists")
     int delete();
 
-    @Query("DELETE FROM lists WHERE id = :id")
-    int delete(String id);
+    @Delete
+    int delete(DoneList doneList);
 
     @Query("SELECT id, name, createdDateTime, (SELECT COUNT(*) FROM tasks t WHERE t.listId = l.id) AS tasksCount, " +
             "(SELECT COUNT(*) FROM tasks t WHERE t.listId = l.id AND t.done) AS doneTasksCount " +
