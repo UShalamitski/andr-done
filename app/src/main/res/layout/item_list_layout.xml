@@ -10,24 +10,22 @@
     android:layout_marginStart="10dp"
     android:layout_marginTop="10dp"
     android:background="@android:color/white"
-    card_view:cardCornerRadius="0dp"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground">
+    android:foreground="?android:attr/selectableItemBackground"
+    card_view:cardCornerRadius="0dp">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/list_item_top_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="20dp"
+        android:layout_height="@dimen/list.item.height"
         android:paddingEnd="16dp"
-        android:paddingStart="14dp"
-        android:paddingTop="12dp">
+        android:paddingStart="14dp">
 
         <RelativeLayout
             android:id="@+id/list_item_count_layout"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginEnd="14dp"
             android:minWidth="36.5sp">
@@ -37,7 +35,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
                 android:fontFamily="sans-serif-medium"
                 android:textAppearance="?android:textAppearanceMedium"
                 android:textColor="@color/black_primary"
@@ -54,14 +51,19 @@
             android:textAppearance="?android:textAppearanceMedium"
             android:textColor="@color/black_primary" />
 
-        <ImageView
+        <RelativeLayout
             android:id="@+id/list_menu"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/icon_more_vert_white_24dp"
-            android:tint="@color/black_secondary" />
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/icon_more_vert_white_24dp"
+                android:tint="@color/black_secondary" />
+        </RelativeLayout>
     </RelativeLayout>
 
     <RelativeLayout

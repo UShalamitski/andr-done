@@ -5,10 +5,10 @@
     android:id="@+id/task_item_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground">
+    android:foreground="?android:attr/selectableItemBackground"
+    android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/item_view_background"
@@ -145,14 +145,19 @@
             </RelativeLayout>
         </RelativeLayout>
 
-        <ImageView
+        <RelativeLayout
             android:id="@+id/task_menu"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/icon_more_vert_white_24dp"
-            android:tint="@color/black_secondary" />
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/icon_more_vert_white_24dp"
+                android:tint="@color/black_secondary" />
+        </RelativeLayout>
 
         <CheckBox
             android:id="@+id/task_checkbox"

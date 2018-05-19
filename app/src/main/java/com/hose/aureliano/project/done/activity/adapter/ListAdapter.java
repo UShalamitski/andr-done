@@ -289,7 +289,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         private String id;
         private TextView taskCounts;
         private TextView name;
-        private ImageView menu;
+        private View menu;
         private ProgressBar progressBar;
         private View view;
 

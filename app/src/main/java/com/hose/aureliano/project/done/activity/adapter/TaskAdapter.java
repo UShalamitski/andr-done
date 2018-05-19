@@ -443,7 +443,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         private ImageView backgroundRightIcon;
         private ImageView backgroundLeftIcon;
         private TextView name;
-        private ImageView menu;
+        private View menu;
         private CheckBox checkBox;
         private RelativeLayout taskInfoLayout;
         private ImageView dueDateIcon;
