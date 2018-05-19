@@ -182,7 +182,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                                 adapter.selectAll();
                                 break;
                             case R.id.menu_tasks_selected_duplicate:
-                                taskService.duplicate(adapter.getSelectedTasks());
+                                taskService.duplicate(adapter.getSelectedTasks(), adapter.getAvailablePosition());
                                 refreshDataAndFinishActionMode();
                                 ActivityUtils.showSnackBar(coordinator, context.getString(R.string.task_duplicate));
                                 break;
@@ -299,7 +299,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                     int position = taskService.getAvailablePosition(listId);
                     for (Task task : adapter.getSelectedTasks()) {
                         task.setListId(listId);
-                        task.setPosition(++position);
+                        task.setPosition(position++);
                         taskService.update(task);
                     }
                     adapter.refresh();

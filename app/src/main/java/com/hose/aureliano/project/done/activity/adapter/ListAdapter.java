@@ -106,7 +106,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
                                         doneListDao.delete(doneList);
                                     });
                                     int position = getPosition(itemView);
-
+                                    doneLists.remove(position);
+                                    notifyItemRemoved(position);
                                 });
                         break;
                     case R.id.menu_edit:

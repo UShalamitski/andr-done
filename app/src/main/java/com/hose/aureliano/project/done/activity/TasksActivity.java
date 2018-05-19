@@ -58,10 +58,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
     private View coordinator;
     private TaskAdapter taskAdapter;
     private FloatingActionButton floatingActionButton;
-
     private TaskService taskService = new TaskService(this);
-    private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(5);
-    private Map<Task, ScheduledFuture> itemsToRemoveMap = new HashMap<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

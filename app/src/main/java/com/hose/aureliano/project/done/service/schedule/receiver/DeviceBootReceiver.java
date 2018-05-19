@@ -3,6 +3,7 @@ package com.hose.aureliano.project.done.service.schedule.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.widget.Toast;
 
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.service.TaskService;
@@ -23,7 +24,8 @@ public class DeviceBootReceiver extends BroadcastReceiver {
     private static final String[] ACTIONS = {
             "android.intent.action.BOOT_COMPLETED",
             "android.intent.action.QUICKBOOT_POWERON",
-            "com.htc.intent.action.QUICKBOOT_POWERON"};
+            "com.htc.intent.action.QUICKBOOT_POWERON",
+            "android.intent.action.MY_PACKAGE_REPLACED"};
 
     @Override
     public void onReceive(Context context, Intent intent) {

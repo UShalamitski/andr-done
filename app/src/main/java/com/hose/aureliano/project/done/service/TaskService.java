@@ -43,12 +43,13 @@ public class TaskService {
     /**
      * Inserts {@link Task}s.
      *
-     * @param tasks list of {@link Task}s to insert
+     * @param tasks    list of {@link Task}s to insert
+     * @param position next available position to insert
      */
-    public void duplicate(List<Task> tasks) {
+    public void duplicate(List<Task> tasks, int position) {
         for (Task task : tasks) {
             task.setId(null);
-            task.setPosition(null);
+            task.setPosition(position++);
             task.setDone(false);
             Integer taskId = (int) taskDao.insert(task);
             if (null != task.getRemindDateTime() && System.currentTimeMillis() < task.getRemindDateTime()) {
@@ -136,6 +137,6 @@ public class TaskService {
      * @return next available position for new task in particular list.
      */
     public int getAvailablePosition(String listId) {
-        return taskDao.getMaxPosition(listId);
+        return taskDao.getMaxPosition(listId) + 1;
     }
 }
