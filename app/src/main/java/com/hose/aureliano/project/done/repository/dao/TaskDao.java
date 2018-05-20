@@ -42,4 +42,7 @@ public interface TaskDao {
 
     @Query("SELECT MAX(position) FROM tasks WHERE listId = :listId")
     int getMaxPosition(String listId);
+
+    @Query("SELECT * FROM tasks WHERE NOT done AND dueDateTime < CAST(strftime('%s', 'now')  AS  integer) * 1000")
+    List<Task> readOverdueTasks();
 }

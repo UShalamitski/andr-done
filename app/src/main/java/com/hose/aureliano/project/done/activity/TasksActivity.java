@@ -39,11 +39,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Activity fot displaying all TODOs for selected list.
@@ -222,7 +217,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
             taskAdapter.refresh();
             ActivityUtils.showSnackBar(coordinator, String.format("done: %s", name.getText()));
             if (task.getRemindTimeIsSet()) {
-                AlarmService.setAlarm(this, task);
+                AlarmService.setTaskReminder(this, task);
             }
         } else {
             ActivityUtils.showSnackBar(coordinator, "Oops! Something went wrong!");

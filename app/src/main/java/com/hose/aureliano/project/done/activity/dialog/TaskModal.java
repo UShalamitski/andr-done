@@ -70,7 +70,7 @@ public class TaskModal extends DialogFragment {
             changeRemindDate(defaultTextColor, blackColor, getString(R.string.task_remind_me));
             task.setRemindDateTime(null);
             task.setRemindTimeIsSet(false);
-            AlarmService.cancelAlarm(getContext(), task);
+            AlarmService.cancelTaskReminder(getContext(), task);
         });
 
         if (task.getDueDateTime() != null) {

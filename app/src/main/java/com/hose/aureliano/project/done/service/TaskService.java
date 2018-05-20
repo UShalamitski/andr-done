@@ -54,7 +54,7 @@ public class TaskService {
             Integer taskId = (int) taskDao.insert(task);
             if (null != task.getRemindDateTime() && System.currentTimeMillis() < task.getRemindDateTime()) {
                 task.setId(taskId);
-                AlarmService.setAlarm(context, task);
+                AlarmService.setTaskReminder(context, task);
             }
         }
     }
@@ -88,7 +88,7 @@ public class TaskService {
     public void deleteByListId(String listId) {
         List<Task> tasks = taskDao.read(listId);
         for (Task task : tasks) {
-            AlarmService.cancelAlarm(context, task);
+            AlarmService.cancelTaskReminder(context, task);
         }
         taskDao.deleteByListId(listId);
     }
@@ -99,7 +99,7 @@ public class TaskService {
      * @param task instance of {@link Task} to remove
      */
     public void delete(Task task) {
-        AlarmService.cancelAlarm(context, task);
+        AlarmService.cancelTaskReminder(context, task);
         taskDao.delete(task.getId());
     }
 
@@ -138,5 +138,12 @@ public class TaskService {
      */
     public int getAvailablePosition(String listId) {
         return taskDao.getMaxPosition(listId) + 1;
+    }
+
+    /**
+     * @return overdue tasks.
+     */
+    public List<Task> getOverdueTasks() {
+        return taskDao.readOverdueTasks();
     }
 }

@@ -29,6 +29,7 @@
             android:parentActivityName=".activity.ListsActivity" />
 
         <receiver android:name=".service.schedule.receiver.ReminderReceiver" />
+        <receiver android:name=".service.schedule.receiver.OverdueTasksReceiver" />
         <receiver android:name=".service.schedule.receiver.DeviceBootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />

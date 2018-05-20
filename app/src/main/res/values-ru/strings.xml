@@ -44,6 +44,8 @@
     <string name="task.remind_me">Напомнить</string>
     <string name="task.removed">Задача удалена</string>
     <string name="task.selected">Выбрано: %s</string>
+    <string name="tasks.overdue.notification.title">Просроченные задачи: %s</string>
+    <string name="tasks.overdue.notification.text">Нажмите, чтобы просмотреть</string>
 
     <string name="list.delete.confirmation">Вы уверены, что хотите удалить выбранный список?</string>
     <string name="list.add_new">Добавить список</string>

@@ -179,10 +179,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
                 setVisibility(holder.reminderIcon, false);
                 setVisibility(holder.reminderText, false);
                 setVisibility(holder.dueDateAndReminderDelimiter, false);
-                AlarmService.cancelAlarm(context, currentTask);
+                AlarmService.cancelTaskReminder(context, currentTask);
             } else if (!isChecked && currentTask.getRemindTimeIsSet()) {
                 if (currentTask.getRemindDateTime() > System.currentTimeMillis()) {
-                    AlarmService.setAlarm(context, currentTask);
+                    AlarmService.setTaskReminder(context, currentTask);
                     setVisibility(holder.taskInfoLayout, true);
                     setVisibility(holder.reminderIcon, true);
                     setVisibility(holder.reminderText, null == currentTask.getDueDateTime());

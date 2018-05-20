@@ -28,8 +28,10 @@ import com.hose.aureliano.project.done.activity.dialog.ListModal;
 import com.hose.aureliano.project.done.activity.helper.ListItemTouchHelper;
 import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.service.ListService;
+import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 import com.hose.aureliano.project.done.utils.AnimationUtil;
+import com.hose.aureliano.project.done.utils.PreferencesUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -42,7 +44,7 @@ import java.util.UUID;
  * <p>
  * Date: 12.02.2018.
  *
- * @author evere
+ * @author Uladzislau Shalamitski
  */
 public class ListsActivity extends AppCompatActivity implements ListModal.NoticeDialogListener {
 
@@ -130,6 +132,7 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
         });
 
         new ItemTouchHelper(new ListItemTouchHelper(this, listsAdapter)).attachToRecyclerView(recyclerView);
+        configureApplication();
     }
 
     @Override
@@ -224,5 +227,13 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
         listsAdapter.updatePositions();
         listsAdapter.notifyDataSetChanged();
         listService.update(listsAdapter.getItems());
+    }
+
+    private void configureApplication() {
+        String isFirstRunConfiguredPreferenceName = getString(R.string.preference_isFirstRunConfigured);
+        if (!PreferencesUtil.getPreference(this, isFirstRunConfiguredPreferenceName)) {
+            AlarmService.setOverdueTasksReminder(this);
+            PreferencesUtil.addPreference(this, isFirstRunConfiguredPreferenceName, true);
+        }
     }
 }
