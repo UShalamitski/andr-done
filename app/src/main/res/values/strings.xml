@@ -10,6 +10,7 @@
     <string name="move">Move</string>
     <string name="sort">Sort</string>
     <string name="undo">Undo</string>
+    <string name="view">View</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="ok">Ok</string>
@@ -28,6 +29,13 @@
     <string name="menu.due_date.select">Select due date</string>
 
     <string name="modal.select.list">Select list</string>
+
+    <string name="navbar.overdue">Overdue</string>
+    <string name="navbar.folders">Folders</string>
+    <string name="navbar.my_lists">My lists</string>
+    <string name="navbar.today">Today</string>
+    <string name="navbar.views">Views</string>
+    <string name="navbar.week">Week</string>
 
     <string name="date_time_picker.time">Time</string>
     <string name="date_time_picker.without_time">Without time</string>

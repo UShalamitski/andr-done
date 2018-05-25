@@ -35,7 +35,10 @@ public interface TaskDao {
     int deleteByListId(String listId);
 
     @Query("SELECT * FROM tasks WHERE listId = :listId ORDER BY CASE WHEN position IS NULL THEN 1 ELSE 0 END, position")
-    List<Task> read(String listId);
+    List<Task> readByListId(String listId);
+
+    @Query("SELECT * FROM tasks WHERE NOT done AND dueDateTime BETWEEN :beginDate AND :endDate ORDER BY dueDateTime")
+    List<Task> readByDueDate(long beginDate, long endDate);
 
     @Query("SELECT * FROM tasks WHERE remindDateTime IS NOT null AND NOT done")
     List<Task> readNotCompletedWithReminder();

@@ -205,7 +205,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                                 updateDueDate(CalendarUtils.getTomorrowDateTimeInMillis());
                                 break;
                             case R.id.menu_tasks_due_date_next_week:
-                                updateDueDate(CalendarUtils.getNextWeekDateTimeInMillis());
+                                updateDueDate(CalendarUtils.getNextMondayDateTimeInMillis());
                                 break;
                             case R.id.menu_tasks_without_due_date:
                                 updateDueDate(null);

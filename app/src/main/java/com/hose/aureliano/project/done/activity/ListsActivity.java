@@ -3,9 +3,15 @@ package com.hose.aureliano.project.done.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -27,6 +33,7 @@ import com.hose.aureliano.project.done.activity.component.RecyclerViewEmptySuppo
 import com.hose.aureliano.project.done.activity.dialog.ListModal;
 import com.hose.aureliano.project.done.activity.helper.ListItemTouchHelper;
 import com.hose.aureliano.project.done.model.DoneList;
+import com.hose.aureliano.project.done.model.TaskViewEnum;
 import com.hose.aureliano.project.done.service.ListService;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
@@ -46,16 +53,30 @@ import java.util.UUID;
  *
  * @author Uladzislau Shalamitski
  */
-public class ListsActivity extends AppCompatActivity implements ListModal.NoticeDialogListener {
+public class ListsActivity extends AppCompatActivity implements ListModal.NoticeDialogListener,
+        NavigationView.OnNavigationItemSelectedListener {
 
+    private View coordinator;
+    private DrawerLayout drawer;
     private ListAdapter listsAdapter;
     private ListService listService = new ListService(this);
-    View coordinator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lists);
+        setContentView(R.layout.activity_list_drawer);
+
+        Toolbar toolbar = findViewById(R.id.lists_toolbar);
+        setSupportActionBar(toolbar);
+
+        drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle =
+                new ActionBarDrawerToggle(this, drawer, toolbar, R.string.action_settings, R.string.app_name);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         coordinator = findViewById(R.id.coordinator_layout);
         listsAdapter = new ListAdapter(this, getSupportFragmentManager());
@@ -114,7 +135,7 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
                     editText.onKeyPreIme(1, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
                     Intent intent = new Intent(this, TasksActivity.class);
                     intent.putExtra("listId", list.getId());
-                    intent.putExtra("name", list.getName());
+                    intent.putExtra("title", list.getName());
                     this.startActivity(intent);
                 });
             }
@@ -133,6 +154,15 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
 
         new ItemTouchHelper(new ListItemTouchHelper(this, listsAdapter)).attachToRecyclerView(recyclerView);
         configureApplication();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -191,6 +221,36 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        Intent intent = null;
+        if (id == R.id.navbar_view_today) {
+            intent = new Intent(this, TasksActivity.class);
+            intent.putExtra("view", TaskViewEnum.TODAY);
+            intent.putExtra("title", getString(R.string.navbar_today));
+            this.startActivity(intent);
+        } else if (id == R.id.navbar_view_week) {
+            intent = new Intent(this, TasksActivity.class);
+            intent.putExtra("view", TaskViewEnum.WEEK);
+            intent.putExtra("title", getString(R.string.navbar_week));
+            this.startActivity(intent);
+        } else if (id == R.id.navbar_view_overdue) {
+            intent = new Intent(this, TasksActivity.class);
+            intent.putExtra("view", TaskViewEnum.OVERDUE);
+            intent.putExtra("title", getString(R.string.navbar_overdue));
+            this.startActivity(intent);
+        }
+
+        if (null != intent) {
+            new Handler().postDelayed(() -> drawer.closeDrawer(GravityCompat.START), 300);
+        } else {
+            drawer.closeDrawer(GravityCompat.START);
+        }
+
+        return true;
     }
 
     @Override

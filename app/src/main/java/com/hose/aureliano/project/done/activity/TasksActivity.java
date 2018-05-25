@@ -30,6 +30,7 @@ import com.hose.aureliano.project.done.activity.component.RecyclerViewEmptySuppo
 import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.activity.helper.TaskItemTouchHelper;
 import com.hose.aureliano.project.done.model.Task;
+import com.hose.aureliano.project.done.model.TaskViewEnum;
 import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
@@ -45,7 +46,7 @@ import java.util.Date;
  * <p>
  * Date: 12.02.2018.
  *
- * @author evere
+ * @author Uladzislau Shalamitski
  */
 public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDialogListener {
 
@@ -59,88 +60,101 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
-        setTitle(getIntent().getStringExtra("name"));
+        setTitle(getIntent().getStringExtra("title"));
 
+        TaskViewEnum viewEnum = null != getIntent().getExtras().get("view")
+                ? (TaskViewEnum) getIntent().getExtras().get("view") : null;
         listId = getIntent().getStringExtra("listId");
         coordinator = findViewById(R.id.tasks_coordinator_layout);
-        taskAdapter = new TaskAdapter(this, getSupportFragmentManager(), listId);
+        taskAdapter = new TaskAdapter(this, getSupportFragmentManager(), listId, viewEnum);
 
         RecyclerViewEmptySupport listView = findViewById(R.id.activity_tasks_list_view);
         listView.setEmptyView(findViewById(R.id.activity_tasks_empty_view));
         listView.setAdapter(taskAdapter);
         listView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
-        InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
         floatingActionButton = findViewById(R.id.activity_tasks_fab);
-        CustomEditText editText = findViewById(R.id.activity_task_new_edit_text);
-        View bottomView = findViewById(R.id.activity_task_new);
-        ViewGroup decorView = getWindow().getDecorView().findViewById(R.id.activity_task_to_decor);
-        ImageView newIcon = findViewById(R.id.activity_task_new_icon);
-        View background = LayoutInflater.from(this).inflate(R.layout.decor_view_layout, null);
 
+        View bottomView = findViewById(R.id.activity_task_new);
         bottomView.setVisibility(View.GONE);
         bottomView.setOnClickListener(view -> {
         });
-        background.setOnClickListener(view -> {
-            inputManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
-            editText.onKeyPreIme(1, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
-        });
-        editText.setListener(() -> {
-            bottomView.setVisibility(View.GONE);
-            AnimationUtil.animateAlphaFadeOut(background, () -> {
-                decorView.removeView(background);
-                floatingActionButton.show();
+
+        if (TaskViewEnum.OVERDUE != viewEnum) {
+            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            CustomEditText editText = findViewById(R.id.activity_task_new_edit_text);
+
+            ViewGroup decorView = getWindow().getDecorView().findViewById(R.id.activity_task_to_decor);
+            ImageView newIcon = findViewById(R.id.activity_task_new_icon);
+            View background = LayoutInflater.from(this).inflate(R.layout.decor_view_layout, null);
+
+            background.setOnClickListener(view -> {
+                inputManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
+                editText.onKeyPreIme(1, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
             });
-        });
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (StringUtils.isNoneBlank(s)) {
-                    newIcon.setColorFilter(getResources().getColor(R.color.green));
-                } else if (StringUtils.isBlank(s)) {
-                    newIcon.setColorFilter(getResources().getColor(R.color.darker_gray));
-                }
-            }
-        });
-        editText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE && StringUtils.isNotBlank(editText.getText().toString())) {
-                int position = taskAdapter.getAvailablePosition();
-                Task task = new Task();
-                task.setListId(listId);
-                task.setName(editText.getText().toString());
-                task.setPosition(position);
-                task.setCreatedDateTime(new Date().getTime());
-                long id = taskService.insert(task);
-                ActivityUtils.handleDbInteractionResult(id, coordinator, () -> {
-                    task.setId((int) id);
-                    taskAdapter.getItems().add(task);
-                    int adapterPos = taskAdapter.getItems().indexOf(task);
-                    taskAdapter.notifyItemInserted(adapterPos);
-                    listView.scrollToPosition(adapterPos);
-                    editText.setText(StringUtils.EMPTY);
+            editText.setListener(() -> {
+                bottomView.setVisibility(View.GONE);
+                AnimationUtil.animateAlphaFadeOut(background, () -> {
+                    decorView.removeView(background);
+                    floatingActionButton.show();
                 });
-            }
-            return true;
-        });
+            });
 
-        floatingActionButton.setOnClickListener(view -> {
-            bottomView.setVisibility(View.VISIBLE);
-            editText.requestFocus();
-            if (null != inputManager) {
-                floatingActionButton.hide();
-                inputManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
-                AnimationUtil.animateAlphaFadeIn(background);
-                decorView.addView(background);
-            }
-        });
+            editText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (StringUtils.isNoneBlank(s)) {
+                        newIcon.setColorFilter(getResources().getColor(R.color.green));
+                    } else if (StringUtils.isBlank(s)) {
+                        newIcon.setColorFilter(getResources().getColor(R.color.darker_gray));
+                    }
+                }
+            });
+
+            editText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
+                if (actionId == EditorInfo.IME_ACTION_DONE && StringUtils.isNotBlank(editText.getText().toString())) {
+                    int position = taskAdapter.getAvailablePosition();
+                    Task task = new Task();
+                    task.setListId(listId);
+                    task.setName(editText.getText().toString());
+                    task.setPosition(position);
+                    task.setCreatedDateTime(new Date().getTime());
+                    long id = taskService.insert(task);
+                    ActivityUtils.handleDbInteractionResult(id, coordinator, () -> {
+                        task.setId((int) id);
+                        taskAdapter.getItems().add(task);
+                        int adapterPos = taskAdapter.getItems().indexOf(task);
+                        taskAdapter.notifyItemInserted(adapterPos);
+                        listView.scrollToPosition(adapterPos);
+                        editText.setText(StringUtils.EMPTY);
+                    });
+                }
+                return true;
+            });
+
+            floatingActionButton.setVisibility(View.VISIBLE);
+            floatingActionButton.setOnClickListener(view -> {
+                bottomView.setVisibility(View.VISIBLE);
+                editText.requestFocus();
+                if (null != inputManager) {
+                    floatingActionButton.hide();
+                    inputManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+                    AnimationUtil.animateAlphaFadeIn(background);
+                    decorView.addView(background);
+                }
+            });
+        } else {
+            floatingActionButton.setVisibility(View.GONE);
+        }
 
         new ItemTouchHelper(new TaskItemTouchHelper(this, taskAdapter, coordinator)).attachToRecyclerView(listView);
     }
@@ -148,13 +162,17 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
     @Override
     public void onSupportActionModeStarted(@NonNull ActionMode mode) {
         super.onSupportActionModeStarted(mode);
-        floatingActionButton.hide();
+        if (null != floatingActionButton) {
+            floatingActionButton.hide();
+        }
     }
 
     @Override
     public void onSupportActionModeFinished(@NonNull ActionMode mode) {
         super.onSupportActionModeFinished(mode);
-        floatingActionButton.show();
+        if (null != floatingActionButton) {
+            floatingActionButton.show();
+        }
     }
 
     @Override
@@ -206,7 +224,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
 
     @Override
     public void onDialogPositiveClick(DialogFragment fragment, Task task) {
-        long result = 0;
+        long result;
         TextView name = fragment.getDialog().findViewById(R.id.tasks_modal_name);
         task.setName(name.getText().toString());
         task.setListId(listId);

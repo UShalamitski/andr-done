@@ -24,6 +24,22 @@ public class CalendarUtils {
     }
 
     /**
+     * @return time in milliseconds for today at 00:00:000
+     */
+    public static long getTodayAtZeroDateTimeInMillis() {
+        return getDateTimeAtZeroInMillis().getTimeInMillis();
+    }
+
+    /**
+     * @return time in milliseconds for next week at 23:59:999
+     */
+    public static long getNextWeekDaysDateTimeInMillis() {
+        Calendar calendar = getDateTimeInMillis();
+        calendar.add(Calendar.DAY_OF_MONTH, 7);
+        return calendar.getTimeInMillis();
+    }
+
+    /**
      * @return time in milliseconds for tomorrow at 23:59:59.999
      */
     public static long getTomorrowDateTimeInMillis() {
@@ -35,7 +51,7 @@ public class CalendarUtils {
     /**
      * @return time in milliseconds for next monday at 23:59:59.999
      */
-    public static long getNextWeekDateTimeInMillis() {
+    public static long getNextMondayDateTimeInMillis() {
         GregorianCalendar calendar = getDateTimeInMillis();
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
@@ -79,6 +95,15 @@ public class CalendarUtils {
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
         calendar.set(Calendar.MILLISECOND, 999);
+        return calendar;
+    }
+
+    private static GregorianCalendar getDateTimeAtZeroInMillis() {
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
         return calendar;
     }
 }

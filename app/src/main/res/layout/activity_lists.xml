@@ -7,10 +7,24 @@
     android:layout_height="match_parent"
     tools:context="com.hose.aureliano.project.done.activity.ListsActivity">
 
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/lists_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+    </android.support.design.widget.AppBarLayout>
+
     <FrameLayout
         android:id="@+id/qwer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <com.hose.aureliano.project.done.activity.component.RecyclerViewEmptySupport
             android:id="@+id/activity_lists_list_view"
@@ -94,6 +108,7 @@
                 android:layout_toEndOf="@+id/activity_list_new_icon"
                 android:backgroundTint="@android:color/transparent"
                 android:hint="@string/list.add_new"
+                android:imeOptions="actionDone"
                 android:inputType="textCapSentences"
                 android:singleLine="true" />
         </RelativeLayout>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <item android:title="@string/navbar.views">
+        <menu>
+            <item
+                android:id="@+id/navbar_view_today"
+                android:icon="@drawable/icon_event_white_24dp"
+                android:title="@string/navbar.today" />
+            <item
+                android:id="@+id/navbar_view_week"
+                android:icon="@drawable/icon_calendar_range_white_24dp"
+                android:title="@string/navbar.week" />
+            <item
+                android:id="@+id/navbar_view_overdue"
+                android:icon="@drawable/icon_clock_alert_white_24dp"
+                android:title="@string/navbar.overdue" />
+        </menu>
+    </item>
+
+    <item android:title="@string/navbar.folders">
+        <menu>
+            <item
+                android:id="@+id/nav_folder"
+                android:icon="@drawable/icon_folder_white_24"
+                android:title="@string/navbar.my_lists" />
+        </menu>
+    </item>
+</menu>

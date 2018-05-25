@@ -3,10 +3,13 @@ package com.hose.aureliano.project.done.service;
 import android.content.Context;
 
 import com.hose.aureliano.project.done.model.Task;
+import com.hose.aureliano.project.done.model.TaskViewEnum;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.TaskDao;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
+import com.hose.aureliano.project.done.utils.CalendarUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +32,45 @@ public class TaskService {
     public TaskService(Context context) {
         this.context = context;
         taskDao = DatabaseCreator.getDatabase(context).getTaskDao();
+    }
+
+    /**
+     * Retrieves {@link Task}s by list id.
+     *
+     * @param listId identifier of list
+     * @return list of {@link Task}s by list id
+     */
+    public List<Task> getTasks(String listId) {
+        return taskDao.readByListId(listId);
+    }
+
+    /**
+     * Retrieves {@link Task}s
+     *
+     * @param view view name
+     * @return list of {@link Task}s
+     */
+    public List<Task> getTasksForView(TaskViewEnum view) {
+        List<Task> tasks;
+        switch (view) {
+            case TODAY: {
+                tasks = taskDao.readByDueDate(CalendarUtils.getTodayAtZeroDateTimeInMillis(),
+                        CalendarUtils.getTodayDateTimeInMillis());
+                break;
+            }
+            case WEEK: {
+                tasks = taskDao.readByDueDate(CalendarUtils.getTodayAtZeroDateTimeInMillis(),
+                        CalendarUtils.getNextWeekDaysDateTimeInMillis());
+                break;
+            }
+            case OVERDUE: {
+                tasks = taskDao.readOverdueTasks();
+                break;
+            }
+            default:
+                tasks = new ArrayList<>();
+        }
+        return tasks;
     }
 
     /**
@@ -86,7 +128,7 @@ public class TaskService {
      * @param listId identifier of list
      */
     public void deleteByListId(String listId) {
-        List<Task> tasks = taskDao.read(listId);
+        List<Task> tasks = taskDao.readByListId(listId);
         for (Task task : tasks) {
             AlarmService.cancelTaskReminder(context, task);
         }

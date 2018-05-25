@@ -22,13 +22,13 @@ import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.api.Adapter;
 import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.model.Task;
-import com.hose.aureliano.project.done.repository.DatabaseCreator;
-import com.hose.aureliano.project.done.repository.dao.TaskDao;
+import com.hose.aureliano.project.done.model.TaskViewEnum;
 import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -54,10 +54,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     private Set<Integer> selectedIdsSet;
     private FragmentManager fragmentManager;
     private TaskService taskService;
-    private TaskDao taskDao;
     private List<Task> taskList;
     private Context context;
     private String listId;
+    private TaskViewEnum view;
     private ActionMode actionMode;
 
     /**
@@ -67,15 +67,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
      * @param fragmentManager fragment manager
      * @param listId          identifier of the list
      */
-    public TaskAdapter(Context context, FragmentManager fragmentManager, String listId) {
-        taskDao = DatabaseCreator.getDatabase(context).getTaskDao();
+    public TaskAdapter(Context context, FragmentManager fragmentManager, String listId,
+                       TaskViewEnum view) {
         taskService = new TaskService(context);
-        taskList = taskDao.read(listId);
         this.fragmentManager = fragmentManager;
         this.context = context;
         this.listId = listId;
+        this.view = view;
         selectedIdsSet = new HashSet<>();
         initStaticResources();
+        refresh();
     }
 
     @Override
@@ -173,7 +174,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
             Task currentTask = getItem(buttonView);
             if (currentTask.getDone() != buttonView.isChecked()) {
                 currentTask.setDone(buttonView.isChecked());
-                taskDao.update(currentTask);
+                taskService.update(currentTask);
             }
             if (isChecked && currentTask.getRemindTimeIsSet()) {
                 setVisibility(holder.reminderIcon, false);
@@ -303,7 +304,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
      * Refreshes data on UI.
      */
     public void refresh() {
-        this.taskList = taskDao.read(listId);
+        if (StringUtils.isNoneBlank(listId)) {
+            taskList = taskService.getTasks(listId);
+        } else if (null != view) {
+            taskList = taskService.getTasksForView(view);
+        }
         notifyDataSetChanged();
     }
 
