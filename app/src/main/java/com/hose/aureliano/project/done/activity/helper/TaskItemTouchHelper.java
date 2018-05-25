@@ -1,7 +1,6 @@
 package com.hose.aureliano.project.done.activity.helper;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -15,16 +14,13 @@ import android.view.View;
 
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.TaskAdapter;
-import com.hose.aureliano.project.done.model.DoneList;
+import com.hose.aureliano.project.done.activity.dialog.SelectListModal;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.service.ListService;
 import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 import com.hose.aureliano.project.done.utils.CalendarUtils;
 
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -187,7 +183,17 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                                 ActivityUtils.showSnackBar(coordinator, context.getString(R.string.task_duplicate));
                                 break;
                             case R.id.menu_tasks_selected_move:
-                                createDialogToMoveTasks(mode);
+                                new SelectListModal(context, listService, listId -> {
+                                    int position = taskService.getAvailablePosition(listId);
+                                    for (Task task : adapter.getSelectedTasks()) {
+                                        task.setListId(listId);
+                                        task.setPosition(position++);
+                                        taskService.update(task);
+                                    }
+                                    adapter.refresh();
+                                    actionMode.finish();
+                                    ActivityUtils.showSnackBar(coordinator, context.getString(R.string.task_move));
+                                });
                                 break;
                             case R.id.menu_tasks_selected_delete:
                                 ActivityUtils.showConfirmationDialog(context, R.string.task_delete_selected_confirmation,
@@ -289,32 +295,6 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     private void refreshDataAndFinishActionMode() {
         adapter.refresh();
         actionMode.finish();
-    }
-
-    private void createDialogToMoveTasks(ActionMode actionMode) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(context.getString(R.string.modal_select_list));
-
-        List<DoneList> lists = listService.getLists();
-        List<String> listsNames = new ArrayList<>(CollectionUtils.size(lists));
-        for (DoneList list : lists) {
-            listsNames.add(list.getName());
-        }
-        builder.setItems(listsNames.toArray(new String[CollectionUtils.size(lists)]),
-                (dialog, which) -> {
-                    String listId = lists.get(which).getId();
-                    int position = taskService.getAvailablePosition(listId);
-                    for (Task task : adapter.getSelectedTasks()) {
-                        task.setListId(listId);
-                        task.setPosition(position++);
-                        taskService.update(task);
-                    }
-                    adapter.refresh();
-                    actionMode.finish();
-                    ActivityUtils.showSnackBar(coordinator, context.getString(R.string.task_move));
-                });
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.create().show();
     }
 
     private void initStaticVariables() {

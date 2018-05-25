@@ -170,7 +170,7 @@ public class Task {
 
         private String name;
 
-        private Fields(String name) {
+        Fields(String name) {
             this.name = name;
         }
 
