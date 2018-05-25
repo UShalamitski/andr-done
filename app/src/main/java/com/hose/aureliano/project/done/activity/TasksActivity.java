@@ -9,6 +9,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,7 +31,7 @@ import com.hose.aureliano.project.done.activity.component.RecyclerViewEmptySuppo
 import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.activity.helper.TaskItemTouchHelper;
 import com.hose.aureliano.project.done.model.Task;
-import com.hose.aureliano.project.done.model.TaskViewEnum;
+import com.hose.aureliano.project.done.model.TasksViewEnum;
 import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
@@ -60,10 +61,20 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
-        setTitle(getIntent().getStringExtra("title"));
 
-        TaskViewEnum viewEnum = null != getIntent().getExtras().get("view")
-                ? (TaskViewEnum) getIntent().getExtras().get("view") : null;
+        Toolbar toolbar = findViewById(R.id.tasks_toolbar);
+        toolbar.setNavigationIcon(R.drawable.icon_arrow_back_white_24);
+        setSupportActionBar(toolbar);
+
+        TasksViewEnum viewEnum = null != getIntent().getExtras().get("view")
+                ? (TasksViewEnum) getIntent().getExtras().get("view") : null;
+        if (null != viewEnum) {
+            setTitle(getString(R.string.view));
+            toolbar.setSubtitle(getIntent().getStringExtra("title"));
+        } else {
+            setTitle(getIntent().getStringExtra("title"));
+        }
+
         listId = getIntent().getStringExtra("listId");
         coordinator = findViewById(R.id.tasks_coordinator_layout);
         taskAdapter = new TaskAdapter(this, getSupportFragmentManager(), listId, viewEnum);
@@ -80,7 +91,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
         bottomView.setOnClickListener(view -> {
         });
 
-        if (TaskViewEnum.OVERDUE != viewEnum) {
+        if (TasksViewEnum.OVERDUE != viewEnum) {
             InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
             CustomEditText editText = findViewById(R.id.activity_task_new_edit_text);
 
@@ -157,6 +168,11 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
         }
 
         new ItemTouchHelper(new TaskItemTouchHelper(this, taskAdapter, coordinator)).attachToRecyclerView(listView);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     @Override

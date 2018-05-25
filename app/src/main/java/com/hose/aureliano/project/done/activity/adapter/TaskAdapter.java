@@ -22,7 +22,7 @@ import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.api.Adapter;
 import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.model.Task;
-import com.hose.aureliano.project.done.model.TaskViewEnum;
+import com.hose.aureliano.project.done.model.TasksViewEnum;
 import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
@@ -57,7 +57,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     private List<Task> taskList;
     private Context context;
     private String listId;
-    private TaskViewEnum view;
+    private TasksViewEnum view;
     private ActionMode actionMode;
 
     /**
@@ -68,7 +68,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
      * @param listId          identifier of the list
      */
     public TaskAdapter(Context context, FragmentManager fragmentManager, String listId,
-                       TaskViewEnum view) {
+                       TasksViewEnum view) {
         taskService = new TaskService(context);
         this.fragmentManager = fragmentManager;
         this.context = context;
@@ -77,6 +77,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         selectedIdsSet = new HashSet<>();
         initStaticResources();
         refresh();
+    }
+
+    /**
+     * @return {@link TasksViewEnum}.
+     */
+    public TasksViewEnum getTasksView() {
+        return view;
     }
 
     @Override

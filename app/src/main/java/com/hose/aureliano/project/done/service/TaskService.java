@@ -3,7 +3,7 @@ package com.hose.aureliano.project.done.service;
 import android.content.Context;
 
 import com.hose.aureliano.project.done.model.Task;
-import com.hose.aureliano.project.done.model.TaskViewEnum;
+import com.hose.aureliano.project.done.model.TasksViewEnum;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.TaskDao;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
@@ -50,7 +50,7 @@ public class TaskService {
      * @param view view name
      * @return list of {@link Task}s
      */
-    public List<Task> getTasksForView(TaskViewEnum view) {
+    public List<Task> getTasksForView(TasksViewEnum view) {
         List<Task> tasks;
         switch (view) {
             case TODAY: {

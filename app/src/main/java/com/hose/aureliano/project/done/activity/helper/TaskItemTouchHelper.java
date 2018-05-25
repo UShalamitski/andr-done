@@ -261,13 +261,20 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                         adapter.restoreItem(position, task);
                         itemsToRemoveMap.remove(task).cancel(false);
                     });
-            ActivityUtils.vibrate(context);
         } else if (direction == ItemTouchHelper.RIGHT) {
-            TaskAdapter.ViewHolder holder = ((TaskAdapter.ViewHolder) viewHolder);
-            holder.getCheckBox().setChecked(!holder.getCheckBox().isChecked());
-            adapter.notifyDataSetChanged();
-            ActivityUtils.vibrate(context);
+            if (null != adapter.getTasksView()) {
+                int position = viewHolder.getAdapterPosition();
+                Task task = adapter.getItem(position);
+                task.setDone(!task.getDone());
+                taskService.update(task);
+                adapter.removeItem(position);
+            } else {
+                TaskAdapter.ViewHolder holder = ((TaskAdapter.ViewHolder) viewHolder);
+                holder.getCheckBox().setChecked(!holder.getCheckBox().isChecked());
+                adapter.notifyDataSetChanged();
+            }
         }
+        ActivityUtils.vibrate(context);
     }
 
     private void updateDueDate(Long timeInMillis) {

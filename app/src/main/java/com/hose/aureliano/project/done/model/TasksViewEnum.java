@@ -7,7 +7,7 @@ package com.hose.aureliano.project.done.model;
  *
  * @author Uladzislau_Shalamits
  */
-public enum TaskViewEnum {
+public enum TasksViewEnum {
 
     /**
      * All tasks that should be completed today.

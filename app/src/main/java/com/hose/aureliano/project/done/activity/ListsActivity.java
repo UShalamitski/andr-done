@@ -33,7 +33,7 @@ import com.hose.aureliano.project.done.activity.component.RecyclerViewEmptySuppo
 import com.hose.aureliano.project.done.activity.dialog.ListModal;
 import com.hose.aureliano.project.done.activity.helper.ListItemTouchHelper;
 import com.hose.aureliano.project.done.model.DoneList;
-import com.hose.aureliano.project.done.model.TaskViewEnum;
+import com.hose.aureliano.project.done.model.TasksViewEnum;
 import com.hose.aureliano.project.done.service.ListService;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
@@ -64,7 +64,7 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_drawer);
+        setContentView(R.layout.activity_lists_drawer);
 
         Toolbar toolbar = findViewById(R.id.lists_toolbar);
         setSupportActionBar(toolbar);
@@ -229,17 +229,17 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
         Intent intent = null;
         if (id == R.id.navbar_view_today) {
             intent = new Intent(this, TasksActivity.class);
-            intent.putExtra("view", TaskViewEnum.TODAY);
+            intent.putExtra("view", TasksViewEnum.TODAY);
             intent.putExtra("title", getString(R.string.navbar_today));
             this.startActivity(intent);
         } else if (id == R.id.navbar_view_week) {
             intent = new Intent(this, TasksActivity.class);
-            intent.putExtra("view", TaskViewEnum.WEEK);
+            intent.putExtra("view", TasksViewEnum.WEEK);
             intent.putExtra("title", getString(R.string.navbar_week));
             this.startActivity(intent);
         } else if (id == R.id.navbar_view_overdue) {
             intent = new Intent(this, TasksActivity.class);
-            intent.putExtra("view", TaskViewEnum.OVERDUE);
+            intent.putExtra("view", TasksViewEnum.OVERDUE);
             intent.putExtra("title", getString(R.string.navbar_overdue));
             this.startActivity(intent);
         }
