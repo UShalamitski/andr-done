@@ -183,7 +183,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                                 ActivityUtils.showSnackBar(coordinator, context.getString(R.string.task_duplicate));
                                 break;
                             case R.id.menu_tasks_selected_move:
-                                new SelectListModal(context, listService, listId -> {
+                                new SelectListModal(context, listId -> {
                                     int position = taskService.getAvailablePosition(listId);
                                     for (Task task : adapter.getSelectedTasks()) {
                                         task.setListId(listId);

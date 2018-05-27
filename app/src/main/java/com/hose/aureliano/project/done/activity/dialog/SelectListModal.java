@@ -24,11 +24,11 @@ public class SelectListModal {
     /**
      * Creates a new dialog to select list.
      *
-     * @param context     application context
-     * @param listService instance of {@link ListService}
-     * @param handler     instance of {link SelectListDialogHandler}
+     * @param context application context
+     * @param handler instance of {link SelectListDialogHandler}
      */
-    public SelectListModal(Context context, ListService listService, SelectListDialogHandler handler) {
+    public SelectListModal(Context context, SelectListDialogHandler handler) {
+        ListService listService = new ListService(context);
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(context.getString(R.string.modal_select_list));
 
@@ -54,6 +54,6 @@ public class SelectListModal {
          *
          * @param listId identifier of selected list
          */
-        void handle(String listId);
+        void handle(Integer listId);
     }
 }

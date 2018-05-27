@@ -40,7 +40,7 @@ public class TaskService {
      * @param listId identifier of list
      * @return list of {@link Task}s by list id
      */
-    public List<Task> getTasks(String listId) {
+    public List<Task> getTasks(Integer listId) {
         return taskDao.readByListId(listId);
     }
 
@@ -127,7 +127,7 @@ public class TaskService {
      *
      * @param listId identifier of list
      */
-    public void deleteByListId(String listId) {
+    public void deleteByListId(Integer listId) {
         List<Task> tasks = taskDao.readByListId(listId);
         for (Task task : tasks) {
             AlarmService.cancelTaskReminder(context, task);
@@ -178,7 +178,7 @@ public class TaskService {
      * @param listId identifier of list
      * @return next available position for new task in particular list.
      */
-    public int getAvailablePosition(String listId) {
+    public int getAvailablePosition(Integer listId) {
         return taskDao.getMaxPosition(listId) + 1;
     }
 

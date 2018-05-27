@@ -28,7 +28,6 @@ import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -56,7 +55,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     private TaskService taskService;
     private List<Task> taskList;
     private Context context;
-    private String listId;
+    private Integer listId;
     private TasksViewEnum view;
     private ActionMode actionMode;
 
@@ -67,7 +66,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
      * @param fragmentManager fragment manager
      * @param listId          identifier of the list
      */
-    public TaskAdapter(Context context, FragmentManager fragmentManager, String listId,
+    public TaskAdapter(Context context, FragmentManager fragmentManager, Integer listId,
                        TasksViewEnum view) {
         taskService = new TaskService(context);
         this.fragmentManager = fragmentManager;
@@ -293,6 +292,22 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     }
 
     /**
+     * Returns position in adapter to insert new {@link Task} by due date.
+     *
+     * @param dueDate due date of task to insert
+     * @return position in adapter to insert new {@link Task} by due date
+     */
+    public int getPositionByDueDate(long dueDate) {
+        int position = 0;
+        for (Task task : getItems()) {
+            if (task.getDueDateTime() <= dueDate) {
+                position = task.getPosition();
+            }
+        }
+        return position;
+    }
+
+    /**
      * Sets position for tasks as their index.
      */
     public void updatePositions() {
@@ -311,7 +326,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
      * Refreshes data on UI.
      */
     public void refresh() {
-        if (StringUtils.isNoneBlank(listId)) {
+        if (null != listId) {
             taskList = taskService.getTasks(listId);
         } else if (null != view) {
             taskList = taskService.getTasksForView(view);

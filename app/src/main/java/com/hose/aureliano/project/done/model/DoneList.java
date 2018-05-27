@@ -1,8 +1,6 @@
 package com.hose.aureliano.project.done.model;
 
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -15,25 +13,13 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author evere
  */
 @Entity(tableName = "lists")
-public class DoneList {
+public class DoneList extends BaseEntity {
 
-    @NonNull
-    @PrimaryKey
-    private String id;
     private String name;
     private Integer position;
     private int tasksCount;
     private int doneTasksCount;
     private Long createdDateTime;
-
-    @NonNull
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -76,12 +62,12 @@ public class DoneList {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DoneList doneList = (DoneList) o;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        DoneList doneList = (DoneList) obj;
         return new EqualsBuilder()
-                .append(id, doneList.id)
+                .appendSuper(super.equals(doneList))
                 .append(name, doneList.name)
                 .append(position, doneList.position)
                 .append(createdDateTime, doneList.createdDateTime)
@@ -90,8 +76,8 @@ public class DoneList {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(id)
+        return new HashCodeBuilder()
+                .appendSuper(super.hashCode())
                 .append(name)
                 .append(position)
                 .append(createdDateTime)

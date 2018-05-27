@@ -11,7 +11,6 @@ import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -32,7 +31,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -93,7 +91,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         View view = LayoutInflater.from(context).inflate(R.layout.item_list_layout, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         viewHolder.menu.setOnClickListener(itemView -> {
-            DoneList doneList = getItem(itemView);
+            DoneList doneList = getItem(viewHolder.getAdapterPosition());
             PopupMenu popupMenu = new PopupMenu(context, itemView);
             popupMenu.inflate(R.menu.menu_list_more);
             popupMenu.setOnMenuItemClickListener(item -> {
@@ -105,7 +103,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
                                         taskService.deleteByListId(doneList.getId());
                                         doneListDao.delete(doneList);
                                     });
-                                    int position = getPosition(itemView);
+                                    int position = viewHolder.getAdapterPosition();
                                     doneLists.remove(position);
                                     notifyItemRemoved(position);
                                 });
@@ -113,8 +111,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
                     case R.id.menu_edit:
                         Bundle bundle = new Bundle();
                         bundle.putString("name", doneList.getName());
-                        bundle.putString("id", doneList.getId());
+                        bundle.putInt("id", doneList.getId());
                         bundle.putLong("createdDateTime", doneList.getCreatedDateTime());
+                        bundle.putInt("position", doneList.getPosition());
                         DialogFragment dialog = new ListModal();
                         dialog.setArguments(bundle);
                         dialog.show(fragmentManager, "list_edit");
@@ -156,7 +155,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         holder.id = doneList.getId();
         holder.taskCounts.setText(String.format("%s/%s", doneList.getDoneTasksCount(), doneList.getTasksCount()));
         holder.name.setText(doneList.getName());
-        holder.menu.setTag(doneList.getId());
         holder.progressBar.setMax(doneList.getTasksCount());
         holder.progressBar.setProgress(doneList.getDoneTasksCount());
         holder.view.setBackgroundColor(
@@ -181,6 +179,19 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         for (DoneList list : getItems()) {
             list.setPosition(position++);
         }
+    }
+
+    /**
+     * @return available position for new list
+     */
+    public int getAvailablePosition() {
+        int position = 0;
+        for (DoneList list : getItems()) {
+            if (list.getPosition() > position) {
+                position = list.getPosition();
+            }
+        }
+        return ++position;
     }
 
     @Override
@@ -249,30 +260,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
         return doneLists.get(position);
     }
 
-    private DoneList getItem(View view) {
-        return getItem((String) view.getTag());
-    }
-
-    private DoneList getItem(String listId) {
-        for (DoneList list : doneLists) {
-            if (list.getId().equals(listId)) {
-                return list;
-            }
-        }
-        throw new NoSuchElementException();
-    }
-
-    private int getPosition(View view) {
-        int pos = 0;
-        for (DoneList list : doneLists) {
-            if (list.getId().equals(view.getTag())) {
-                return pos;
-            }
-            pos++;
-        }
-        throw new NoSuchElementException();
-    }
-
     private void initStaticResources() {
         if (0 == COLOR_WHITE) {
             COLOR_WHITE = ContextCompat.getColor(context, R.color.white);
@@ -287,7 +274,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private String id;
+        private Integer id;
         private TextView taskCounts;
         private TextView name;
         private View menu;

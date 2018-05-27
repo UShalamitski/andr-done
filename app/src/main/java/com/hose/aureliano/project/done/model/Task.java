@@ -1,11 +1,7 @@
 package com.hose.aureliano.project.done.model;
 
-import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -15,16 +11,13 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * <p>
  * Date: 11.02.2018.
  *
- * @author evere
+ * @author Uladzislau Shalamitski
  */
 @Entity(tableName = "tasks",
         foreignKeys = @ForeignKey(entity = DoneList.class, parentColumns = "id", childColumns = "listId"))
-public class Task {
+public class Task extends BaseEntity {
 
-    @NonNull
-    @PrimaryKey(autoGenerate = true)
-    private Integer id;
-    private String listId;
+    private Integer listId;
     private String name;
     private Long dueDateTime;
     private boolean dueTimeIsSet;
@@ -37,19 +30,11 @@ public class Task {
     public Task() {
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getListId() {
+    public Integer getListId() {
         return listId;
     }
 
-    public void setListId(String listId) {
+    public void setListId(Integer listId) {
         this.listId = listId;
     }
 
@@ -127,7 +112,7 @@ public class Task {
         }
         Task that = (Task) obj;
         return new EqualsBuilder()
-                .append(id, that.id)
+                .appendSuper(super.equals(that))
                 .append(listId, that.listId)
                 .append(name, that.name)
                 .append(done, that.done)
@@ -143,7 +128,7 @@ public class Task {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(id)
+                .appendSuper(super.hashCode())
                 .append(listId)
                 .append(name)
                 .append(done)

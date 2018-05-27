@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.Toolbar;
@@ -26,21 +27,28 @@ import android.widget.TextView;
 
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.TaskAdapter;
+import com.hose.aureliano.project.done.activity.callback.DiffUtilCallback;
 import com.hose.aureliano.project.done.activity.component.CustomEditText;
 import com.hose.aureliano.project.done.activity.component.RecyclerViewEmptySupport;
+import com.hose.aureliano.project.done.activity.dialog.SelectListModal;
 import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.activity.helper.TaskItemTouchHelper;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.model.TasksViewEnum;
 import com.hose.aureliano.project.done.service.TaskService;
+import com.hose.aureliano.project.done.service.comporator.TaskCreateDateComparator;
+import com.hose.aureliano.project.done.service.comporator.TaskDueDateComparator;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 import com.hose.aureliano.project.done.utils.AnimationUtil;
+import com.hose.aureliano.project.done.utils.CalendarUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Activity fot displaying all TODOs for selected list.
@@ -51,8 +59,11 @@ import java.util.Date;
  */
 public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDialogListener {
 
-    private String listId;
+    private Integer listId;
     private View coordinator;
+    private View backgroundView;
+    private View bottomView;
+    private ViewGroup decorView;
     private TaskAdapter taskAdapter;
     private FloatingActionButton floatingActionButton;
     private TaskService taskService = new TaskService(this);
@@ -75,7 +86,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
             setTitle(getIntent().getStringExtra("title"));
         }
 
-        listId = getIntent().getStringExtra("listId");
+        listId = getIntent().getIntExtra("listId", 0);
         coordinator = findViewById(R.id.tasks_coordinator_layout);
         taskAdapter = new TaskAdapter(this, getSupportFragmentManager(), listId, viewEnum);
 
@@ -86,33 +97,33 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
 
         floatingActionButton = findViewById(R.id.activity_tasks_fab);
 
-        View bottomView = findViewById(R.id.activity_task_new);
+        bottomView = findViewById(R.id.activity_task_new);
         bottomView.setVisibility(View.GONE);
         bottomView.setOnClickListener(view -> {
         });
 
         if (TasksViewEnum.OVERDUE != viewEnum) {
             InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-            CustomEditText editText = findViewById(R.id.activity_task_new_edit_text);
+            CustomEditText newTaskEditText = findViewById(R.id.activity_task_new_edit_text);
 
-            ViewGroup decorView = getWindow().getDecorView().findViewById(R.id.activity_task_to_decor);
+            decorView = getWindow().getDecorView().findViewById(R.id.activity_task_to_decor);
             ImageView newIcon = findViewById(R.id.activity_task_new_icon);
-            View background = LayoutInflater.from(this).inflate(R.layout.decor_view_layout, null);
+            backgroundView = LayoutInflater.from(this).inflate(R.layout.decor_view_layout, null);
 
-            background.setOnClickListener(view -> {
+            backgroundView.setOnClickListener(view -> {
                 inputManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
-                editText.onKeyPreIme(1, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
+                newTaskEditText.onKeyPreIme(1, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
             });
 
-            editText.setListener(() -> {
+            newTaskEditText.setListener(() -> {
                 bottomView.setVisibility(View.GONE);
-                AnimationUtil.animateAlphaFadeOut(background, () -> {
-                    decorView.removeView(background);
+                AnimationUtil.animateAlphaFadeOut(backgroundView, () -> {
+                    decorView.removeView(backgroundView);
                     floatingActionButton.show();
                 });
             });
 
-            editText.addTextChangedListener(new TextWatcher() {
+            newTaskEditText.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
@@ -131,14 +142,17 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
                 }
             });
 
-            editText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
-                if (actionId == EditorInfo.IME_ACTION_DONE && StringUtils.isNotBlank(editText.getText().toString())) {
-                    int position = taskAdapter.getAvailablePosition();
+            newTaskEditText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
+                if (actionId == EditorInfo.IME_ACTION_DONE && StringUtils.isNotBlank(newTaskEditText.getText().toString())) {
+                    taskService.getAvailablePosition(listId);
                     Task task = new Task();
                     task.setListId(listId);
-                    task.setName(editText.getText().toString());
-                    task.setPosition(position);
+                    task.setName(newTaskEditText.getText().toString());
                     task.setCreatedDateTime(new Date().getTime());
+                    task.setPosition(taskService.getAvailablePosition(listId));
+                    if (null != viewEnum) {
+                        task.setDueDateTime(CalendarUtils.getTodayDateTimeInMillis());
+                    }
                     long id = taskService.insert(task);
                     ActivityUtils.handleDbInteractionResult(id, coordinator, () -> {
                         task.setId((int) id);
@@ -146,7 +160,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
                         int adapterPos = taskAdapter.getItems().indexOf(task);
                         taskAdapter.notifyItemInserted(adapterPos);
                         listView.scrollToPosition(adapterPos);
-                        editText.setText(StringUtils.EMPTY);
+                        newTaskEditText.setText(StringUtils.EMPTY);
                     });
                 }
                 return true;
@@ -154,14 +168,15 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
 
             floatingActionButton.setVisibility(View.VISIBLE);
             floatingActionButton.setOnClickListener(view -> {
-                bottomView.setVisibility(View.VISIBLE);
-                editText.requestFocus();
-                if (null != inputManager) {
-                    floatingActionButton.hide();
-                    inputManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
-                    AnimationUtil.animateAlphaFadeIn(background);
-                    decorView.addView(background);
+                if (null != viewEnum) {
+                    new SelectListModal(this, listId -> {
+                        this.listId = listId;
+                        showAddNewTaskView(inputManager, newTaskEditText);
+                    });
+                } else {
+                    showAddNewTaskView(inputManager, newTaskEditText);
                 }
+                newTaskEditText.requestFocus();
             });
         } else {
             floatingActionButton.setVisibility(View.GONE);
@@ -199,68 +214,50 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_tasks_sort_name:
-                Collections.sort(taskAdapter.getItems(),
-                        (task1, task2) -> StringUtils.compare(task1.getName(), task2.getName()));
-                applySortChanges();
-                return true;
-            case R.id.menu_tasks_sort_due_date:
-                Collections.sort(taskAdapter.getItems(), (task1, task2) -> {
-                    if (null == task1.getDueDateTime() && null == task2.getDueDateTime()) {
-                        return 0;
-                    } else if (null == task1.getDueDateTime() && null != task2.getDueDateTime()) {
-                        return 1;
-                    } else if (null != task1.getDueDateTime() && null == task2.getDueDateTime()) {
-                        return -1;
-                    } else {
-                        return task1.getDueDateTime().compareTo(task2.getDueDateTime());
-                    }
-                });
-                applySortChanges();
-                return true;
-            case R.id.menu_tasks_sort_create_date:
-                Collections.sort(taskAdapter.getItems(), (task1, task2) -> {
-                    if (null == task1.getCreatedDateTime() && null == task2.getCreatedDateTime()) {
-                        return 0;
-                    } else if (null == task1.getCreatedDateTime() && null != task2.getCreatedDateTime()) {
-                        return 1;
-                    } else if (null != task1.getCreatedDateTime() && null == task2.getCreatedDateTime()) {
-                        return -1;
-                    } else {
-                        return task1.getCreatedDateTime().compareTo(task2.getCreatedDateTime());
-                    }
-                });
-                applySortChanges();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        int id = item.getItemId();
+        if (id == R.id.menu_tasks_sort_name || id == R.id.menu_tasks_sort_due_date || id == R.id.menu_tasks_sort_create_date) {
+            List<Task> oldTasks = new ArrayList<>(taskAdapter.getItems());
+            if (id == R.id.menu_tasks_sort_name) {
+                Collections.sort(taskAdapter.getItems(), (t1, t2) -> StringUtils.compare(t1.getName(), t2.getName()));
+            } else if (id == R.id.menu_tasks_sort_due_date) {
+                Collections.sort(taskAdapter.getItems(), new TaskDueDateComparator());
+            } else {
+                Collections.sort(taskAdapter.getItems(), new TaskCreateDateComparator());
+            }
+            applySortChanges(oldTasks);
         }
+        return true;
     }
 
     @Override
     public void onDialogPositiveClick(DialogFragment fragment, Task task) {
-        long result;
         TextView name = fragment.getDialog().findViewById(R.id.tasks_modal_name);
         task.setName(name.getText().toString());
         task.setListId(listId);
-
-        result = task.getId() != null ? taskService.update(task) : taskService.insert(task);
-
-        if (result != -1) {
+        ActivityUtils.handleDbInteractionResult(taskService.update(task), coordinator, () -> {
             taskAdapter.refresh();
-            ActivityUtils.showSnackBar(coordinator, String.format("done: %s", name.getText()));
             if (task.getRemindTimeIsSet()) {
                 AlarmService.setTaskReminder(this, task);
             }
-        } else {
-            ActivityUtils.showSnackBar(coordinator, "Oops! Something went wrong!");
+        });
+    }
+
+    private void showAddNewTaskView(InputMethodManager inputManager, CustomEditText newTaskEditText) {
+        bottomView.setVisibility(View.VISIBLE);
+        newTaskEditText.requestFocus();
+        if (null != inputManager) {
+            floatingActionButton.hide();
+            inputManager.showSoftInput(newTaskEditText, InputMethodManager.SHOW_IMPLICIT);
+            AnimationUtil.animateAlphaFadeIn(backgroundView);
+            decorView.addView(backgroundView);
         }
     }
 
-    private void applySortChanges() {
+    private void applySortChanges(List<Task> oldTasks) {
+        DiffUtilCallback<Task> utilCallback = new DiffUtilCallback<>(oldTasks, taskAdapter.getItems());
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(utilCallback);
+        diffResult.dispatchUpdatesTo(taskAdapter);
         taskAdapter.updatePositions();
-        taskAdapter.notifyDataSetChanged();
         taskService.update(taskAdapter.getItems());
     }
 }

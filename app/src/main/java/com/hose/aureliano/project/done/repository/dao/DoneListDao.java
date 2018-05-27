@@ -32,8 +32,9 @@ public interface DoneListDao {
     @Delete
     int delete(DoneList doneList);
 
-    @Query("SELECT id, name, createdDateTime, (SELECT COUNT(*) FROM tasks t WHERE t.listId = l.id) AS tasksCount, " +
+    @Query("SELECT id, name, createdDateTime, position, (SELECT COUNT(*) FROM tasks t " +
+            "WHERE t.listId = l.id) AS tasksCount, " +
             "(SELECT COUNT(*) FROM tasks t WHERE t.listId = l.id AND t.done) AS doneTasksCount " +
-            "FROM lists l ORDER BY CASE WHEN position IS NULL THEN 1 ELSE 0 END, position")
+            "FROM lists l ORDER BY position")
     List<DoneList> read();
 }

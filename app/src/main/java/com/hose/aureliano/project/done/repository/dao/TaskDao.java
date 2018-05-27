@@ -32,10 +32,10 @@ public interface TaskDao {
     int delete(int id);
 
     @Query("DELETE FROM tasks WHERE listId = :listId")
-    int deleteByListId(String listId);
+    int deleteByListId(Integer listId);
 
     @Query("SELECT * FROM tasks WHERE listId = :listId ORDER BY CASE WHEN position IS NULL THEN 1 ELSE 0 END, position")
-    List<Task> readByListId(String listId);
+    List<Task> readByListId(Integer listId);
 
     @Query("SELECT * FROM tasks WHERE NOT done AND dueDateTime BETWEEN :beginDate AND :endDate ORDER BY dueDateTime")
     List<Task> readByDueDate(long beginDate, long endDate);
@@ -44,7 +44,7 @@ public interface TaskDao {
     List<Task> readNotCompletedWithReminder();
 
     @Query("SELECT MAX(position) FROM tasks WHERE listId = :listId")
-    int getMaxPosition(String listId);
+    int getMaxPosition(Integer listId);
 
     @Query("SELECT * FROM tasks WHERE NOT done AND dueDateTime < CAST(strftime('%s', 'now')  AS  integer) * 1000")
     List<Task> readOverdueTasks();

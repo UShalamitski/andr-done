@@ -11,6 +11,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
@@ -28,6 +29,7 @@ import android.widget.ImageView;
 
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.ListAdapter;
+import com.hose.aureliano.project.done.activity.callback.DiffUtilCallback;
 import com.hose.aureliano.project.done.activity.component.CustomEditText;
 import com.hose.aureliano.project.done.activity.component.RecyclerViewEmptySupport;
 import com.hose.aureliano.project.done.activity.dialog.ListModal;
@@ -35,6 +37,8 @@ import com.hose.aureliano.project.done.activity.helper.ListItemTouchHelper;
 import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.model.TasksViewEnum;
 import com.hose.aureliano.project.done.service.ListService;
+import com.hose.aureliano.project.done.service.comporator.ListCreateDateComparator;
+import com.hose.aureliano.project.done.service.comporator.ListProgressComparator;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 import com.hose.aureliano.project.done.utils.AnimationUtil;
@@ -42,9 +46,10 @@ import com.hose.aureliano.project.done.utils.PreferencesUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.UUID;
+import java.util.List;
 
 /**
  * Activity fot displaying all users lists of TODOs.
@@ -128,13 +133,15 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
             if (actionId == EditorInfo.IME_ACTION_DONE && StringUtils.isNotBlank(editText.getText().toString())) {
                 DoneList list = new DoneList();
                 list.setName(editText.getText().toString());
-                list.setId(UUID.randomUUID().toString());
                 list.setCreatedDateTime(new Date().getTime());
-                ActivityUtils.handleDbInteractionResult(listService.insert(list), coordinator, () -> {
+                list.setPosition(listsAdapter.getAvailablePosition());
+                int id = (int) listService.insert(list);
+                ActivityUtils.handleDbInteractionResult(id, coordinator, () -> {
                     editText.setText(StringUtils.EMPTY);
                     editText.onKeyPreIme(1, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
                     Intent intent = new Intent(this, TasksActivity.class);
-                    intent.putExtra("listId", list.getId());
+                    intent.putExtra("listId", id);
+                    intent.putExtra("position", list.getPosition());
                     intent.putExtra("title", list.getName());
                     this.startActivity(intent);
                 });
@@ -179,48 +186,20 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_lists_sort_name:
+        int id = item.getItemId();
+        if (id == R.id.menu_lists_sort_name || id == R.id.menu_lists_sort_progress || id == R.id.menu_lists_sort_creation_date) {
+            List<DoneList> oldTasks = new ArrayList<>(listsAdapter.getItems());
+            if (id == R.id.menu_lists_sort_name) {
                 Collections.sort(listsAdapter.getItems(),
                         (list1, list2) -> StringUtils.compare(list1.getName(), list2.getName()));
-                applySortChanges();
-                return true;
-            case R.id.menu_lists_sort_progress:
-                Collections.sort(listsAdapter.getItems(), (list1, list2) -> {
-                    int result;
-                    if (0 == list1.getTasksCount() && 0 == list2.getTasksCount()) {
-                        result = 0;
-                    } else if (0 != list1.getTasksCount() && 0 == list2.getTasksCount()) {
-                        result = 1;
-                    } else if (0 == list1.getTasksCount() && 0 != list2.getTasksCount()) {
-                        result = -1;
-                    } else {
-                        result = Double.compare(list1.getDoneTasksCount() * 100d / list1.getTasksCount(),
-                                list2.getDoneTasksCount() * 100d / list2.getTasksCount());
-                    }
-                    return result;
-                });
-                applySortChanges();
-                return true;
-            case R.id.menu_lists_sort_creation_date:
-                Collections.sort(listsAdapter.getItems(), (list1, list2) -> {
-                    int result;
-                    if (null == list1.getCreatedDateTime() && null == list2.getCreatedDateTime()) {
-                        result = 0;
-                    } else if (null == list1.getCreatedDateTime() && null != list2.getCreatedDateTime()) {
-                        result = 1;
-                    } else if (null != list1.getCreatedDateTime() && null == list2.getCreatedDateTime()) {
-                        result = -1;
-                    } else {
-                        result = list1.getCreatedDateTime().compareTo(list2.getCreatedDateTime());
-                    }
-                    return result;
-                });
-                applySortChanges();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+            } else if (id == R.id.menu_lists_sort_progress) {
+                Collections.sort(listsAdapter.getItems(), new ListProgressComparator());
+            } else {
+                Collections.sort(listsAdapter.getItems(), new ListCreateDateComparator());
+            }
+            applySortChanges(oldTasks);
         }
+        return true;
     }
 
     @Override
@@ -263,12 +242,10 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
 
         Bundle bundle = fragment.getArguments();
         if (null != bundle) {
-            doneList.setId(bundle.getString("id"));
+            doneList.setId(bundle.getInt("id"));
+            doneList.setPosition(bundle.getInt("position"));
             doneList.setCreatedDateTime(bundle.getLong("createdDateTime"));
             result = listService.update(doneList);
-        } else {
-            doneList.setId(UUID.randomUUID().toString());
-            result = listService.insert(doneList);
         }
 
         if (result != -1) {
@@ -283,9 +260,11 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
     public void onDialogNegativeClick(DialogFragment dialog) {
     }
 
-    private void applySortChanges() {
+    private void applySortChanges(List<DoneList> oldTasks) {
+        DiffUtilCallback<DoneList> utilCallback = new DiffUtilCallback<>(oldTasks, listsAdapter.getItems());
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(utilCallback);
+        diffResult.dispatchUpdatesTo(listsAdapter);
         listsAdapter.updatePositions();
-        listsAdapter.notifyDataSetChanged();
         listService.update(listsAdapter.getItems());
     }
 
