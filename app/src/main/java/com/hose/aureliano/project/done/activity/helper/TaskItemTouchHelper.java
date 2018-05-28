@@ -165,6 +165,10 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                     @Override
                     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
                         adapter.setActionMode(actionMode);
+                        if (null != adapter.getTasksView()) {
+                            menu.findItem(R.id.menu_tasks_selected_duplicate).setVisible(false);
+                            menu.findItem(R.id.menu_tasks_selected_move).setVisible(false);
+                        }
                         return true;
                     }
 

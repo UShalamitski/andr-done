@@ -67,6 +67,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
     private View bottomView;
     private ViewGroup decorView;
     private TaskAdapter taskAdapter;
+    private TasksViewEnum viewEnum;
     private FloatingActionButton floatingActionButton;
     private TaskService taskService = new TaskService(this);
     private SparseBooleanArray sortMap = new SparseBooleanArray();
@@ -80,7 +81,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
         toolbar.setNavigationIcon(R.drawable.icon_arrow_back_white_24);
         setSupportActionBar(toolbar);
 
-        TasksViewEnum viewEnum = null != getIntent().getExtras().get("view")
+        viewEnum = null != getIntent().getExtras().get("view")
                 ? (TasksViewEnum) getIntent().getExtras().get("view") : null;
         if (null != viewEnum) {
             setTitle(getString(R.string.view));
@@ -147,7 +148,6 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
 
             newTaskEditText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
                 if (actionId == EditorInfo.IME_ACTION_DONE && StringUtils.isNotBlank(newTaskEditText.getText().toString())) {
-                    taskService.getAvailablePosition(listId);
                     Task task = new Task();
                     task.setListId(listId);
                     task.setName(newTaskEditText.getText().toString());
@@ -280,7 +280,9 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
         DiffUtilCallback<Task> utilCallback = new DiffUtilCallback<>(oldTasks, newTasks);
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(utilCallback);
         diffResult.dispatchUpdatesTo(taskAdapter);
-        taskAdapter.updatePositions();
-        taskService.update(newTasks);
+        if (null == viewEnum) {
+            taskAdapter.updatePositions();
+            taskService.update(newTasks);
+        }
     }
 }

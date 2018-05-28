@@ -292,22 +292,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     }
 
     /**
-     * Returns position in adapter to insert new {@link Task} by due date.
-     *
-     * @param dueDate due date of task to insert
-     * @return position in adapter to insert new {@link Task} by due date
-     */
-    public int getPositionByDueDate(long dueDate) {
-        int position = 0;
-        for (Task task : getItems()) {
-            if (task.getDueDateTime() <= dueDate) {
-                position = task.getPosition();
-            }
-        }
-        return position;
-    }
-
-    /**
      * Sets position for tasks as their index.
      */
     public void updatePositions() {
