@@ -47,6 +47,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -86,7 +87,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
             setTitle(getIntent().getStringExtra("title"));
         }
 
-        listId = getIntent().getIntExtra("listId", 0);
+        listId = (Integer) getIntent().getExtras().get("listId");
         coordinator = findViewById(R.id.tasks_coordinator_layout);
         taskAdapter = new TaskAdapter(this, getSupportFragmentManager(), listId, viewEnum);
 
@@ -214,17 +215,18 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.menu_tasks_sort_name || id == R.id.menu_tasks_sort_due_date || id == R.id.menu_tasks_sort_create_date) {
-            List<Task> oldTasks = new ArrayList<>(taskAdapter.getItems());
-            if (id == R.id.menu_tasks_sort_name) {
-                Collections.sort(taskAdapter.getItems(), (t1, t2) -> StringUtils.compare(t1.getName(), t2.getName()));
-            } else if (id == R.id.menu_tasks_sort_due_date) {
-                Collections.sort(taskAdapter.getItems(), new TaskDueDateComparator());
-            } else {
-                Collections.sort(taskAdapter.getItems(), new TaskCreateDateComparator());
-            }
-            applySortChanges(oldTasks);
+        switch (item.getItemId()) {
+            case R.id.menu_tasks_sort_name:
+                applySortChanges((t1, t2) -> StringUtils.compare(t1.getName(), t2.getName()));
+                break;
+            case R.id.menu_tasks_sort_due_date:
+                applySortChanges(new TaskDueDateComparator());
+                break;
+            case R.id.menu_tasks_sort_create_date:
+                applySortChanges(new TaskCreateDateComparator());
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
         }
         return true;
     }
@@ -253,11 +255,14 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
         }
     }
 
-    private void applySortChanges(List<Task> oldTasks) {
-        DiffUtilCallback<Task> utilCallback = new DiffUtilCallback<>(oldTasks, taskAdapter.getItems());
+    private void applySortChanges(Comparator<Task> comparator) {
+        List<Task> newTasks = taskAdapter.getItems();
+        List<Task> oldTasks = new ArrayList<>(newTasks);
+        Collections.sort(newTasks, comparator);
+        DiffUtilCallback<Task> utilCallback = new DiffUtilCallback<>(oldTasks, newTasks);
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(utilCallback);
         diffResult.dispatchUpdatesTo(taskAdapter);
         taskAdapter.updatePositions();
-        taskService.update(taskAdapter.getItems());
+        taskService.update(newTasks);
     }
 }

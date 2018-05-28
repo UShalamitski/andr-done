@@ -48,6 +48,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -186,18 +187,19 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.menu_lists_sort_name || id == R.id.menu_lists_sort_progress || id == R.id.menu_lists_sort_creation_date) {
-            List<DoneList> oldTasks = new ArrayList<>(listsAdapter.getItems());
-            if (id == R.id.menu_lists_sort_name) {
-                Collections.sort(listsAdapter.getItems(),
-                        (list1, list2) -> StringUtils.compare(list1.getName(), list2.getName()));
-            } else if (id == R.id.menu_lists_sort_progress) {
-                Collections.sort(listsAdapter.getItems(), new ListProgressComparator());
-            } else {
-                Collections.sort(listsAdapter.getItems(), new ListCreateDateComparator());
-            }
-            applySortChanges(oldTasks);
+        switch (item.getItemId()) {
+            case R.id.menu_lists_sort_name:
+                applySortChanges((list1, list2) ->
+                        StringUtils.compare(list1.getName(), list2.getName()));
+                break;
+            case R.id.menu_lists_sort_progress:
+                applySortChanges(new ListProgressComparator());
+                break;
+            case R.id.menu_lists_sort_creation_date:
+                applySortChanges(new ListCreateDateComparator());
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
         }
         return true;
     }
@@ -260,12 +262,15 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
     public void onDialogNegativeClick(DialogFragment dialog) {
     }
 
-    private void applySortChanges(List<DoneList> oldTasks) {
-        DiffUtilCallback<DoneList> utilCallback = new DiffUtilCallback<>(oldTasks, listsAdapter.getItems());
+    private void applySortChanges(Comparator<DoneList> comparator) {
+        List<DoneList> newTasks = listsAdapter.getItems();
+        List<DoneList> oldTasks = new ArrayList<>(newTasks);
+        Collections.sort(listsAdapter.getItems(), comparator);
+        DiffUtilCallback<DoneList> utilCallback = new DiffUtilCallback<>(oldTasks, newTasks);
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(utilCallback);
         diffResult.dispatchUpdatesTo(listsAdapter);
         listsAdapter.updatePositions();
-        listService.update(listsAdapter.getItems());
+        listService.update(newTasks);
     }
 
     private void configureApplication() {
