@@ -13,17 +13,30 @@ import java.util.Comparator;
  */
 public class TaskCreateDateComparator implements Comparator<Task> {
 
+    private boolean isAsc;
+
+    /**
+     * Constructor.
+     *
+     * @param isAsc shows whether items should be sorted by ascending or not
+     */
+    public TaskCreateDateComparator(boolean isAsc) {
+        this.isAsc = isAsc;
+    }
+
     @Override
     public int compare(Task task1, Task task2) {
         int result;
         if (null == task1.getCreatedDateTime() && null != task2.getCreatedDateTime()) {
-            result = 1;
+            result = isAsc ? 1 : -1;
         } else if (null != task1.getCreatedDateTime() && null == task2.getCreatedDateTime()) {
-            result = -1;
+            result = isAsc ? -1 : 1;
         } else if (null == task1.getCreatedDateTime() && null == task2.getCreatedDateTime()) {
             result = 0;
         } else {
-            result = task1.getCreatedDateTime().compareTo(task2.getCreatedDateTime());
+            result = isAsc
+                    ? task1.getCreatedDateTime().compareTo(task2.getCreatedDateTime())
+                    : task2.getCreatedDateTime().compareTo(task1.getCreatedDateTime());
         }
         return result;
     }

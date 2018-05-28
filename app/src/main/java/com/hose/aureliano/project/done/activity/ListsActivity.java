@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.SparseBooleanArray;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -66,6 +67,7 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
     private DrawerLayout drawer;
     private ListAdapter listsAdapter;
     private ListService listService = new ListService(this);
+    private SparseBooleanArray sortMap = new SparseBooleanArray();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,6 +162,11 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
             }
         });
 
+        sortMap.append(R.id.menu_lists_sort_name, true);
+        sortMap.append(R.id.menu_lists_sort_progress, true);
+        sortMap.append(R.id.menu_lists_sort_creation_date, true);
+
+
         new ItemTouchHelper(new ListItemTouchHelper(this, listsAdapter)).attachToRecyclerView(recyclerView);
         configureApplication();
     }
@@ -187,16 +194,21 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        boolean sortDirection;
         switch (item.getItemId()) {
             case R.id.menu_lists_sort_name:
-                applySortChanges((list1, list2) ->
-                        StringUtils.compare(list1.getName(), list2.getName()));
+                sortDirection = getAndRevertSortDirection(R.id.menu_lists_sort_name);
+                applySortChanges((list1, list2) -> sortDirection
+                        ? StringUtils.compare(list1.getName(), list2.getName())
+                        : StringUtils.compare(list2.getName(), list1.getName()));
                 break;
             case R.id.menu_lists_sort_progress:
-                applySortChanges(new ListProgressComparator());
+                sortDirection = getAndRevertSortDirection(R.id.menu_lists_sort_progress);
+                applySortChanges(new ListProgressComparator(sortDirection));
                 break;
             case R.id.menu_lists_sort_creation_date:
-                applySortChanges(new ListCreateDateComparator());
+                sortDirection = getAndRevertSortDirection(R.id.menu_lists_sort_creation_date);
+                applySortChanges(new ListCreateDateComparator(sortDirection));
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -271,6 +283,12 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
         diffResult.dispatchUpdatesTo(listsAdapter);
         listsAdapter.updatePositions();
         listService.update(newTasks);
+    }
+
+    private boolean getAndRevertSortDirection(int key) {
+        boolean sortDirection = sortMap.get(key);
+        sortMap.put(key, !sortDirection);
+        return sortDirection;
     }
 
     private void configureApplication() {

@@ -16,7 +16,6 @@ import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.TaskAdapter;
 import com.hose.aureliano.project.done.activity.dialog.SelectListModal;
 import com.hose.aureliano.project.done.model.Task;
-import com.hose.aureliano.project.done.service.ListService;
 import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 import com.hose.aureliano.project.done.utils.CalendarUtils;
@@ -46,7 +45,6 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     private static Drawable DRAWABLE_DONE;
 
     private TaskService taskService;
-    private ListService listService;
     private TaskAdapter adapter;
     private Context context;
     private View coordinator;
@@ -67,7 +65,6 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
         this.adapter = adapter;
         this.coordinator = coordinator;
         taskService = new TaskService(context);
-        listService = new ListService(context);
         initStaticVariables();
     }
 

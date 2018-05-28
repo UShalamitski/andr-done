@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.SparseBooleanArray;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -68,6 +69,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
     private TaskAdapter taskAdapter;
     private FloatingActionButton floatingActionButton;
     private TaskService taskService = new TaskService(this);
+    private SparseBooleanArray sortMap = new SparseBooleanArray();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -183,6 +185,10 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
             floatingActionButton.setVisibility(View.GONE);
         }
 
+        sortMap.append(R.id.menu_tasks_sort_name, true);
+        sortMap.append(R.id.menu_tasks_sort_due_date, true);
+        sortMap.append(R.id.menu_tasks_sort_create_date, true);
+
         new ItemTouchHelper(new TaskItemTouchHelper(this, taskAdapter, coordinator)).attachToRecyclerView(listView);
     }
 
@@ -215,15 +221,21 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        boolean sortDirection;
         switch (item.getItemId()) {
             case R.id.menu_tasks_sort_name:
-                applySortChanges((t1, t2) -> StringUtils.compare(t1.getName(), t2.getName()));
+                sortDirection = getAndRevertSortDirection(R.id.menu_tasks_sort_name);
+                applySortChanges((task1, task2) -> sortDirection
+                        ? StringUtils.compare(task1.getName(), task2.getName())
+                        : StringUtils.compare(task2.getName(), task1.getName()));
                 break;
             case R.id.menu_tasks_sort_due_date:
-                applySortChanges(new TaskDueDateComparator());
+                sortDirection = getAndRevertSortDirection(R.id.menu_tasks_sort_due_date);
+                applySortChanges(new TaskDueDateComparator(sortDirection));
                 break;
             case R.id.menu_tasks_sort_create_date:
-                applySortChanges(new TaskCreateDateComparator());
+                sortDirection = getAndRevertSortDirection(R.id.menu_tasks_sort_create_date);
+                applySortChanges(new TaskCreateDateComparator(sortDirection));
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -242,6 +254,12 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
                 AlarmService.setTaskReminder(this, task);
             }
         });
+    }
+
+    private boolean getAndRevertSortDirection(int key) {
+        boolean sortDirection = sortMap.get(key);
+        sortMap.put(key, !sortDirection);
+        return sortDirection;
     }
 
     private void showAddNewTaskView(InputMethodManager inputManager, CustomEditText newTaskEditText) {
