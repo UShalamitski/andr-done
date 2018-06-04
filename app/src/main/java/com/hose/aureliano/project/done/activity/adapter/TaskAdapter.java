@@ -1,8 +1,11 @@
 package com.hose.aureliano.project.done.activity.adapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
@@ -19,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hose.aureliano.project.done.R;
+import com.hose.aureliano.project.done.activity.TaskDetailsActivity;
 import com.hose.aureliano.project.done.activity.adapter.api.Adapter;
 import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.model.Task;
@@ -118,7 +122,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
             if (null != actionMode) {
                 toggleSelection(viewHolder, actionMode);
             } else {
-                viewHolder.checkBox.setChecked(!viewHolder.checkBox.isChecked());
+                Intent intent = new Intent(context, TaskDetailsActivity.class);
+                context.startActivity(intent,
+                        ActivityOptionsCompat.makeSceneTransitionAnimation((Activity) context).toBundle());
             }
             ActivityUtils.vibrate(context);
         });

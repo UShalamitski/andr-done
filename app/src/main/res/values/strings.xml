@@ -48,9 +48,11 @@
     <string name="task.duplicate">Selected tasks were duplicated</string>
     <string name="task.empty_view">There are no tasks yet</string>
     <string name="task.move">Selected tasks were moved</string>
+    <string name="task.add_note">Add note</string>
     <string name="task.notification.title">Reminder</string>
     <string name="task.remind_me">Remind me</string>
     <string name="task.removed">Task was removed</string>
+    <string name="task.repeat">Repeat</string>
     <string name="task.selected">Selected: %s</string>
     <string name="tasks.overdue.notification.title">%s overdue task(s) for today</string>
     <string name="tasks.overdue.notification.text">Press to view</string>

@@ -48,9 +48,11 @@
     <string name="task.duplicate">Выбранные задачи продублированы</string>
     <string name="task.empty_view">Задач пока нет</string>
     <string name="task.move">Выбранные задачи перемещены</string>
+    <string name="task.add_note">Добавить заметку</string>
     <string name="task.notification.title">Напоминание</string>
     <string name="task.remind_me">Напомнить</string>
     <string name="task.removed">Задача удалена</string>
+    <string name="task.repeat">Повторять</string>
     <string name="task.selected">Выбрано: %s</string>
     <string name="tasks.overdue.notification.title">Просроченные задачи: %s</string>
     <string name="tasks.overdue.notification.text">Нажмите, чтобы просмотреть</string>
