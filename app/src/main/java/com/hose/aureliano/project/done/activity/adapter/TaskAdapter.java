@@ -121,12 +121,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         view.setOnClickListener(itemView -> {
             if (null != actionMode) {
                 toggleSelection(viewHolder, actionMode);
+                ActivityUtils.vibrate(context);
             } else {
                 Intent intent = new Intent(context, TaskDetailsActivity.class);
+                Task task = getItem(viewHolder.getAdapterPosition());
+                intent.putExtra("listId", listId);
+                intent.putExtra("taskName", task.getName());
+                intent.putExtra("taskId", task.getId());
+                intent.putExtra("done", task.getDone());
                 context.startActivity(intent,
                         ActivityOptionsCompat.makeSceneTransitionAnimation((Activity) context).toBundle());
             }
-            ActivityUtils.vibrate(context);
         });
 
         view.setOnLongClickListener(longClickView -> {

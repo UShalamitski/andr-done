@@ -221,6 +221,7 @@
             android:baselineAligned="false">
 
             <RelativeLayout
+                android:id="@+id/task_detail_bottom_bar_done"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_weight="1"
@@ -229,6 +230,7 @@
                 android:foreground="?android:attr/selectableItemBackground">
 
                 <ImageView
+                    android:id="@+id/task_detail_bottom_bar_done_icon"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_centerHorizontal="true"
@@ -238,6 +240,7 @@
             </RelativeLayout>
 
             <RelativeLayout
+                android:id="@+id/task_detail_bottom_bar_delete"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_weight="1"

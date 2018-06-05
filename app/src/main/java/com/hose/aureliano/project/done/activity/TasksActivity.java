@@ -256,6 +256,12 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        taskAdapter.refresh();
+    }
+
     private boolean getAndRevertSortDirection(int key) {
         boolean sortDirection = sortMap.get(key);
         sortMap.put(key, !sortDirection);
