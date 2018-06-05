@@ -126,9 +126,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
                 Intent intent = new Intent(context, TaskDetailsActivity.class);
                 Task task = getItem(viewHolder.getAdapterPosition());
                 intent.putExtra("listId", listId);
-                intent.putExtra("taskName", task.getName());
-                intent.putExtra("taskId", task.getId());
-                intent.putExtra("done", task.getDone());
+                intent.putExtra(Task.Fields.NAME.fieldName(), task.getName());
+                intent.putExtra(Task.Fields.ID.fieldName(), task.getId());
+                intent.putExtra(Task.Fields.DONE.fieldName(), task.getDone());
+                intent.putExtra(Task.Fields.DUE_DATE_TIME.fieldName(), task.getDueDateTime());
+                intent.putExtra(Task.Fields.REMIND_DATE_TIME.fieldName(), task.getRemindDateTime());
+                intent.putExtra(Task.Fields.CREATED_DATE_TIME.fieldName(), task.getCreatedDateTime());
+                intent.putExtra(Task.Fields.POSITION.fieldName(), task.getPosition());
                 context.startActivity(intent,
                         ActivityOptionsCompat.makeSceneTransitionAnimation((Activity) context).toBundle());
             }
@@ -414,22 +418,22 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
 
     private Bundle buildBundle(Task task) {
         Bundle bundle = new Bundle();
-        bundle.putInt(Task.Fields.ID.getFieldName(), task.getId());
-        bundle.putString(Task.Fields.NAME.getFieldName(), task.getName());
-        bundle.putBoolean(Task.Fields.DONE.getFieldName(), task.getDone());
+        bundle.putInt(Task.Fields.ID.fieldName(), task.getId());
+        bundle.putString(Task.Fields.NAME.fieldName(), task.getName());
+        bundle.putBoolean(Task.Fields.DONE.fieldName(), task.getDone());
         if (null != task.getPosition()) {
-            bundle.putInt(Task.Fields.POSITION.getFieldName(), task.getPosition());
+            bundle.putInt(Task.Fields.POSITION.fieldName(), task.getPosition());
         }
         if (null != task.getDueDateTime()) {
-            bundle.putLong(Task.Fields.DUE_DATE_TIME.getFieldName(), task.getDueDateTime());
-            bundle.putBoolean(Task.Fields.DUE_TIME_IS_SET.getFieldName(), task.getDueTimeIsSet());
+            bundle.putLong(Task.Fields.DUE_DATE_TIME.fieldName(), task.getDueDateTime());
+            bundle.putBoolean(Task.Fields.DUE_TIME_IS_SET.fieldName(), task.getDueTimeIsSet());
         }
         if (null != task.getRemindDateTime()) {
-            bundle.putLong(Task.Fields.REMIND_DATE_TIME.getFieldName(), task.getRemindDateTime());
-            bundle.putBoolean(Task.Fields.REMIND_TIME_IS_SET.getFieldName(), task.getRemindTimeIsSet());
+            bundle.putLong(Task.Fields.REMIND_DATE_TIME.fieldName(), task.getRemindDateTime());
+            bundle.putBoolean(Task.Fields.REMIND_TIME_IS_SET.fieldName(), task.getRemindTimeIsSet());
         }
         if (null != task.getCreatedDateTime()) {
-            bundle.putLong(Task.Fields.CREATED_DATE_TIME.getFieldName(), task.getCreatedDateTime());
+            bundle.putLong(Task.Fields.CREATED_DATE_TIME.fieldName(), task.getCreatedDateTime());
         }
         return bundle;
     }

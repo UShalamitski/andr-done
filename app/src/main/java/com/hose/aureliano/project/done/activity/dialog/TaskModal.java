@@ -84,23 +84,23 @@ public class TaskModal extends DialogFragment {
 
         RelativeLayout relativeLayout = view.findViewById(R.id.task_modal_layout_calendar);
         relativeLayout.setOnClickListener(v -> {
-            DateTimePickerDialog pickerDialog = new DateTimePickerDialog(getContext(), task.getDueDateTime(),
+/*            DateTimePickerDialog pickerDialog = new DateTimePickerDialog(getContext(), task.getDueDateTime(),
                     task.getDueTimeIsSet(), (dateTime, isTimeSet) -> {
                 changeDueDate(blueColor, blueColor, ActivityUtils.getStringDate(getContext(), dateTime, isTimeSet));
                 task.setDueDateTime(dateTime);
                 task.setDueTimeIsSet(isTimeSet);
             });
-            pickerDialog.show();
+            pickerDialog.show();*/
         });
         RelativeLayout layoutAlert = view.findViewById(R.id.task_modal_layout_alert);
         layoutAlert.setOnClickListener(v -> {
-            DateTimePickerDialog dateTimePickerDialog = new DateTimePickerDialog(getContext(), task.getRemindDateTime(),
+/*            DateTimePickerDialog dateTimePickerDialog = new DateTimePickerDialog(getContext(), task.getRemindDateTime(),
                     task.getRemindTimeIsSet(), (dateTime, isTimeSet) -> {
                 changeRemindDate(blueColor, blueColor, ActivityUtils.getStringDate(getContext(), dateTime, isTimeSet));
                 task.setRemindDateTime(dateTime);
                 task.setRemindTimeIsSet(isTimeSet);
             });
-            dateTimePickerDialog.show();
+            dateTimePickerDialog.show();*/
         });
 
         builder.setView(view);
@@ -123,15 +123,15 @@ public class TaskModal extends DialogFragment {
         Task task = new Task();
         Bundle bundle = getArguments();
         if (bundle != null) {
-            task.setId((Integer) bundle.get(Task.Fields.ID.getFieldName()));
-            task.setName(bundle.getString(Task.Fields.NAME.getFieldName()));
-            task.setDone(bundle.getBoolean(Task.Fields.DONE.getFieldName(), false));
-            task.setDueDateTime((Long) bundle.get(Task.Fields.DUE_DATE_TIME.getFieldName()));
-            task.setRemindDateTime((Long) bundle.get(Task.Fields.REMIND_DATE_TIME.getFieldName()));
-            task.setDueTimeIsSet(bundle.getBoolean(Task.Fields.DUE_TIME_IS_SET.getFieldName(), false));
-            task.setRemindTimeIsSet(bundle.getBoolean(Task.Fields.REMIND_TIME_IS_SET.getFieldName(), false));
-            task.setPosition((Integer) bundle.get(Task.Fields.POSITION.getFieldName()));
-            task.setCreatedDateTime((Long) bundle.get(Task.Fields.CREATED_DATE_TIME.getFieldName()));
+            task.setId((Integer) bundle.get(Task.Fields.ID.fieldName()));
+            task.setName(bundle.getString(Task.Fields.NAME.fieldName()));
+            task.setDone(bundle.getBoolean(Task.Fields.DONE.fieldName(), false));
+            task.setDueDateTime((Long) bundle.get(Task.Fields.DUE_DATE_TIME.fieldName()));
+            task.setRemindDateTime((Long) bundle.get(Task.Fields.REMIND_DATE_TIME.fieldName()));
+            task.setDueTimeIsSet(bundle.getBoolean(Task.Fields.DUE_TIME_IS_SET.fieldName(), false));
+            task.setRemindTimeIsSet(bundle.getBoolean(Task.Fields.REMIND_TIME_IS_SET.fieldName(), false));
+            task.setPosition((Integer) bundle.get(Task.Fields.POSITION.fieldName()));
+            task.setCreatedDateTime((Long) bundle.get(Task.Fields.CREATED_DATE_TIME.fieldName()));
         }
         return task;
     }

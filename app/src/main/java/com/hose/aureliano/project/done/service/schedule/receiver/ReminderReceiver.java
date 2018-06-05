@@ -34,11 +34,11 @@ public class ReminderReceiver extends BroadcastReceiver {
         Bundle extras = intent.getExtras();
         if (extras != null) {
             taskService = new TaskService(context);
-            int taskId = extras.getInt(Task.Fields.ID.getFieldName());
+            int taskId = extras.getInt(Task.Fields.ID.fieldName());
 
             Intent contentIntent = new Intent().setClass(context, TasksActivity.class);;
-            contentIntent.putExtra("listId", extras.getString(Task.Fields.LIST_ID.getFieldName()));
-            contentIntent.putExtra("name", extras.getString(Task.Fields.NAME.getFieldName()));
+            contentIntent.putExtra("listId", extras.getString(Task.Fields.LIST_ID.fieldName()));
+            contentIntent.putExtra("name", extras.getString(Task.Fields.NAME.fieldName()));
             contentIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
@@ -49,7 +49,7 @@ public class ReminderReceiver extends BroadcastReceiver {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, "channelId")
                     .setSmallIcon(R.drawable.ic_launcher_foreground)
                     .setContentTitle(context.getString(R.string.task_notification_title))
-                    .setContentText(extras.getString(Task.Fields.NAME.getFieldName()))
+                    .setContentText(extras.getString(Task.Fields.NAME.fieldName()))
                     .setContentIntent(pendingIntent)
                     .setDefaults(Notification.DEFAULT_ALL)
                     .setVisibility(Notification.VISIBILITY_PUBLIC)

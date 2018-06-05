@@ -159,7 +159,7 @@ public class Task extends BaseEntity {
             this.name = name;
         }
 
-        public String getFieldName() {
+        public String fieldName() {
             return name;
         }
     }

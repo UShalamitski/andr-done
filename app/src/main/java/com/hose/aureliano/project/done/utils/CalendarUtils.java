@@ -49,11 +49,34 @@ public class CalendarUtils {
     }
 
     /**
+     * @return time in milliseconds for tomorrow at 09:00:00.000
+     */
+    public static long getTomorrowAtNineDateTimeInMillis() {
+        GregorianCalendar calendar = getDateTimeAtZeroInMillis();
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 9);
+        return calendar.getTimeInMillis();
+    }
+
+    /**
      * @return time in milliseconds for next monday at 23:59:59.999
      */
     public static long getNextMondayDateTimeInMillis() {
         GregorianCalendar calendar = getDateTimeInMillis();
         calendar.add(Calendar.DAY_OF_MONTH, 1);
+        while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
+            calendar.add(Calendar.DATE, 1);
+        }
+        return calendar.getTimeInMillis();
+    }
+
+    /**
+     * @return time in milliseconds for next monday at 09:00:00.000
+     */
+    public static long getNextMondayAtNineDateTimeInMillis() {
+        GregorianCalendar calendar = getDateTimeAtZeroInMillis();
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 9);
         while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
             calendar.add(Calendar.DATE, 1);
         }

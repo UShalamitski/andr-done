@@ -15,18 +15,21 @@
     <string name="no">No</string>
     <string name="ok">Ok</string>
 
+    <string name="menu.due_date.clear">Without due date</string>
+    <string name="menu.due_date.today">Today</string>
+    <string name="menu.due_date.tomorrow">Tomorrow</string>
+    <string name="menu.due_date.next_week">Next week</string>
+    <string name="menu.due_date.select">Select due date</string>
     <string name="menu.duplicate">Duplicate</string>
     <string name="menu.select_all">Select all</string>
     <string name="menu.sort.create_date">By name</string>
     <string name="menu.sort.due_date">By due date</string>
     <string name="menu.sort.name">By create date</string>
     <string name="menu.sort.progress">By progress</string>
+    <string name="menu.remind_date.tomorrow">Tomorrow 9:00</string>
+    <string name="menu.remind_date.next_monday">Next Monday at 9:00</string>
+    <string name="menu.remind_date.select">Select date and time</string>
     <string name="menu.unselect_all">Unselect all</string>
-    <string name="menu.due_date.clear">Without due date</string>
-    <string name="menu.due_date.today">Today</string>
-    <string name="menu.due_date.tomorrow">Tomorrow</string>
-    <string name="menu.due_date.next_week">Next week</string>
-    <string name="menu.due_date.select">Select due date</string>
 
     <string name="modal.select.list">Select list</string>
 
@@ -38,7 +41,6 @@
     <string name="navbar.week">Week</string>
 
     <string name="date_time_picker.time">Time</string>
-    <string name="date_time_picker.without_time">Without time</string>
 
     <string name="task.add_new">Add new task</string>
     <string name="task.delete.confirmation">Are you sure you want to delete selected task?</string>

@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/menu_tasks__due_date">
+
+    <item
+        android:id="@+id/menu_tasks_remind_date_tomorrow"
+        android:orderInCategory="0"
+        android:title="@string/menu.remind_date.tomorrow" />
+    <item
+        android:id="@+id/menu_tasks_remind_date_next_week"
+        android:orderInCategory="10"
+        android:title="@string/menu.remind_date.next_monday" />
+    <item
+        android:id="@+id/menu_tasks_select_remind_date"
+        android:orderInCategory="20"
+        android:title="@string/menu.remind_date.select" />
+</menu>

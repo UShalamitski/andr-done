@@ -30,13 +30,15 @@ public class AlarmService {
      * @param task    instance of {@link Task}
      */
     public static void setTaskReminder(Context context, Task task) {
-        Intent intent = new Intent(context, ReminderReceiver.class);
-        intent.putExtra(Task.Fields.NAME.getFieldName(), task.getName());
-        intent.putExtra(Task.Fields.ID.getFieldName(), task.getId());
-        intent.putExtra(Task.Fields.LIST_ID.getFieldName(), task.getListId());
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, task.getId(), intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        setAlarm(context, pendingIntent, task.getRemindDateTime());
+        if (null != task.getRemindDateTime()) {
+            Intent intent = new Intent(context, ReminderReceiver.class);
+            intent.putExtra(Task.Fields.NAME.fieldName(), task.getName());
+            intent.putExtra(Task.Fields.ID.fieldName(), task.getId());
+            intent.putExtra(Task.Fields.LIST_ID.fieldName(), task.getListId());
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, task.getId(), intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            setAlarm(context, pendingIntent, task.getRemindDateTime());
+        }
     }
 
     /**

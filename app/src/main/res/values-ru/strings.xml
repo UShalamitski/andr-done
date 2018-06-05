@@ -27,6 +27,9 @@
     <string name="menu.due_date.tomorrow">Завтра</string>
     <string name="menu.due_date.next_week">Следующая неделя</string>
     <string name="menu.due_date.select">Выбрать дату исполнения</string>
+    <string name="menu.remind_date.tomorrow">Завтра в 9:00</string>
+    <string name="menu.remind_date.next_monday">Следующий понедельник в 9:00</string>
+    <string name="menu.remind_date.select">Выбрать дaту и время</string>
 
     <string name="modal.select.list">Выберите список</string>
 
@@ -38,7 +41,6 @@
     <string name="navbar.week">Неделя</string>
 
     <string name="date_time_picker.time">Время</string>
-    <string name="date_time_picker.without_time">Без времени</string>
 
     <string name="task.add_new">Добавить задачу</string>
     <string name="task.delete.confirmation">Вы уверены, что хотите удалить выбранную задачу?</string>
