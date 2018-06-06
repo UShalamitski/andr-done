@@ -81,7 +81,6 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginEnd="40dp"
                 android:layout_marginStart="45dp"
                 android:maxLines="1"
                 android:textAppearance="?android:textAppearanceMedium"
@@ -143,20 +142,6 @@
                     android:layout_toEndOf="@+id/task_info_reminder_icon"
                     android:textAppearance="?android:textAppearanceSmall" />
             </RelativeLayout>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/task_menu"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true">
-
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/icon_more_vert_white_24dp"
-                android:tint="@color/black_secondary" />
         </RelativeLayout>
 
         <CheckBox

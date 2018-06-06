@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.ActionMode;
@@ -17,14 +15,12 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.TaskDetailsActivity;
 import com.hose.aureliano.project.done.activity.adapter.api.Adapter;
-import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.model.TasksViewEnum;
 import com.hose.aureliano.project.done.service.TaskService;
@@ -55,7 +51,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     private static int COLOR_GRAY_LIGHT;
 
     private Set<Integer> selectedIdsSet;
-    private FragmentManager fragmentManager;
     private TaskService taskService;
     private List<Task> taskList;
     private Context context;
@@ -66,14 +61,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     /**
      * Controller.
      *
-     * @param context         context
-     * @param fragmentManager fragment manager
-     * @param listId          identifier of the list
+     * @param context context
+     * @param listId  identifier of the list
      */
-    public TaskAdapter(Context context, FragmentManager fragmentManager, Integer listId,
+    public TaskAdapter(Context context, Integer listId,
                        TasksViewEnum view) {
         taskService = new TaskService(context);
-        this.fragmentManager = fragmentManager;
         this.context = context;
         this.listId = listId;
         this.view = view;
@@ -94,29 +87,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         View view = LayoutInflater.from(context).inflate(R.layout.item_task_layout, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         viewHolder.checkBox.setOnClickListener(v -> ActivityUtils.vibrate(context));
-        viewHolder.menu.setOnClickListener(menuView -> {
-            Task currentTask = getItem(menuView);
-            PopupMenu popupMenu = new PopupMenu(context, menuView);
-            popupMenu.inflate(R.menu.menu_list_more);
-            popupMenu.setOnMenuItemClickListener(item -> {
-                switch (item.getItemId()) {
-                    case R.id.menu_delete:
-                        ActivityUtils.showConfirmationDialog(context, R.string.task_delete_confirmation,
-                                (dialog, which) -> {
-                                    taskService.delete(currentTask);
-                                    removeItem(getPosition(menuView));
-                                });
-                        break;
-                    case R.id.menu_edit:
-                        DialogFragment dialog = new TaskModal();
-                        dialog.setArguments(buildBundle(currentTask));
-                        dialog.show(fragmentManager, "task_modal");
-                        break;
-                }
-                return true;
-            });
-            popupMenu.show();
-        });
 
         view.setOnClickListener(itemView -> {
             if (null != actionMode) {
@@ -156,19 +126,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     public void onBindViewHolder(ViewHolder holder, int position) {
         Task task = getItem(position);
         holder.checkBox.setTag(task.getId());
-        holder.menu.setTag(task.getId());
         holder.name.setText(task.getName());
         holder.name.setTextColor(task.getDone() ? COLOR_BLACK_SECONDARY : COLOR_BLACK_PRIMARY);
         crossOutText(holder, task.getDone());
         holder.checkBox.setChecked(task.getDone());
 
         if (null != task.getDueDateTime()) {
-            holder.dueDateText
-                    .setText(ActivityUtils.getStringDate(context, task.getDueDateTime(), task.getDueTimeIsSet()));
+            holder.dueDateText.setText(ActivityUtils.getStringDate(context, task.getDueDateTime(), false));
         }
         if (null != task.getRemindDateTime()) {
-            holder.reminderText
-                    .setText(ActivityUtils.getStringDate(context, task.getRemindDateTime(), task.getRemindTimeIsSet()));
+            holder.reminderText.setText(ActivityUtils.getStringDate(context, task.getRemindDateTime(), true));
         }
 
         if (null != task.getDueDateTime() || null != task.getRemindDateTime() && !task.getDone()) {
@@ -197,12 +164,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
                 currentTask.setDone(buttonView.isChecked());
                 taskService.update(currentTask);
             }
-            if (isChecked && currentTask.getRemindTimeIsSet()) {
+            if (isChecked && null != currentTask.getRemindDateTime()) {
                 setVisibility(holder.reminderIcon, false);
                 setVisibility(holder.reminderText, false);
                 setVisibility(holder.dueDateAndReminderDelimiter, false);
                 AlarmService.cancelTaskReminder(context, currentTask);
-            } else if (!isChecked && currentTask.getRemindTimeIsSet()) {
+            } else if (!isChecked && null != currentTask.getRemindDateTime()) {
                 if (currentTask.getRemindDateTime() > System.currentTimeMillis()) {
                     AlarmService.setTaskReminder(context, currentTask);
                     setVisibility(holder.taskInfoLayout, true);
@@ -212,7 +179,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
                 } else {
                     taskService.deleteReminderDate(currentTask.getId());
                     currentTask.setRemindDateTime(null);
-                    currentTask.setRemindTimeIsSet(false);
                     setVisibility(holder.reminderIcon, false);
                     setVisibility(holder.reminderText, false);
                     setVisibility(holder.dueDateAndReminderDelimiter, false);
@@ -426,11 +392,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         }
         if (null != task.getDueDateTime()) {
             bundle.putLong(Task.Fields.DUE_DATE_TIME.fieldName(), task.getDueDateTime());
-            bundle.putBoolean(Task.Fields.DUE_TIME_IS_SET.fieldName(), task.getDueTimeIsSet());
         }
         if (null != task.getRemindDateTime()) {
             bundle.putLong(Task.Fields.REMIND_DATE_TIME.fieldName(), task.getRemindDateTime());
-            bundle.putBoolean(Task.Fields.REMIND_TIME_IS_SET.fieldName(), task.getRemindTimeIsSet());
         }
         if (null != task.getCreatedDateTime()) {
             bundle.putLong(Task.Fields.CREATED_DATE_TIME.fieldName(), task.getCreatedDateTime());
@@ -469,7 +433,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         private ImageView backgroundRightIcon;
         private ImageView backgroundLeftIcon;
         private TextView name;
-        private View menu;
         private CheckBox checkBox;
         private RelativeLayout taskInfoLayout;
         private ImageView dueDateIcon;
@@ -492,7 +455,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
             this.reminderIcon = view.findViewById(R.id.task_info_reminder_icon);
             this.reminderText = view.findViewById(R.id.task_info_reminder_text);
             this.name = view.findViewById(R.id.task_name);
-            this.menu = view.findViewById(R.id.task_menu);
             this.checkBox = view.findViewById(R.id.task_checkbox);
             this.view = view.findViewById(R.id.task_item_layout);
             this.viewForeground = view.findViewById(R.id.item_view_foreground);

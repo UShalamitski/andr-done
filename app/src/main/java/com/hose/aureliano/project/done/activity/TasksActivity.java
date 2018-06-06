@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.view.ActionMode;
@@ -24,7 +23,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.TaskAdapter;
@@ -32,14 +30,12 @@ import com.hose.aureliano.project.done.activity.callback.DiffUtilCallback;
 import com.hose.aureliano.project.done.activity.component.CustomEditText;
 import com.hose.aureliano.project.done.activity.component.RecyclerViewEmptySupport;
 import com.hose.aureliano.project.done.activity.dialog.SelectListModal;
-import com.hose.aureliano.project.done.activity.dialog.TaskModal;
 import com.hose.aureliano.project.done.activity.helper.TaskItemTouchHelper;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.model.TasksViewEnum;
 import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.service.comporator.TaskCreateDateComparator;
 import com.hose.aureliano.project.done.service.comporator.TaskDueDateComparator;
-import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 import com.hose.aureliano.project.done.utils.AnimationUtil;
 import com.hose.aureliano.project.done.utils.CalendarUtils;
@@ -59,7 +55,7 @@ import java.util.List;
  *
  * @author Uladzislau Shalamitski
  */
-public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDialogListener {
+public class TasksActivity extends AppCompatActivity {
 
     private Integer listId;
     private View coordinator;
@@ -92,7 +88,7 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
 
         listId = (Integer) getIntent().getExtras().get("listId");
         coordinator = findViewById(R.id.tasks_coordinator_layout);
-        taskAdapter = new TaskAdapter(this, getSupportFragmentManager(), listId, viewEnum);
+        taskAdapter = new TaskAdapter(this, listId, viewEnum);
 
         RecyclerViewEmptySupport listView = findViewById(R.id.activity_tasks_list_view);
         listView.setEmptyView(findViewById(R.id.activity_tasks_empty_view));
@@ -241,19 +237,6 @@ public class TasksActivity extends AppCompatActivity implements TaskModal.TaskDi
                 return super.onOptionsItemSelected(item);
         }
         return true;
-    }
-
-    @Override
-    public void onDialogPositiveClick(DialogFragment fragment, Task task) {
-        TextView name = fragment.getDialog().findViewById(R.id.tasks_modal_name);
-        task.setName(name.getText().toString());
-        task.setListId(listId);
-        ActivityUtils.handleDbInteractionResult(taskService.update(task), coordinator, () -> {
-            taskAdapter.refresh();
-            if (task.getRemindTimeIsSet()) {
-                AlarmService.setTaskReminder(this, task);
-            }
-        });
     }
 
     @Override

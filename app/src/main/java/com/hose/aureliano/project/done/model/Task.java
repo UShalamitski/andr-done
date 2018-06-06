@@ -20,9 +20,7 @@ public class Task extends BaseEntity {
     private Integer listId;
     private String name;
     private Long dueDateTime;
-    private boolean dueTimeIsSet;
     private Long remindDateTime;
-    private boolean remindTimeIsSet;
     private boolean done;
     private Integer position;
     private Long createdDateTime;
@@ -70,22 +68,6 @@ public class Task extends BaseEntity {
         this.remindDateTime = remindDateTime;
     }
 
-    public boolean getDueTimeIsSet() {
-        return dueTimeIsSet;
-    }
-
-    public void setDueTimeIsSet(boolean dueTimeIsSet) {
-        this.dueTimeIsSet = dueTimeIsSet;
-    }
-
-    public boolean getRemindTimeIsSet() {
-        return remindTimeIsSet;
-    }
-
-    public void setRemindTimeIsSet(boolean remindTimeIsSet) {
-        this.remindTimeIsSet = remindTimeIsSet;
-    }
-
     public Integer getPosition() {
         return position;
     }
@@ -117,9 +99,7 @@ public class Task extends BaseEntity {
                 .append(name, that.name)
                 .append(done, that.done)
                 .append(dueDateTime, that.dueDateTime)
-                .append(dueTimeIsSet, that.dueTimeIsSet)
                 .append(remindDateTime, that.remindDateTime)
-                .append(remindTimeIsSet, that.remindTimeIsSet)
                 .append(position, that.position)
                 .append(createdDateTime, that.createdDateTime)
                 .isEquals();
@@ -133,9 +113,7 @@ public class Task extends BaseEntity {
                 .append(name)
                 .append(done)
                 .append(dueDateTime)
-                .append(dueTimeIsSet)
                 .append(remindDateTime)
-                .append(remindTimeIsSet)
                 .append(position)
                 .append(createdDateTime)
                 .toHashCode();
@@ -148,9 +126,7 @@ public class Task extends BaseEntity {
         DONE("done"),
         POSITION("position"),
         DUE_DATE_TIME("dueDateTime"),
-        DUE_TIME_IS_SET("dueTimeIsSet"),
         REMIND_DATE_TIME("remindDateTime"),
-        REMIND_TIME_IS_SET("remindTimeIsSet"),
         CREATED_DATE_TIME("createdDateTime");
 
         private String name;
