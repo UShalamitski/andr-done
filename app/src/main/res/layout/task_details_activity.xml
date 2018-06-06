@@ -130,7 +130,7 @@
                     android:tint="@color/black_secondary" />
 
                 <TextView
-                    android:id="@+id/task_modal_repeat_text"
+                    android:id="@+id/task_details_repeat_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"

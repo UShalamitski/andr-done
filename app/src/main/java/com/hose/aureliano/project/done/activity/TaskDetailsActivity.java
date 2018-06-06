@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.dialog.DateTimePickerDialog;
 import com.hose.aureliano.project.done.model.Task;
+import com.hose.aureliano.project.done.model.TaskRepeatEnum;
 import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
@@ -53,7 +54,40 @@ public class TaskDetailsActivity extends AppCompatActivity {
             prepareTaskName(taskNameView, task.getDone());
 
             View repeatView = findViewById(R.id.task_details_repeat);
-            repeatView.setVisibility(View.GONE);
+            ImageView repeatIcon = findViewById(R.id.task_details_repeat_icon);
+            TextView repeatText = findViewById(R.id.task_details_repeat_text);
+            View repeatClearView = findViewById(R.id.task_details_repeat_clear);
+            changeRepeatFields(repeatText, repeatIcon, task);
+            repeatClearView.setOnClickListener(view -> {
+                task.setRepeatType(null);
+                changeRepeatFields(repeatText, repeatIcon, task);
+            });
+            repeatView.setOnClickListener(view -> {
+                PopupMenu popupMenu = new PopupMenu(this, view);
+                popupMenu.inflate(R.menu.menu_repeat);
+                popupMenu.setOnMenuItemClickListener(item -> {
+                    switch (item.getItemId()) {
+                        case R.id.menu_task_repeat_every_day:
+                            task.setRepeatType(TaskRepeatEnum.EVERY_DAY);
+                            break;
+                        case R.id.menu_task_repeat_every_week:
+                            task.setRepeatType(TaskRepeatEnum.EVERY_WEEK);
+                            break;
+                        case R.id.menu_task_repeat_every_month:
+                            task.setRepeatType(TaskRepeatEnum.EVERY_MONTH);
+                            break;
+                        case R.id.menu_task_repeat_every_year:
+                            task.setRepeatType(TaskRepeatEnum.EVERY_YEAR);
+                            break;
+                        case R.id.menu_task_repeat_working_days:
+                            task.setRepeatType(TaskRepeatEnum.WORKING_DAYS);
+                            break;
+                    }
+                    changeRepeatFieldsAndSave(repeatText, repeatIcon, task);
+                    return true;
+                });
+                popupMenu.show();
+            });
 
             View dueDateView = findViewById(R.id.task_details_due_date);
             ImageView dueDateIcon = findViewById(R.id.task_details_due_date_icon);
@@ -179,6 +213,8 @@ public class TaskDetailsActivity extends AppCompatActivity {
         task.setRemindDateTime((Long) extras.get(Task.Fields.REMIND_DATE_TIME.fieldName()));
         task.setCreatedDateTime((Long) extras.get(Task.Fields.CREATED_DATE_TIME.fieldName()));
         task.setPosition((Integer) extras.get(Task.Fields.POSITION.fieldName()));
+        String repeatType = extras.getString(Task.Fields.REPEAT_TYPE.fieldName());
+        task.setRepeatType(null != repeatType ? TaskRepeatEnum.valueOf(repeatType) : null);
         return task;
     }
 
@@ -191,6 +227,48 @@ public class TaskDetailsActivity extends AppCompatActivity {
     private void prepareTaskName(EditText taskNameView, boolean isChecked) {
         crossOutText(taskNameView, isChecked);
         taskNameView.setTextColor(isChecked ? COLOR_BLACK_SECONDARY : COLOR_BLACK_PRIMARY);
+    }
+
+    private void changeRepeatFields(TextView repeatDateText, ImageView repeatDateIcon, Task task) {
+        if (null == task.getRepeatType()) {
+            repeatDateText.setTextColor(COLOR_BLACK_SECONDARY);
+            repeatDateIcon.setColorFilter(COLOR_BLACK_SECONDARY);
+            repeatDateText.setText(getString(R.string.task_repeat));
+            task.setRemindDateTime(null);
+        } else {
+            repeatDateText.setTextColor(COLOR_BLUE);
+            repeatDateIcon.setColorFilter(COLOR_BLUE);
+            repeatDateText.setText(getRepeatFieldString(task.getRepeatType()));
+        }
+    }
+
+    private void changeRepeatFieldsAndSave(TextView remindDateText, ImageView remindDateIcon, Task task) {
+        changeRepeatFields(remindDateText, remindDateIcon, task);
+        taskService.update(task);
+    }
+
+    private String getRepeatFieldString(TaskRepeatEnum repeatEnum) {
+        String remindText;
+        switch (repeatEnum) {
+            case EVERY_DAY:
+                remindText = getString(R.string.menu_repeat_every_day);
+                break;
+            case EVERY_WEEK:
+                remindText = getString(R.string.menu_repeat_every_week);
+                break;
+            case EVERY_MONTH:
+                remindText = getString(R.string.menu_repeat_every_month);
+                break;
+            case EVERY_YEAR:
+                remindText = getString(R.string.menu_repeat_every_year);
+                break;
+            case WORKING_DAYS:
+                remindText = getString(R.string.menu_repeat_working_days);
+                break;
+            default:
+                remindText = getString(R.string.task_repeat);
+        }
+        return remindText;
     }
 
     private void changeRemindDateFields(TextView remindDateText, ImageView remindDateIcon, Task task) {

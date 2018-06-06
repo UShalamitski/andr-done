@@ -29,6 +29,11 @@
     <string name="menu.remind_date.tomorrow">Tomorrow 9:00</string>
     <string name="menu.remind_date.next_monday">Next Monday at 9:00</string>
     <string name="menu.remind_date.select">Select date and time</string>
+    <string name="menu.repeat.every_day">Every Day</string>
+    <string name="menu.repeat.every_week">Every Week</string>
+    <string name="menu.repeat.every_month">Every Month</string>
+    <string name="menu.repeat.every_year">Every Year</string>
+    <string name="menu.repeat.working_days">Working Days</string>
     <string name="menu.unselect_all">Unselect all</string>
 
     <string name="modal.select.list">Select list</string>

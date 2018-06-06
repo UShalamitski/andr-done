@@ -2,6 +2,7 @@ package com.hose.aureliano.project.done.model;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.TypeConverters;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -24,6 +25,8 @@ public class Task extends BaseEntity {
     private boolean done;
     private Integer position;
     private Long createdDateTime;
+    @TypeConverters(TaskRepeatEnum.class)
+    private TaskRepeatEnum repeatType;
 
     public Task() {
     }
@@ -84,6 +87,14 @@ public class Task extends BaseEntity {
         this.createdDateTime = createdDateTime;
     }
 
+    public TaskRepeatEnum getRepeatType() {
+        return repeatType;
+    }
+
+    public void setRepeatType(TaskRepeatEnum repeatType) {
+        this.repeatType = repeatType;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -102,6 +113,7 @@ public class Task extends BaseEntity {
                 .append(remindDateTime, that.remindDateTime)
                 .append(position, that.position)
                 .append(createdDateTime, that.createdDateTime)
+                .append(repeatType, that.repeatType)
                 .isEquals();
     }
 
@@ -116,6 +128,7 @@ public class Task extends BaseEntity {
                 .append(remindDateTime)
                 .append(position)
                 .append(createdDateTime)
+                .append(repeatType)
                 .toHashCode();
     }
 
@@ -127,7 +140,8 @@ public class Task extends BaseEntity {
         POSITION("position"),
         DUE_DATE_TIME("dueDateTime"),
         REMIND_DATE_TIME("remindDateTime"),
-        CREATED_DATE_TIME("createdDateTime");
+        CREATED_DATE_TIME("createdDateTime"),
+        REPEAT_TYPE("repeatType");
 
         private String name;
 

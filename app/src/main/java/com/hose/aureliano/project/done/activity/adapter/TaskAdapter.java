@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
-import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -103,6 +102,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
                 intent.putExtra(Task.Fields.REMIND_DATE_TIME.fieldName(), task.getRemindDateTime());
                 intent.putExtra(Task.Fields.CREATED_DATE_TIME.fieldName(), task.getCreatedDateTime());
                 intent.putExtra(Task.Fields.POSITION.fieldName(), task.getPosition());
+                intent.putExtra(Task.Fields.REPEAT_TYPE.fieldName(),
+                        null != task.getRepeatType() ? task.getRepeatType().name() : null);
                 context.startActivity(intent,
                         ActivityOptionsCompat.makeSceneTransitionAnimation((Activity) context).toBundle());
             }
@@ -380,26 +381,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         holder.name.setPaintFlags(checked
                 ? holder.name.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
                 : holder.name.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-    }
-
-    private Bundle buildBundle(Task task) {
-        Bundle bundle = new Bundle();
-        bundle.putInt(Task.Fields.ID.fieldName(), task.getId());
-        bundle.putString(Task.Fields.NAME.fieldName(), task.getName());
-        bundle.putBoolean(Task.Fields.DONE.fieldName(), task.getDone());
-        if (null != task.getPosition()) {
-            bundle.putInt(Task.Fields.POSITION.fieldName(), task.getPosition());
-        }
-        if (null != task.getDueDateTime()) {
-            bundle.putLong(Task.Fields.DUE_DATE_TIME.fieldName(), task.getDueDateTime());
-        }
-        if (null != task.getRemindDateTime()) {
-            bundle.putLong(Task.Fields.REMIND_DATE_TIME.fieldName(), task.getRemindDateTime());
-        }
-        if (null != task.getCreatedDateTime()) {
-            bundle.putLong(Task.Fields.CREATED_DATE_TIME.fieldName(), task.getCreatedDateTime());
-        }
-        return bundle;
     }
 
     private void initStaticResources() {
