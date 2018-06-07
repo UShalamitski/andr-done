@@ -1,5 +1,7 @@
 package com.hose.aureliano.project.done.utils;
 
+import com.hose.aureliano.project.done.model.TaskRepeatEnum;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -109,6 +111,42 @@ public class CalendarUtils {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.add(Calendar.DAY_OF_MONTH, 1);
+        return calendar.getTimeInMillis();
+    }
+
+    /**
+     * @param timeMillis
+     * @param repeatEnum
+     * @return
+     */
+    public static long getTime(long timeMillis, TaskRepeatEnum repeatEnum) {
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(timeMillis);
+        switch (repeatEnum) {
+            case EVERY_DAY: {
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                break;
+            }
+            case EVERY_WEEK: {
+                calendar.add(Calendar.WEEK_OF_MONTH, 1);
+                break;
+            }
+            case EVERY_MONTH: {
+                calendar.add(Calendar.MONTH, 1);
+                break;
+            }
+            case EVERY_YEAR: {
+                calendar.add(Calendar.YEAR, 1);
+                break;
+            }
+            case WORKING_DAYS: {
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                while (calendar.get(Calendar.DAY_OF_WEEK) < 2 || calendar.get(Calendar.DAY_OF_WEEK) > 6) {
+                    calendar.add(Calendar.DAY_OF_MONTH, 1);
+                }
+                break;
+            }
+        }
         return calendar.getTimeInMillis();
     }
 

@@ -17,6 +17,13 @@ public interface Adapter<T> {
     List<T> getItems();
 
     /**
+     * Sets list of items.
+     *
+     * @param items items to insert.
+     */
+    void setItems(List<T> items);
+
+    /**
      * Remove adapter items.
      *
      * @param items list of {@link T}s to remove

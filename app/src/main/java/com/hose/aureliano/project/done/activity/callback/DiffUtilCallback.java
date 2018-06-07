@@ -46,6 +46,6 @@ public class DiffUtilCallback<T extends BaseEntity> extends DiffUtil.Callback {
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
         T oldItem = oldList.get(oldItemPosition);
         T newItem = newList.get(newItemPosition);
-        return oldItem.getId().equals(newItem.getId());
+        return oldItem.equals(newItem);
     }
 }

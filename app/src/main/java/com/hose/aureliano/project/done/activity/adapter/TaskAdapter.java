@@ -54,7 +54,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     private List<Task> taskList;
     private Context context;
     private Integer listId;
-    private TasksViewEnum view;
+    private TasksViewEnum viewEnum;
     private ActionMode actionMode;
 
     /**
@@ -64,11 +64,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
      * @param listId  identifier of the list
      */
     public TaskAdapter(Context context, Integer listId,
-                       TasksViewEnum view) {
+                       TasksViewEnum viewEnum) {
         taskService = new TaskService(context);
         this.context = context;
         this.listId = listId;
-        this.view = view;
+        this.viewEnum = viewEnum;
         selectedIdsSet = new HashSet<>();
         initStaticResources();
         refresh();
@@ -78,7 +78,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
      * @return {@link TasksViewEnum}.
      */
     public TasksViewEnum getTasksView() {
-        return view;
+        return viewEnum;
     }
 
     @Override
@@ -153,6 +153,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
                 setVisibility(holder.reminderIcon, false);
                 setVisibility(holder.reminderText, false);
             }
+            setVisibility(holder.repeatDelimiter, null != task.getRepeatType());
+            setVisibility(holder.repeatIcon, null != task.getRepeatType());
             colorDueDate(task, holder, task.getDone());
         } else {
             setVisibility(holder.taskInfoLayout, false);
@@ -288,14 +290,20 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         return taskList;
     }
 
+    @Override
+    public void setItems(List<Task> items) {
+        taskList.clear();
+        taskList.addAll(items);
+    }
+
     /**
      * Refreshes data on UI.
      */
     public void refresh() {
         if (null != listId) {
             taskList = taskService.getTasks(listId);
-        } else if (null != view) {
-            taskList = taskService.getTasksForView(view);
+        } else if (null != viewEnum) {
+            taskList = taskService.getTasksForView(viewEnum);
         }
         notifyDataSetChanged();
     }
@@ -313,9 +321,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     @Override
     public void removeItems(List<Task> tasks) {
         for (Task task : tasks) {
-            taskList.remove(task);
+            int index = taskList.indexOf(task);
+            taskList.remove(index);
+            notifyItemRemoved(index);
         }
-        notifyDataSetChanged();
     }
 
     /**
@@ -421,6 +430,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         private TextView dueDateAndReminderDelimiter;
         private ImageView reminderIcon;
         private TextView reminderText;
+        private TextView repeatDelimiter;
+        private ImageView repeatIcon;
 
         /**
          * Controller.
@@ -433,6 +444,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
             this.dueDateIcon = view.findViewById(R.id.task_info_due_icon);
             this.dueDateText = view.findViewById(R.id.task_info_due_text);
             this.dueDateAndReminderDelimiter = view.findViewById(R.id.task_info_delimiter_before_reminder);
+            this.repeatDelimiter = view.findViewById(R.id.task_info_delimiter_before_repeat);
+            this.repeatIcon = view.findViewById(R.id.task_info_repeat_icon);
             this.reminderIcon = view.findViewById(R.id.task_info_reminder_icon);
             this.reminderText = view.findViewById(R.id.task_info_reminder_text);
             this.name = view.findViewById(R.id.task_name);

@@ -30,7 +30,7 @@ public class AlarmService {
      * @param task    instance of {@link Task}
      */
     public static void setTaskReminder(Context context, Task task) {
-        if (null != task.getRemindDateTime()) {
+        if (null != task.getRemindDateTime() && System.currentTimeMillis() <= task.getRemindDateTime()) {
             Intent intent = new Intent(context, ReminderReceiver.class);
             intent.putExtra(Task.Fields.NAME.fieldName(), task.getName());
             intent.putExtra(Task.Fields.ID.fieldName(), task.getId());

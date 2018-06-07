@@ -242,7 +242,14 @@ public class TasksActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        taskAdapter.refresh();
+        List<Task> oldTasks = new ArrayList<>(taskAdapter.getItems());
+        if (null != listId) {
+            taskAdapter.setItems(taskService.getTasks(listId));
+        } else {
+            taskAdapter.setItems(taskService.getTasksForView(viewEnum));
+        }
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtilCallback<>(oldTasks, taskAdapter.getItems()));
+        result.dispatchUpdatesTo(taskAdapter);
     }
 
     private boolean getAndRevertSortDirection(int key) {
@@ -266,8 +273,7 @@ public class TasksActivity extends AppCompatActivity {
         List<Task> newTasks = taskAdapter.getItems();
         List<Task> oldTasks = new ArrayList<>(newTasks);
         Collections.sort(newTasks, comparator);
-        DiffUtilCallback<Task> utilCallback = new DiffUtilCallback<>(oldTasks, newTasks);
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(utilCallback);
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtilCallback<>(oldTasks, newTasks));
         diffResult.dispatchUpdatesTo(taskAdapter);
         if (null == viewEnum) {
             taskAdapter.updatePositions();

@@ -60,7 +60,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
             changeRepeatFields(repeatText, repeatIcon, task);
             repeatClearView.setOnClickListener(view -> {
                 task.setRepeatType(null);
-                changeRepeatFields(repeatText, repeatIcon, task);
+                changeRepeatFieldsAndSave(repeatText, repeatIcon, task);
             });
             repeatView.setOnClickListener(view -> {
                 PopupMenu popupMenu = new PopupMenu(this, view);
@@ -96,6 +96,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
             changeDueDateFields(dueDateText, dueDateIcon, repeatView, task);
             dueDateClearView.setOnClickListener(view -> {
                 task.setDueDateTime(null);
+                task.setRepeatType(null);
                 repeatView.setVisibility(View.GONE);
                 changeDueDateFieldsAndSave(dueDateText, dueDateIcon, repeatView, task);
             });
@@ -173,13 +174,28 @@ public class TaskDetailsActivity extends AppCompatActivity {
             checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (task.getDone() != isChecked) {
                     task.setDone(buttonView.isChecked());
-                    taskService.update(task);
                 }
                 if (isChecked) {
                     AlarmService.cancelTaskReminder(this, task);
+                    if (null != task.getRepeatType()) {
+                        Task newTask = new Task();
+                        newTask.setListId(task.getListId());
+                        newTask.setName(task.getName());
+                        newTask.setRepeatType(task.getRepeatType());
+                        newTask.setCreatedDateTime(System.currentTimeMillis());
+                        newTask.setPosition(task.getPosition());
+                        newTask.setDueDateTime(CalendarUtils.getTime(task.getDueDateTime(), task.getRepeatType()));
+                        if (null != task.getRemindDateTime()) {
+                            newTask.setRemindDateTime(task.getRemindDateTime());
+                        }
+                        task.setRepeatType(null);
+                        changeRepeatFields(repeatText, repeatIcon, task);
+                        taskService.insert(newTask);
+                    }
                 } else {
                     AlarmService.setTaskReminder(this, task);
                 }
+                taskService.update(task);
                 prepareTaskName(taskNameView, isChecked);
                 doneCancelButtonIcon.setImageDrawable(isChecked ? DRAWABLE_CANCEL : DRAWABLE_DONE);
                 changeDueDateFieldsAndSave(dueDateText, dueDateIcon, repeatView, task);
@@ -234,7 +250,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
             repeatDateText.setTextColor(COLOR_BLACK_SECONDARY);
             repeatDateIcon.setColorFilter(COLOR_BLACK_SECONDARY);
             repeatDateText.setText(getString(R.string.task_repeat));
-            task.setRemindDateTime(null);
+            task.setRepeatType(null);
         } else {
             repeatDateText.setTextColor(COLOR_BLUE);
             repeatDateIcon.setColorFilter(COLOR_BLUE);
@@ -301,6 +317,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
             repeatView.setVisibility(View.VISIBLE);
             dueDateText.setText(ActivityUtils.getStringDate(this, task.getDueDateTime(), false));
         } else {
+            repeatView.setVisibility(View.GONE);
             dueDateText.setTextColor(COLOR_BLACK_SECONDARY);
             dueDateIcon.setColorFilter(COLOR_BLACK_SECONDARY);
             dueDateText.setText(getString(R.string.task_due_date));

@@ -200,6 +200,12 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
     }
 
     @Override
+    public void setItems(List<DoneList> items) {
+        doneLists.clear();
+        doneLists.addAll(items);
+    }
+
+    @Override
     public void removeItems(List<DoneList> lists) {
         for (DoneList list : lists) {
             doneLists.remove(list);
