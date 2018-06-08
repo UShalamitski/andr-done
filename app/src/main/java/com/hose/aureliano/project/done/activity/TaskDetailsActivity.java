@@ -186,19 +186,22 @@ public class TaskDetailsActivity extends AppCompatActivity {
                         newTask.setPosition(task.getPosition());
                         newTask.setDueDateTime(CalendarUtils.getTime(task.getDueDateTime(), task.getRepeatType()));
                         if (null != task.getRemindDateTime()) {
-                            newTask.setRemindDateTime(task.getRemindDateTime());
+                            newTask.setRemindDateTime(
+                                    CalendarUtils.getTime(task.getRemindDateTime(), task.getRepeatType()));
                         }
                         task.setRepeatType(null);
                         changeRepeatFields(repeatText, repeatIcon, task);
+                        AlarmService.setTaskReminder(this, newTask);
                         taskService.insert(newTask);
                     }
                 } else {
                     AlarmService.setTaskReminder(this, task);
                 }
-                taskService.update(task);
                 prepareTaskName(taskNameView, isChecked);
                 doneCancelButtonIcon.setImageDrawable(isChecked ? DRAWABLE_CANCEL : DRAWABLE_DONE);
-                changeDueDateFieldsAndSave(dueDateText, dueDateIcon, repeatView, task);
+                changeRemindDateFields(remindDateText, remindDateIcon, task);
+                changeDueDateFields(dueDateText, dueDateIcon, repeatView, task);
+                taskService.update(task);
                 ActivityUtils.vibrate(this);
             });
 
@@ -288,15 +291,20 @@ public class TaskDetailsActivity extends AppCompatActivity {
     }
 
     private void changeRemindDateFields(TextView remindDateText, ImageView remindDateIcon, Task task) {
-        if (null == task.getRemindDateTime() || System.currentTimeMillis() > task.getRemindDateTime()) {
+        if (null != task.getRemindDateTime() && System.currentTimeMillis() < task.getRemindDateTime()) {
+            if (task.getDone()) {
+                remindDateText.setTextColor(COLOR_BLACK_SECONDARY);
+                remindDateIcon.setColorFilter(COLOR_BLACK_SECONDARY);
+            } else {
+                remindDateText.setTextColor(COLOR_BLUE);
+                remindDateIcon.setColorFilter(COLOR_BLUE);
+            }
+            remindDateText.setText(ActivityUtils.getStringDate(this, task.getRemindDateTime(), true));
+        } else {
             remindDateText.setTextColor(COLOR_BLACK_SECONDARY);
             remindDateIcon.setColorFilter(COLOR_BLACK_SECONDARY);
             remindDateText.setText(getString(R.string.task_remind_me));
             task.setRemindDateTime(null);
-        } else {
-            remindDateText.setTextColor(COLOR_BLUE);
-            remindDateIcon.setColorFilter(COLOR_BLUE);
-            remindDateText.setText(ActivityUtils.getStringDate(this, task.getRemindDateTime(), true));
         }
     }
 
