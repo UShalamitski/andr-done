@@ -82,6 +82,32 @@ public class TaskService {
         return taskDao.insert(task);
     }
 
+
+    /**
+     * Creates new {@link Task} based on {@link Task#getRepeatType()}.
+     * Inserts it into database.
+     *
+     * @param task to repeat
+     */
+    public void createRepetitiveTask(Task task) {
+        if (null != task.getRepeatType()) {
+            Task newTask = new Task();
+            newTask.setListId(task.getListId());
+            newTask.setName(task.getName());
+            newTask.setRepeatType(task.getRepeatType());
+            newTask.setCreatedDateTime(System.currentTimeMillis());
+            newTask.setPosition(task.getPosition());
+            newTask.setDueDateTime(CalendarUtils.getTime(task.getDueDateTime(), task.getRepeatType()));
+            if (null != task.getRemindDateTime()) {
+                newTask.setRemindDateTime(
+                        CalendarUtils.getTime(task.getRemindDateTime(), task.getRepeatType()));
+            }
+            task.setRepeatType(null);
+            newTask.setId((int) insert(newTask));
+            AlarmService.setTaskReminder(context, newTask);
+        }
+    }
+
     /**
      * Inserts {@link Task}s.
      *

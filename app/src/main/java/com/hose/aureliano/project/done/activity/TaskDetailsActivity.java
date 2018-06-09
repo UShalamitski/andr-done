@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -178,21 +179,8 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 if (isChecked) {
                     AlarmService.cancelTaskReminder(this, task);
                     if (null != task.getRepeatType()) {
-                        Task newTask = new Task();
-                        newTask.setListId(task.getListId());
-                        newTask.setName(task.getName());
-                        newTask.setRepeatType(task.getRepeatType());
-                        newTask.setCreatedDateTime(System.currentTimeMillis());
-                        newTask.setPosition(task.getPosition());
-                        newTask.setDueDateTime(CalendarUtils.getTime(task.getDueDateTime(), task.getRepeatType()));
-                        if (null != task.getRemindDateTime()) {
-                            newTask.setRemindDateTime(
-                                    CalendarUtils.getTime(task.getRemindDateTime(), task.getRepeatType()));
-                        }
-                        task.setRepeatType(null);
+                        taskService.createRepetitiveTask(task);
                         changeRepeatFields(repeatText, repeatIcon, task);
-                        AlarmService.setTaskReminder(this, newTask);
-                        taskService.insert(newTask);
                     }
                 } else {
                     AlarmService.setTaskReminder(this, task);
@@ -220,6 +208,17 @@ public class TaskDetailsActivity extends AppCompatActivity {
                             onBackPressed();
                         });
             });
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

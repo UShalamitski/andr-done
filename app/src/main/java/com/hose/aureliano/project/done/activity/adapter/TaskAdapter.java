@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Paint;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.TaskDetailsActivity;
 import com.hose.aureliano.project.done.activity.adapter.api.Adapter;
+import com.hose.aureliano.project.done.activity.callback.DiffUtilCallback;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.model.TasksViewEnum;
 import com.hose.aureliano.project.done.service.TaskService;
@@ -94,7 +96,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
             } else {
                 Intent intent = new Intent(context, TaskDetailsActivity.class);
                 Task task = getItem(viewHolder.getAdapterPosition());
-                intent.putExtra("listId", listId);
+                intent.putExtra("listId", task.getListId());
                 intent.putExtra(Task.Fields.NAME.fieldName(), task.getName());
                 intent.putExtra(Task.Fields.ID.fieldName(), task.getId());
                 intent.putExtra(Task.Fields.DONE.fieldName(), task.getDone());
@@ -130,6 +132,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         holder.name.setText(task.getName());
         holder.name.setTextColor(task.getDone() ? COLOR_BLACK_SECONDARY : COLOR_BLACK_PRIMARY);
         crossOutText(holder, task.getDone());
+
+        holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setChecked(task.getDone());
 
         if (null != task.getDueDateTime()) {
@@ -163,16 +167,21 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             crossOutText(holder, isChecked);
             Task currentTask = getItem(buttonView);
-            if (currentTask.getDone() != buttonView.isChecked()) {
-                currentTask.setDone(buttonView.isChecked());
-                taskService.update(currentTask);
-            }
-            if (isChecked && null != currentTask.getRemindDateTime()) {
-                setVisibility(holder.reminderIcon, false);
-                setVisibility(holder.reminderText, false);
-                setVisibility(holder.dueDateAndReminderDelimiter, false);
-                AlarmService.cancelTaskReminder(context, currentTask);
-            } else if (!isChecked && null != currentTask.getRemindDateTime()) {
+            currentTask.setDone(isChecked);
+            if (isChecked) {
+                if (null != currentTask.getRemindDateTime()) {
+                    setVisibility(holder.reminderIcon, false);
+                    setVisibility(holder.reminderText, false);
+                    setVisibility(holder.dueDateAndReminderDelimiter, false);
+                    AlarmService.cancelTaskReminder(context, currentTask);
+                }
+                if (null != currentTask.getRepeatType()) {
+                    setVisibility(holder.repeatDelimiter, false);
+                    setVisibility(holder.repeatIcon, false);
+                    taskService.createRepetitiveTask(currentTask);
+                    currentTask.setRepeatType(null);
+                }
+            } else if (null != currentTask.getRemindDateTime()) {
                 if (currentTask.getRemindDateTime() > System.currentTimeMillis()) {
                     AlarmService.setTaskReminder(context, currentTask);
                     setVisibility(holder.taskInfoLayout, true);
@@ -187,11 +196,27 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
                     setVisibility(holder.dueDateAndReminderDelimiter, false);
                 }
             }
+            taskService.update(currentTask);
+            updatesAdapterItems();
             colorDueDate(currentTask, holder, isChecked);
             holder.name.setTextColor(isChecked ? COLOR_BLACK_SECONDARY : COLOR_BLACK_PRIMARY);
         });
         holder.viewForeground.setBackgroundColor(
                 selectedIdsSet.contains(holder.getAdapterPosition()) ? COLOR_GRAY_LIGHT : COLOR_WHITE);
+    }
+
+    /**
+     * Updates adapter items showing in UI with animation.
+     */
+    public void updatesAdapterItems() {
+        List<Task> oldTasks = new ArrayList<>(getItems());
+        if (null != listId) {
+            setItems(taskService.getTasks(listId));
+        } else {
+            setItems(taskService.getTasksForView(viewEnum));
+        }
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtilCallback<>(oldTasks, getItems()));
+        result.dispatchUpdatesTo(this);
     }
 
     /**

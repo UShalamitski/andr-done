@@ -48,13 +48,15 @@ public class AlarmService {
      * @param task    instance of {@link Task}
      */
     public static void cancelTaskReminder(Context context, Task task) {
-        Intent intent = new Intent(context, ReminderReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, task.getId(), intent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        if (manager != null) {
-            manager.cancel(pendingIntent);
-            pendingIntent.cancel();
+        if (null != task.getRemindDateTime()) {
+            Intent intent = new Intent(context, ReminderReceiver.class);
+            PendingIntent pendingIntent =
+                    PendingIntent.getBroadcast(context, task.getId(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
+            AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            if (manager != null) {
+                manager.cancel(pendingIntent);
+                pendingIntent.cancel();
+            }
         }
     }
 

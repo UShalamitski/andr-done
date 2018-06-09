@@ -3,6 +3,7 @@ package com.hose.aureliano.project.done.activity.helper;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -37,12 +38,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
-    private static int COLOR_PRIMARY;
-    private static int COLOR_RED;
-    private static int COLOR_GREEN;
-    private static int COLOR_GRAY;
-    private static Drawable DRAWABLE_CANCEL;
-    private static Drawable DRAWABLE_DONE;
+    private static ColorDrawable DRAWABLE_COLOR_PRIMARY;
+    private static ColorDrawable DRAWABLE_COLOR_RED;
+    private static ColorDrawable DRAWABLE_COLOR_GREEN;
+    private static ColorDrawable DRAWABLE_COLOR_GRAY;
+    private static Drawable DRAWABLE_DRAWABLE_CANCEL;
+    private static Drawable DRAWABLE_DRAWABLE_DONE;
 
     private TaskService taskService;
     private TaskAdapter adapter;
@@ -58,6 +59,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(5);
     private Map<Task, ScheduledFuture> itemsToRemoveMap = new HashMap<>();
+    private Map<Integer, Float> previousDxMap = new HashMap<>();
 
     public TaskItemTouchHelper(Context context, TaskAdapter adapter, View coordinator) {
         super(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
@@ -114,22 +116,25 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
         View view = null;
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             view = ((TaskAdapter.ViewHolder) viewHolder).getViewForeground();
-            if (dX > 0) {
+            Float previousDx = previousDxMap.get(viewHolder.getAdapterPosition());
+            if (dX > 0 && (null == previousDx || previousDx < dX)) {
                 if (taskViewHolder.getCheckBox().isChecked()) {
-                    taskViewHolder.getViewBackground().setBackgroundColor(COLOR_GRAY);
-                    taskViewHolder.getBackgroundLeftIcon().setImageDrawable(DRAWABLE_CANCEL);
-                    taskViewHolder.getBackgroundLeftText().setText(R.string.cancel);
-                } else {
-                    taskViewHolder.getViewBackground().setBackgroundColor(COLOR_GREEN);
-                    taskViewHolder.getBackgroundLeftIcon().setImageDrawable(DRAWABLE_DONE);
+                    if (!taskViewHolder.getViewBackground().getBackground().equals(DRAWABLE_COLOR_GRAY)) {
+                        taskViewHolder.getViewBackground().setBackground(DRAWABLE_COLOR_GRAY);
+                        taskViewHolder.getBackgroundLeftIcon().setImageDrawable(DRAWABLE_DRAWABLE_CANCEL);
+                        taskViewHolder.getBackgroundLeftText().setText(R.string.cancel);
+                    }
+                } else if (!taskViewHolder.getViewBackground().getBackground().equals(DRAWABLE_COLOR_GREEN)) {
+                    taskViewHolder.getViewBackground().setBackground(DRAWABLE_COLOR_GREEN);
+                    taskViewHolder.getBackgroundLeftIcon().setImageDrawable(DRAWABLE_DRAWABLE_DONE);
                     taskViewHolder.getBackgroundLeftText().setText(R.string.done);
                 }
                 taskViewHolder.getBackgroundLeftIcon().setVisibility(View.VISIBLE);
                 taskViewHolder.getBackgroundLeftText().setVisibility(View.VISIBLE);
                 taskViewHolder.getBackgroundRightIcon().setVisibility(View.GONE);
                 taskViewHolder.getBackgroundRightText().setVisibility(View.GONE);
-            } else if (dX < 0) {
-                taskViewHolder.getViewBackground().setBackgroundColor(COLOR_RED);
+            } else if (dX < 0 && !taskViewHolder.getViewBackground().getBackground().equals(DRAWABLE_COLOR_RED)) {
+                taskViewHolder.getViewBackground().setBackground(DRAWABLE_COLOR_RED);
                 taskViewHolder.getBackgroundLeftIcon().setVisibility(View.GONE);
                 taskViewHolder.getBackgroundLeftText().setVisibility(View.GONE);
                 taskViewHolder.getBackgroundRightIcon().setVisibility(View.VISIBLE);
@@ -138,6 +143,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
         } else if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
             view = ((TaskAdapter.ViewHolder) viewHolder).getView();
         }
+        previousDxMap.put(viewHolder.getAdapterPosition(), dX);
         getDefaultUIUtil().onDraw(c, recyclerView, view, dX, dY, actionState, isCurrentlyActive);
     }
 
@@ -155,7 +161,8 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                             actionMode = mode;
                             mode.getMenuInflater().inflate(R.menu.menu_tasks_selected, menu);
                             adapter.toggleSelection(holder, mode);
-                            ((Activity) context).getWindow().setStatusBarColor(COLOR_GRAY);
+                            ((Activity) context)
+                                    .getWindow().setStatusBarColor(ContextCompat.getColor(context, R.color.gray));
                             return true;
                         } else {
                             return false;
@@ -230,7 +237,8 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                     public void onDestroyActionMode(ActionMode mode) {
                         actionMode = null;
                         adapter.clearSelection();
-                        ((Activity) context).getWindow().setStatusBarColor(COLOR_PRIMARY);
+                        ((Activity) context)
+                                .getWindow().setStatusBarColor(ContextCompat.getColor(context, R.color.gray));
                     }
                 });
             }
@@ -278,7 +286,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
             } else {
                 TaskAdapter.ViewHolder holder = ((TaskAdapter.ViewHolder) viewHolder);
                 holder.getCheckBox().setChecked(!holder.getCheckBox().isChecked());
-                adapter.notifyDataSetChanged();
+                adapter.notifyItemChanged(viewHolder.getAdapterPosition());
             }
         }
         ActivityUtils.vibrate(context);
@@ -299,23 +307,23 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     }
 
     private void initStaticVariables() {
-        if (0 == COLOR_PRIMARY) {
-            COLOR_PRIMARY = ContextCompat.getColor(context, R.color.colorPrimary);
+        if (null == DRAWABLE_COLOR_PRIMARY) {
+            DRAWABLE_COLOR_PRIMARY = new ColorDrawable(ContextCompat.getColor(context, R.color.colorPrimary));
         }
-        if (0 == COLOR_RED) {
-            COLOR_RED = ContextCompat.getColor(context, R.color.red);
+        if (null == DRAWABLE_COLOR_RED) {
+            DRAWABLE_COLOR_RED = new ColorDrawable(ContextCompat.getColor(context, R.color.red));
         }
-        if (0 == COLOR_GREEN) {
-            COLOR_GREEN = ContextCompat.getColor(context, R.color.green);
+        if (null == DRAWABLE_COLOR_GREEN) {
+            DRAWABLE_COLOR_GREEN = new ColorDrawable(ContextCompat.getColor(context, R.color.green));
         }
-        if (0 == COLOR_GRAY) {
-            COLOR_GRAY = ContextCompat.getColor(context, R.color.gray);
+        if (null == DRAWABLE_COLOR_GRAY) {
+            DRAWABLE_COLOR_GRAY = new ColorDrawable(ContextCompat.getColor(context, R.color.gray));
         }
-        if (null == DRAWABLE_CANCEL) {
-            DRAWABLE_CANCEL = ContextCompat.getDrawable(context, R.drawable.icon_cancel_white_24dp);
+        if (null == DRAWABLE_DRAWABLE_CANCEL) {
+            DRAWABLE_DRAWABLE_CANCEL = ContextCompat.getDrawable(context, R.drawable.icon_cancel_white_24dp);
         }
-        if (null == DRAWABLE_DONE) {
-            DRAWABLE_DONE = ContextCompat.getDrawable(context, R.drawable.icon_done_white_24dp);
+        if (null == DRAWABLE_DRAWABLE_DONE) {
+            DRAWABLE_DRAWABLE_DONE = ContextCompat.getDrawable(context, R.drawable.icon_done_white_24dp);
         }
     }
 }

@@ -2,6 +2,7 @@ package com.hose.aureliano.project.done.activity;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -47,6 +48,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Activity fot displaying all TODOs for selected list.
@@ -64,7 +67,10 @@ public class TasksActivity extends AppCompatActivity {
     private ViewGroup decorView;
     private TaskAdapter taskAdapter;
     private TasksViewEnum viewEnum;
+    private RecyclerViewEmptySupport recyclerView;
     private FloatingActionButton floatingActionButton;
+
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
     private TaskService taskService = new TaskService(this);
     private SparseBooleanArray sortMap = new SparseBooleanArray();
 
@@ -90,10 +96,10 @@ public class TasksActivity extends AppCompatActivity {
         coordinator = findViewById(R.id.tasks_coordinator_layout);
         taskAdapter = new TaskAdapter(this, listId, viewEnum);
 
-        RecyclerViewEmptySupport listView = findViewById(R.id.activity_tasks_list_view);
-        listView.setEmptyView(findViewById(R.id.activity_tasks_empty_view));
-        listView.setAdapter(taskAdapter);
-        listView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        recyclerView = findViewById(R.id.activity_tasks_list_view);
+        recyclerView.setEmptyView(findViewById(R.id.activity_tasks_empty_view));
+        recyclerView.setAdapter(taskAdapter);
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         floatingActionButton = findViewById(R.id.activity_tasks_fab);
 
@@ -158,7 +164,7 @@ public class TasksActivity extends AppCompatActivity {
                         taskAdapter.getItems().add(task);
                         int adapterPos = taskAdapter.getItems().indexOf(task);
                         taskAdapter.notifyItemInserted(adapterPos);
-                        listView.scrollToPosition(adapterPos);
+                        recyclerView.scrollToPosition(adapterPos);
                         newTaskEditText.setText(StringUtils.EMPTY);
                     });
                 }
@@ -185,7 +191,7 @@ public class TasksActivity extends AppCompatActivity {
         sortMap.append(R.id.menu_tasks_sort_due_date, true);
         sortMap.append(R.id.menu_tasks_sort_create_date, true);
 
-        new ItemTouchHelper(new TaskItemTouchHelper(this, taskAdapter, coordinator)).attachToRecyclerView(listView);
+        new ItemTouchHelper(new TaskItemTouchHelper(this, taskAdapter, coordinator)).attachToRecyclerView(recyclerView);
     }
 
     @Override
@@ -240,16 +246,9 @@ public class TasksActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
-        List<Task> oldTasks = new ArrayList<>(taskAdapter.getItems());
-        if (null != listId) {
-            taskAdapter.setItems(taskService.getTasks(listId));
-        } else {
-            taskAdapter.setItems(taskService.getTasksForView(viewEnum));
-        }
-        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtilCallback<>(oldTasks, taskAdapter.getItems()));
-        result.dispatchUpdatesTo(taskAdapter);
+        taskAdapter.updatesAdapterItems();
     }
 
     private boolean getAndRevertSortDirection(int key) {
@@ -273,11 +272,18 @@ public class TasksActivity extends AppCompatActivity {
         List<Task> newTasks = taskAdapter.getItems();
         List<Task> oldTasks = new ArrayList<>(newTasks);
         Collections.sort(newTasks, comparator);
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtilCallback<>(oldTasks, newTasks));
+
+        Parcelable recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
+        DiffUtil.DiffResult diffResult =
+                DiffUtil.calculateDiff(new DiffUtilCallback<>(oldTasks, newTasks), newTasks.size() < 20);
         diffResult.dispatchUpdatesTo(taskAdapter);
+        recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+
         if (null == viewEnum) {
-            taskAdapter.updatePositions();
-            taskService.update(newTasks);
+            executor.submit(() -> {
+                taskAdapter.updatePositions();
+                taskService.update(newTasks);
+            });
         }
     }
 }
