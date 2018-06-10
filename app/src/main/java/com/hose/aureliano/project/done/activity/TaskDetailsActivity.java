@@ -224,7 +224,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
             View deleteButton = findViewById(R.id.task_detail_bottom_bar_delete);
             deleteButton.setOnClickListener(view -> {
-                ActivityUtils.showConfirmationDialog(this, R.string.task_delete_confirmation,
+                ActivityUtils.showConfirmationDialog(this, R.string.task_details_delete_confirmation,
                         (dialog, which) -> {
                             taskService.delete(task);
                             onBackPressed();

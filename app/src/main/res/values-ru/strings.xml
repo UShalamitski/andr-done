@@ -63,6 +63,7 @@
     <string name="task.selected">Выбрано: %s</string>
     <string name="tasks.overdue.notification.title">Просроченные задачи: %s</string>
     <string name="tasks.overdue.notification.text">Нажмите, чтобы просмотреть</string>
+    <string name="task_details.delete.confirmation">Вы уверены, что хотите удалить задачу?</string>
 
     <string name="list.delete.confirmation">Вы уверены, что хотите удалить выбранный список?</string>
     <string name="list.add_new">Добавить список</string>
