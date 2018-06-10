@@ -30,11 +30,21 @@ public class AlarmService {
      * @param task    instance of {@link Task}
      */
     public static void setTaskReminder(Context context, Task task) {
-        if (null != task.getRemindDateTime() && System.currentTimeMillis() <= task.getRemindDateTime()) {
+        if (!task.getDone() && null != task.getRemindDateTime()
+                && System.currentTimeMillis() <= task.getRemindDateTime()) {
             Intent intent = new Intent(context, ReminderReceiver.class);
-            intent.putExtra(Task.Fields.NAME.fieldName(), task.getName());
-            intent.putExtra(Task.Fields.ID.fieldName(), task.getId());
             intent.putExtra(Task.Fields.LIST_ID.fieldName(), task.getListId());
+            intent.putExtra(Task.Fields.LIST_NAME.fieldName(), task.getListName());
+            intent.putExtra(Task.Fields.NAME.fieldName(), task.getName());
+            intent.putExtra(Task.Fields.NOTE.fieldName(), task.getNote());
+            intent.putExtra(Task.Fields.ID.fieldName(), task.getId());
+            intent.putExtra(Task.Fields.DONE.fieldName(), task.getDone());
+            intent.putExtra(Task.Fields.DUE_DATE_TIME.fieldName(), task.getDueDateTime());
+            intent.putExtra(Task.Fields.REMIND_DATE_TIME.fieldName(), task.getRemindDateTime());
+            intent.putExtra(Task.Fields.CREATED_DATE_TIME.fieldName(), task.getCreatedDateTime());
+            intent.putExtra(Task.Fields.POSITION.fieldName(), task.getPosition());
+            intent.putExtra(Task.Fields.REPEAT_TYPE.fieldName(),
+                    null != task.getRepeatType() ? task.getRepeatType().name() : null);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, task.getId(), intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
             setAlarm(context, pendingIntent, task.getRemindDateTime());

@@ -36,9 +36,9 @@ public class ReminderReceiver extends BroadcastReceiver {
             taskService = new TaskService(context);
             int taskId = extras.getInt(Task.Fields.ID.fieldName());
 
-            Intent contentIntent = new Intent().setClass(context, TasksActivity.class);;
-            contentIntent.putExtra("listId", extras.getString(Task.Fields.LIST_ID.fieldName()));
-            contentIntent.putExtra("name", extras.getString(Task.Fields.NAME.fieldName()));
+            Intent contentIntent = new Intent().setClass(context, TasksActivity.class);
+            contentIntent.putExtras(extras);
+            contentIntent.putExtra("title", extras.getString(Task.Fields.LIST_NAME.fieldName()));
             contentIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);

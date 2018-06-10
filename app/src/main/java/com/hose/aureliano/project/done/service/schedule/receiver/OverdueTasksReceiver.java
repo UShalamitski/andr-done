@@ -12,6 +12,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.ListsActivity;
+import com.hose.aureliano.project.done.model.TasksViewEnum;
 import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 
@@ -34,7 +35,7 @@ public class OverdueTasksReceiver extends BroadcastReceiver {
         int overdueTasksCount = CollectionUtils.size(new TaskService(context).getOverdueTasks());
         if (0 < overdueTasksCount) {
             Intent contentIntent = new Intent().setClass(context, ListsActivity.class);
-            contentIntent.putExtra("view", "overdue");
+            contentIntent.putExtra("view", TasksViewEnum.OVERDUE);
             contentIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);

@@ -47,6 +47,12 @@ public interface TaskDao {
     @Query("SELECT t.id, t.listId, l.name AS listName, t.name, t.note, t.dueDateTime, t.remindDateTime, t.done, t.position, t.createdDateTime, t.repeatType " +
             "FROM tasks t " +
             "INNER JOIN lists l ON l.id = t.listId " +
+            "WHERE t.id = :id")
+    Task readById(Integer id);
+
+    @Query("SELECT t.id, t.listId, l.name AS listName, t.name, t.note, t.dueDateTime, t.remindDateTime, t.done, t.position, t.createdDateTime, t.repeatType " +
+            "FROM tasks t " +
+            "INNER JOIN lists l ON l.id = t.listId " +
             "WHERE t.listId = :listId ORDER BY CASE WHEN t.position IS NULL THEN 1 ELSE 0 END, t.position, t.createdDateTime")
     List<Task> readByListId(Integer listId);
 

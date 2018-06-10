@@ -1,6 +1,7 @@
 package com.hose.aureliano.project.done.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -84,17 +85,18 @@ public class TasksActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.icon_arrow_back_white_24);
         setSupportActionBar(toolbar);
 
-        viewEnum = null != getIntent().getExtras().get("view")
-                ? (TasksViewEnum) getIntent().getExtras().get("view") : null;
+        Bundle extras = getIntent().getExtras();
+        viewEnum = null != extras.get("view")
+                ? (TasksViewEnum) extras.get("view") : null;
         if (null != viewEnum) {
             setTitle(getString(R.string.view));
-            toolbar.setSubtitle(getIntent().getStringExtra("title"));
+            toolbar.setSubtitle(extras.getString("title"));
         } else {
-            listName = getIntent().getStringExtra("title");
+            listName = extras.getString("title");
             setTitle(listName);
         }
 
-        listId = (Integer) getIntent().getExtras().get("listId");
+        listId = (Integer) extras.get(Task.Fields.LIST_ID.fieldName());
         coordinator = findViewById(R.id.tasks_coordinator_layout);
         taskAdapter = new TaskAdapter(this, listId, viewEnum);
 
@@ -194,6 +196,12 @@ public class TasksActivity extends AppCompatActivity {
         sortMap.append(R.id.menu_tasks_sort_name, true);
         sortMap.append(R.id.menu_tasks_sort_due_date, true);
         sortMap.append(R.id.menu_tasks_sort_create_date, true);
+
+        if (null != extras.get(Task.Fields.ID.fieldName())) {
+            Intent intent = new Intent(this, TaskDetailsActivity.class);
+            intent.putExtras(extras);
+            startActivity(intent);
+        }
 
         new ItemTouchHelper(new TaskItemTouchHelper(this, taskAdapter, coordinator)).attachToRecyclerView(recyclerView);
     }
