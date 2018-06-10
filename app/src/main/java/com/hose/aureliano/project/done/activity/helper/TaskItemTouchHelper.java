@@ -57,7 +57,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     private ActionMode actionMode;
     private TaskAdapter.ViewHolder holder;
 
-    private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(5);
+    private ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(10);
     private Map<Task, ScheduledFuture> itemsToRemoveMap = new HashMap<>();
     private Map<Integer, Float> previousDxMap = new HashMap<>();
 
@@ -100,8 +100,8 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
             int i = 0;
             for (Task task : adapter.getItems()) {
                 task.setPosition(i++);
-                taskService.update(task);
             }
+            executorService.submit(() -> taskService.update(adapter.getItems()));
         }
         fromPosition = null;
         toPosition = null;
@@ -191,7 +191,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                                 ActivityUtils.showSnackBar(coordinator, context.getString(R.string.task_duplicate));
                                 break;
                             case R.id.menu_tasks_selected_move:
-                                new SelectListModal(context, listId -> {
+                                new SelectListModal(context, (listId, listName) -> {
                                     int position = taskService.getAvailablePosition(listId);
                                     for (Task task : adapter.getSelectedTasks()) {
                                         task.setListId(listId);
@@ -207,7 +207,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                                 ActivityUtils.showConfirmationDialog(context, R.string.task_delete_selected_confirmation,
                                         (dialog, which) -> {
                                             List<Task> selectedTasks = adapter.getSelectedTasks();
-                                            taskService.delete(selectedTasks);
+                                            executorService.submit(() -> taskService.delete(selectedTasks));
                                             adapter.removeItems(selectedTasks);
                                             actionMode.finish();
                                         });

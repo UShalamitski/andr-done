@@ -15,7 +15,7 @@ import com.hose.aureliano.project.done.repository.dao.TaskDao;
  *
  * @author evere
  */
-@Database(entities = {DoneList.class, Task.class}, version = 1)
+@Database(entities = {DoneList.class, Task.class}, version = 1, exportSchema = false)
 public abstract class DoneDatabase extends RoomDatabase {
 
     public abstract DoneListDao getDoneListDao();

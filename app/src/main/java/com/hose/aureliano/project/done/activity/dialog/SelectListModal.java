@@ -38,7 +38,7 @@ public class SelectListModal {
             listsNames.add(list.getName());
         }
         builder.setItems(listsNames.toArray(new String[CollectionUtils.size(lists)]), (dialog, which) -> {
-            handler.handle(lists.get(which).getId());
+            handler.handle(lists.get(which).getId(), lists.get(which).getName());
         });
         builder.setNegativeButton(R.string.cancel, null);
         builder.create().show();
@@ -54,6 +54,6 @@ public class SelectListModal {
          *
          * @param listId identifier of selected list
          */
-        void handle(Integer listId);
+        void handle(Integer listId, String listName);
     }
 }

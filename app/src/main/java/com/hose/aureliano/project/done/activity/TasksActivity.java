@@ -61,6 +61,7 @@ import java.util.concurrent.Executors;
 public class TasksActivity extends AppCompatActivity {
 
     private Integer listId;
+    private String listName;
     private View coordinator;
     private View backgroundView;
     private View bottomView;
@@ -89,7 +90,8 @@ public class TasksActivity extends AppCompatActivity {
             setTitle(getString(R.string.view));
             toolbar.setSubtitle(getIntent().getStringExtra("title"));
         } else {
-            setTitle(getIntent().getStringExtra("title"));
+            listName = getIntent().getStringExtra("title");
+            setTitle(listName);
         }
 
         listId = (Integer) getIntent().getExtras().get("listId");
@@ -152,6 +154,7 @@ public class TasksActivity extends AppCompatActivity {
                 if (actionId == EditorInfo.IME_ACTION_DONE && StringUtils.isNotBlank(newTaskEditText.getText().toString())) {
                     Task task = new Task();
                     task.setListId(listId);
+                    task.setListName(listName);
                     task.setName(newTaskEditText.getText().toString());
                     task.setCreatedDateTime(new Date().getTime());
                     task.setPosition(taskService.getAvailablePosition(listId));
@@ -174,7 +177,8 @@ public class TasksActivity extends AppCompatActivity {
             floatingActionButton.setVisibility(View.VISIBLE);
             floatingActionButton.setOnClickListener(view -> {
                 if (null != viewEnum) {
-                    new SelectListModal(this, listId -> {
+                    new SelectListModal(this, (listId, listName) -> {
+                        this.listName = listName;
                         this.listId = listId;
                         showAddNewTaskView(inputManager, newTaskEditText);
                     });

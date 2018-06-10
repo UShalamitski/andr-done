@@ -24,15 +24,13 @@ public class CustomEditText extends EditText {
 
     @Override
     public boolean onKeyPreIme(int keyCode, KeyEvent event) {
-        if (event.getAction() != KeyEvent.ACTION_DOWN) {
             if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-                dispatchKeyEvent(event);
+                clearFocus();
                 if (listener != null) {
                     listener.handle();
                 }
                 return false;
             }
-        }
         return super.onKeyPreIme(keyCode, event);
     }
 

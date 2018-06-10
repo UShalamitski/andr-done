@@ -9,8 +9,12 @@ import com.hose.aureliano.project.done.repository.dao.TaskDao;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.CalendarUtils;
 
+import org.apache.commons.collections4.ListUtils;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.Executors;
 
 /**
  * Service logic for tasks.
@@ -89,23 +93,23 @@ public class TaskService {
      *
      * @param task to repeat
      */
-    public void createRepetitiveTask(Task task) {
-        if (null != task.getRepeatType()) {
-            Task newTask = new Task();
-            newTask.setListId(task.getListId());
-            newTask.setName(task.getName());
-            newTask.setRepeatType(task.getRepeatType());
-            newTask.setCreatedDateTime(System.currentTimeMillis());
-            newTask.setPosition(task.getPosition());
-            newTask.setDueDateTime(CalendarUtils.getTime(task.getDueDateTime(), task.getRepeatType()));
-            if (null != task.getRemindDateTime()) {
-                newTask.setRemindDateTime(
-                        CalendarUtils.getTime(task.getRemindDateTime(), task.getRepeatType()));
-            }
-            task.setRepeatType(null);
-            newTask.setId((int) insert(newTask));
-            AlarmService.setTaskReminder(context, newTask);
+    public Task createRepetitiveTask(Task task) {
+        Task newTask = new Task();
+        newTask.setRepeatType(Objects.requireNonNull(task.getRepeatType()));
+        newTask.setListId(task.getListId());
+        newTask.setName(task.getName());
+        newTask.setNote(task.getNote());
+        newTask.setCreatedDateTime(System.currentTimeMillis());
+        newTask.setPosition(task.getPosition());
+        newTask.setDueDateTime(CalendarUtils.getTime(task.getDueDateTime(), task.getRepeatType()));
+        if (null != task.getRemindDateTime()) {
+            newTask.setRemindDateTime(
+                    CalendarUtils.getTime(task.getRemindDateTime(), task.getRepeatType()));
         }
+        task.setRepeatType(null);
+        newTask.setId((int) insert(newTask));
+        AlarmService.setTaskReminder(context, newTask);
+        return newTask;
     }
 
     /**
@@ -119,12 +123,15 @@ public class TaskService {
             task.setId(null);
             task.setPosition(position++);
             task.setDone(false);
-            Integer taskId = (int) taskDao.insert(task);
-            if (null != task.getRemindDateTime() && System.currentTimeMillis() < task.getRemindDateTime()) {
-                task.setId(taskId);
-                AlarmService.setTaskReminder(context, task);
-            }
         }
+        List<Long> taskIds = taskDao.insert(tasks);
+        Executors.newSingleThreadExecutor().submit(() -> {
+            for (List<Long> partition : ListUtils.partition(taskIds, 900)) {
+                for (Task task : taskDao.readNotCompletedWithReminderByIds(partition)) {
+                    AlarmService.setTaskReminder(context, task);
+                }
+            }
+        });
     }
 
     /**
@@ -143,9 +150,7 @@ public class TaskService {
      * @param tasks list of {@link Task} to update
      */
     public void update(List<Task> tasks) {
-        for (Task task : tasks) {
-            update(task);
-        }
+        taskDao.update(tasks);
     }
 
     /**
@@ -177,8 +182,9 @@ public class TaskService {
      * @param tasks list of {@link Task}s to remove
      */
     public void delete(List<Task> tasks) {
+        taskDao.delete(tasks);
         for (Task task : tasks) {
-            delete(task);
+            AlarmService.cancelTaskReminder(context, task);
         }
     }
 

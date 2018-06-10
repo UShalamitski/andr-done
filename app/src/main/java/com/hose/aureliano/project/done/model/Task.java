@@ -19,7 +19,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class Task extends BaseEntity {
 
     private Integer listId;
+    private String listName;
     private String name;
+    private String note;
     private Long dueDateTime;
     private Long remindDateTime;
     private boolean done;
@@ -39,12 +41,28 @@ public class Task extends BaseEntity {
         this.listId = listId;
     }
 
+    public String getListName() {
+        return listName;
+    }
+
+    public void setListName(String listName) {
+        this.listName = listName;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public boolean getDone() {
@@ -107,6 +125,7 @@ public class Task extends BaseEntity {
         return new EqualsBuilder()
                 .appendSuper(super.equals(that))
                 .append(listId, that.listId)
+                .append(listName, that.listName)
                 .append(name, that.name)
                 .append(done, that.done)
                 .append(dueDateTime, that.dueDateTime)
@@ -122,7 +141,9 @@ public class Task extends BaseEntity {
         return new HashCodeBuilder(17, 37)
                 .appendSuper(super.hashCode())
                 .append(listId)
+                .append(listName)
                 .append(name)
+                .append(note)
                 .append(done)
                 .append(dueDateTime)
                 .append(remindDateTime)
@@ -135,6 +156,8 @@ public class Task extends BaseEntity {
     public enum Fields {
         ID("id"),
         LIST_ID("listId"),
+        LIST_NAME("listName"),
+        NOTE("note"),
         NAME("name"),
         DONE("done"),
         POSITION("position"),

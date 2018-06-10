@@ -82,18 +82,18 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="45dp"
+                android:ellipsize="end"
                 android:maxLines="1"
                 android:textAppearance="?android:textAppearanceMedium"
                 android:textColor="@color/black_primary" />
 
             <RelativeLayout
                 android:id="@+id/task_info_layout"
-                android:layout_width="wrap_content"
+                android:layout_width="307dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/task_name"
-                android:layout_marginEnd="40dp"
                 android:layout_marginStart="45dp">
 
                 <ImageView
@@ -107,7 +107,7 @@
                     android:id="@+id/task_info_due_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginEnd="7.5dp"
                     android:layout_marginStart="5dp"
                     android:layout_toEndOf="@+id/task_info_due_icon"
                     android:fontFamily="sans-serif"
@@ -118,7 +118,7 @@
                     android:id="@+id/task_info_delimiter_before_reminder"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginEnd="7.5dp"
                     android:layout_toEndOf="@+id/task_info_due_text"
                     android:fontFamily="sans-serif"
                     android:text="-"
@@ -128,8 +128,8 @@
                     android:id="@+id/task_info_reminder_icon"
                     android:layout_width="14dp"
                     android:layout_height="14dp"
-                    android:layout_marginEnd="10dp"
                     android:layout_centerVertical="true"
+                    android:layout_marginEnd="7.5dp"
                     android:layout_toEndOf="@+id/task_info_delimiter_before_reminder"
                     android:src="@drawable/icon_alarm_white_24dp"
                     android:tint="@color/black_secondary" />
@@ -138,7 +138,7 @@
                     android:id="@+id/task_info_reminder_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginEnd="7.5dp"
                     android:layout_marginStart="-5dp"
                     android:layout_toEndOf="@+id/task_info_reminder_icon"
                     android:textAppearance="?android:textAppearanceSmall" />
@@ -147,7 +147,7 @@
                     android:id="@+id/task_info_delimiter_before_repeat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginEnd="7.5dp"
                     android:layout_toEndOf="@+id/task_info_reminder_text"
                     android:fontFamily="sans-serif"
                     android:text="-"
@@ -158,9 +158,33 @@
                     android:layout_width="14dp"
                     android:layout_height="14dp"
                     android:layout_centerVertical="true"
+                    android:layout_marginEnd="7.5dp"
                     android:layout_toEndOf="@+id/task_info_delimiter_before_repeat"
                     android:src="@drawable/icon_repeat_white_24"
                     android:tint="@color/black_secondary" />
+
+                <TextView
+                    android:id="@+id/task_info_delimiter_before_list_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="7.5dp"
+                    android:layout_toEndOf="@+id/task_info_repeat_icon"
+                    android:fontFamily="sans-serif"
+                    android:text="-"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/task_info_list_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="7.5dp"
+                    android:layout_toEndOf="@+id/task_info_delimiter_before_list_name"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif"
+                    android:maxLines="1"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:visibility="gone" />
             </RelativeLayout>
         </RelativeLayout>
 

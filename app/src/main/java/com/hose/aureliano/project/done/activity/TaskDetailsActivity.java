@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -48,11 +49,23 @@ public class TaskDetailsActivity extends AppCompatActivity {
         Task task;
         if (null != extras) {
             task = buildTask(extras);
-            task.setListId(extras.getInt("listId"));
+            setTitle(task.getListName());
 
             EditText taskNameView = findViewById(R.id.task_details_main_text);
             taskNameView.setText(task.getName());
             prepareTaskName(taskNameView, task.getDone());
+            taskNameView.setOnEditorActionListener((textView, actionId, keyEvent) -> {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    taskNameView.clearFocus();
+                }
+                return true;
+            });
+            taskNameView.setOnFocusChangeListener((View view, boolean hasFocus) -> {
+                if (!hasFocus) {
+                    task.setName(StringUtils.trimToEmpty(taskNameView.getText().toString()));
+                    taskService.update(task);
+                }
+            });
 
             View repeatView = findViewById(R.id.task_details_repeat);
             ImageView repeatIcon = findViewById(R.id.task_details_repeat_icon);
@@ -193,6 +206,15 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 ActivityUtils.vibrate(this);
             });
 
+            EditText taskNoteView = findViewById(R.id.task_details_note_text);
+            taskNoteView.setText(task.getNote());
+            taskNoteView.setOnFocusChangeListener((View view, boolean hasFocus) -> {
+                if (!hasFocus) {
+                    task.setNote(taskNoteView.getText().toString());
+                    taskService.update(task);
+                }
+            });
+
             View doneCancelButton = findViewById(R.id.task_detail_bottom_bar_done);
             doneCancelButtonIcon = findViewById(R.id.task_detail_bottom_bar_done_icon);
             doneCancelButtonIcon.setImageDrawable(task.getDone() ? DRAWABLE_CANCEL : DRAWABLE_DONE);
@@ -225,7 +247,10 @@ public class TaskDetailsActivity extends AppCompatActivity {
     private Task buildTask(Bundle extras) {
         Task task = new Task();
         task.setId((Integer) extras.get(Task.Fields.ID.fieldName()));
+        task.setListId((Integer) extras.get(Task.Fields.LIST_ID.fieldName()));
+        task.setListName(extras.getString(Task.Fields.LIST_NAME.fieldName(), StringUtils.EMPTY));
         task.setName(extras.getString(Task.Fields.NAME.fieldName(), StringUtils.EMPTY));
+        task.setNote(extras.getString(Task.Fields.NOTE.fieldName(), StringUtils.EMPTY));
         task.setDone(extras.getBoolean(Task.Fields.DONE.fieldName(), false));
         task.setDueDateTime((Long) extras.get(Task.Fields.DUE_DATE_TIME.fieldName()));
         task.setRemindDateTime((Long) extras.get(Task.Fields.REMIND_DATE_TIME.fieldName()));

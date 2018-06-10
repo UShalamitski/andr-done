@@ -35,6 +35,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Adapter for {@link RecyclerView} of the {@link Task}s.
@@ -58,6 +60,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     private Integer listId;
     private TasksViewEnum viewEnum;
     private ActionMode actionMode;
+
+    private ExecutorService executor = Executors.newFixedThreadPool(2);
 
     /**
      * Controller.
@@ -96,8 +100,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
             } else {
                 Intent intent = new Intent(context, TaskDetailsActivity.class);
                 Task task = getItem(viewHolder.getAdapterPosition());
-                intent.putExtra("listId", task.getListId());
+                intent.putExtra(Task.Fields.LIST_ID.fieldName(), task.getListId());
+                intent.putExtra(Task.Fields.LIST_NAME.fieldName(), task.getListName());
                 intent.putExtra(Task.Fields.NAME.fieldName(), task.getName());
+                intent.putExtra(Task.Fields.NOTE.fieldName(), task.getNote());
                 intent.putExtra(Task.Fields.ID.fieldName(), task.getId());
                 intent.putExtra(Task.Fields.DONE.fieldName(), task.getDone());
                 intent.putExtra(Task.Fields.DUE_DATE_TIME.fieldName(), task.getDueDateTime());
@@ -142,6 +148,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         if (null != task.getRemindDateTime()) {
             holder.reminderText.setText(ActivityUtils.getStringDate(context, task.getRemindDateTime(), true));
         }
+        if (null != viewEnum) {
+            setVisibility(holder.listNameDelimiter, true);
+            setVisibility(holder.listName, true);
+            holder.listName.setText(task.getListName());
+        }
 
         if (null != task.getDueDateTime() || null != task.getRemindDateTime() && !task.getDone()) {
             setVisibility(holder.taskInfoLayout, true);
@@ -167,7 +178,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             crossOutText(holder, isChecked);
             Task currentTask = getItem(buttonView);
+            Task newTask = null;
             currentTask.setDone(isChecked);
+
             if (isChecked) {
                 if (null != currentTask.getRemindDateTime()) {
                     setVisibility(holder.reminderIcon, false);
@@ -178,7 +191,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
                 if (null != currentTask.getRepeatType()) {
                     setVisibility(holder.repeatDelimiter, false);
                     setVisibility(holder.repeatIcon, false);
-                    taskService.createRepetitiveTask(currentTask);
+                    newTask = taskService.createRepetitiveTask(currentTask);
                     currentTask.setRepeatType(null);
                 }
             } else if (null != currentTask.getRemindDateTime()) {
@@ -197,7 +210,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
                 }
             }
             taskService.update(currentTask);
-            updatesAdapterItems();
+            notifyItemChanged(holder.getAdapterPosition());
+
+            if (null != newTask) {
+                getItems().add(holder.getAdapterPosition() + 1, newTask);
+                notifyItemInserted(holder.getAdapterPosition() + 1);
+            }
+
             colorDueDate(currentTask, holder, isChecked);
             holder.name.setTextColor(isChecked ? COLOR_BLACK_SECONDARY : COLOR_BLACK_PRIMARY);
         });
@@ -209,14 +228,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
      * Updates adapter items showing in UI with animation.
      */
     public void updatesAdapterItems() {
-        List<Task> oldTasks = new ArrayList<>(getItems());
-        if (null != listId) {
-            setItems(taskService.getTasks(listId));
-        } else {
-            setItems(taskService.getTasksForView(viewEnum));
-        }
-        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtilCallback<>(oldTasks, getItems()));
-        result.dispatchUpdatesTo(this);
+        executor.submit(() -> {
+            List<Task> oldTasks = new ArrayList<>(getItems());
+            if (null != listId) {
+                setItems(taskService.getTasks(listId));
+            } else {
+                setItems(taskService.getTasksForView(viewEnum));
+            }
+            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtilCallback<>(oldTasks, getItems()));
+            ((Activity) context).runOnUiThread(() -> {
+                result.dispatchUpdatesTo(this);
+            });
+        });
     }
 
     /**
@@ -345,11 +368,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
 
     @Override
     public void removeItems(List<Task> tasks) {
-        for (Task task : tasks) {
-            int index = taskList.indexOf(task);
-            taskList.remove(index);
-            notifyItemRemoved(index);
-        }
+        taskList.removeAll(new HashSet<>(tasks));
+        notifyDataSetChanged();
     }
 
     /**
@@ -457,6 +477,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         private TextView reminderText;
         private TextView repeatDelimiter;
         private ImageView repeatIcon;
+        private TextView listNameDelimiter;
+        private TextView listName;
 
         /**
          * Controller.
@@ -473,6 +495,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
             this.repeatIcon = view.findViewById(R.id.task_info_repeat_icon);
             this.reminderIcon = view.findViewById(R.id.task_info_reminder_icon);
             this.reminderText = view.findViewById(R.id.task_info_reminder_text);
+            this.listNameDelimiter = view.findViewById(R.id.task_info_delimiter_before_list_name);
+            this.listName = view.findViewById(R.id.task_info_list_name);
             this.name = view.findViewById(R.id.task_name);
             this.checkBox = view.findViewById(R.id.task_checkbox);
             this.view = view.findViewById(R.id.task_item_layout);
