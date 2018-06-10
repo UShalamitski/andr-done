@@ -238,7 +238,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                         actionMode = null;
                         adapter.clearSelection();
                         ((Activity) context)
-                                .getWindow().setStatusBarColor(ContextCompat.getColor(context, R.color.gray));
+                                .getWindow().setStatusBarColor(ContextCompat.getColor(context, R.color.colorPrimary));
                     }
                 });
             }
