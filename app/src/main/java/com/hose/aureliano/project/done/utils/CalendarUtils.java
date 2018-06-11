@@ -115,9 +115,11 @@ public class CalendarUtils {
     }
 
     /**
-     * @param timeMillis
-     * @param repeatEnum
-     * @return
+     * Increases given time based on {@code repeatEnum}.
+     *
+     * @param timeMillis time to increase based on {@code repeatEnum}
+     * @param repeatEnum instance of {@link TaskRepeatEnum}
+     * @return time that will be increased based on {@code repeatEnum}
      */
     public static long getTime(long timeMillis, TaskRepeatEnum repeatEnum) {
         Calendar calendar = new GregorianCalendar();
