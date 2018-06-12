@@ -34,7 +34,12 @@ public enum TaskRepeatEnum {
     /**
      * Task for working days.
      */
-    WORKING_DAYS;
+    WORKING_DAYS,
+
+    /**
+     * Task for weekends.
+     */
+    WEEKENDS;
 
     @TypeConverter
     public static TaskRepeatEnum getTaskRepeatEnumFromString(String value) {

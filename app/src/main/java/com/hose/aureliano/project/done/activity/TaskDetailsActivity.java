@@ -96,6 +96,9 @@ public class TaskDetailsActivity extends AppCompatActivity {
                         case R.id.menu_task_repeat_working_days:
                             task.setRepeatType(TaskRepeatEnum.WORKING_DAYS);
                             break;
+                        case R.id.menu_task_repeat_weekends:
+                            task.setRepeatType(TaskRepeatEnum.WEEKENDS);
+                            break;
                     }
                     changeRepeatFieldsAndSave(repeatText, repeatIcon, task);
                     return true;
@@ -307,6 +310,9 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 break;
             case WORKING_DAYS:
                 remindText = getString(R.string.menu_repeat_working_days);
+                break;
+            case WEEKENDS:
+                remindText = getString(R.string.menu_repeat_weekends);
                 break;
             default:
                 remindText = getString(R.string.task_repeat);

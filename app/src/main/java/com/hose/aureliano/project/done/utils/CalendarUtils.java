@@ -148,6 +148,12 @@ public class CalendarUtils {
                 }
                 break;
             }
+            case WEEKENDS:
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                while (calendar.get(Calendar.DAY_OF_WEEK) != 1 && calendar.get(Calendar.DAY_OF_WEEK) != 7) {
+                    calendar.add(Calendar.DAY_OF_MONTH, 1);
+                }
+                break;
         }
         return calendar.getTimeInMillis();
     }

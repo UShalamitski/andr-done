@@ -34,6 +34,7 @@
     <string name="menu.repeat.every_month">Every Month</string>
     <string name="menu.repeat.every_year">Every Year</string>
     <string name="menu.repeat.working_days">Working Days</string>
+    <string name="menu.repeat.weekends">Weekends</string>
     <string name="menu.unselect_all">Unselect all</string>
 
     <string name="modal.select.list">Select list</string>
