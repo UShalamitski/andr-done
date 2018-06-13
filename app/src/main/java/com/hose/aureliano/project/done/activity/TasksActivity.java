@@ -195,6 +195,7 @@ public class TasksActivity extends AppCompatActivity {
 
         sortMap.append(R.id.menu_tasks_sort_name, true);
         sortMap.append(R.id.menu_tasks_sort_due_date, true);
+        sortMap.append(R.id.menu_tasks_sort_completed, true);
         sortMap.append(R.id.menu_tasks_sort_create_date, true);
 
         if (null != extras.get(Task.Fields.ID.fieldName())) {
@@ -242,6 +243,12 @@ public class TasksActivity extends AppCompatActivity {
                 applySortChanges((task1, task2) -> sortDirection
                         ? StringUtils.compare(task1.getName(), task2.getName())
                         : StringUtils.compare(task2.getName(), task1.getName()));
+                break;
+            case R.id.menu_tasks_sort_completed:
+                sortDirection = getAndRevertSortDirection(R.id.menu_tasks_sort_completed);
+                applySortChanges((task1, task2) -> sortDirection
+                        ? Boolean.compare(task1.getDone(), task2.getDone())
+                        : Boolean.compare(task2.getDone(), task1.getDone()));
                 break;
             case R.id.menu_tasks_sort_due_date:
                 sortDirection = getAndRevertSortDirection(R.id.menu_tasks_sort_due_date);

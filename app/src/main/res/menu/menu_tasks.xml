@@ -16,13 +16,18 @@
                 android:title="@string/menu.sort.name"
                 app:showAsAction="never" />
             <item
-                android:id="@+id/menu_tasks_sort_create_date"
+                android:id="@+id/menu_tasks_sort_completed"
                 android:orderInCategory="30"
+                android:title="@string/menu.sort.completed"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/menu_tasks_sort_create_date"
+                android:orderInCategory="40"
                 android:title="@string/menu.sort.create_date"
                 app:showAsAction="never" />
             <item
                 android:id="@+id/menu_tasks_sort_due_date"
-                android:orderInCategory="40"
+                android:orderInCategory="50"
                 android:title="@string/menu.sort.due_date"
                 app:showAsAction="never" />
         </menu>

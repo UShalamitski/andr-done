@@ -17,6 +17,7 @@
 
     <string name="menu.duplicate">Дублировать</string>
     <string name="menu.select_all">Выбрать все</string>
+    <string name="menu.sort.completed">По завершенным</string>
     <string name="menu.sort.create_date">По дате создания</string>
     <string name="menu.sort.due_date">По дате исполнения</string>
     <string name="menu.sort.name">По имени</string>
