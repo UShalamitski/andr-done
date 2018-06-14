@@ -269,8 +269,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
      */
     public void clearSelection() {
         setActionMode(null);
+        for (Integer id : selectedIdsSet) {
+            notifyItemChanged(id);
+        }
         selectedIdsSet.clear();
-        notifyDataSetChanged();
     }
 
     /**

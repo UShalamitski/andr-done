@@ -232,8 +232,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> im
      */
     public void clearSelection() {
         setActionMode(null);
+        for (Integer id : selectedItemsSet) {
+            notifyItemChanged(id);
+        }
         selectedItemsSet.clear();
-        notifyDataSetChanged();
     }
 
     /**
