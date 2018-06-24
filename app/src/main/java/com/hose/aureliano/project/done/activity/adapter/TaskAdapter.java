@@ -289,10 +289,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     }
 
     public void toggleSelection(TaskAdapter.ViewHolder viewHolder, ActionMode actionMode) {
-        if (selectedIdsSet.contains(viewHolder.getAdapterPosition())) {
+        int pos = viewHolder.getAdapterPosition();
+        if (selectedIdsSet.contains(pos)) {
             selectedIdsSet.remove(viewHolder.getAdapterPosition());
             viewHolder.viewForeground.setBackgroundColor(COLOR_WHITE);
             if (CollectionUtils.isEmpty(selectedIdsSet)) {
+                notifyItemChanged(pos);
                 actionMode.finish();
             }
         } else {

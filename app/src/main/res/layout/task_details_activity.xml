@@ -29,8 +29,8 @@
                 android:layout_marginStart="17dp"
                 android:buttonTint="@color/green"
                 android:focusable="false"
-                android:scaleX="1.15"
-                android:scaleY="1.15" />
+                android:scaleX="@dimen/checkbox.scale"
+                android:scaleY="@dimen/checkbox.scale"/>
 
             <FrameLayout
                 android:layout_width="match_parent"

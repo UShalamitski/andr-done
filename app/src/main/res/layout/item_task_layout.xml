@@ -22,7 +22,7 @@
             android:layout_height="28dp"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="17.5dp"
             android:src="@drawable/icon_done_white_24dp"
             android:tint="@android:color/white" />
 
@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="17.5dp"
             android:layout_toEndOf="@id/task_background_done_icon"
             android:text="@string/done"
             android:textColor="#fff"
@@ -43,7 +43,7 @@
             android:layout_height="28dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="17.5dp"
             android:src="@drawable/icon_delete_white_24dp"
             android:tint="@android:color/white" />
 
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="17.5dp"
             android:layout_toStartOf="@id/task_background_delete_icon"
             android:text="@string/delete"
             android:textColor="#fff"
@@ -81,7 +81,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginStart="45dp"
+                android:layout_marginStart="47dp"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textAppearance="?android:textAppearanceMedium"
@@ -94,7 +94,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/task_name"
-                android:layout_marginStart="45dp">
+                android:layout_marginStart="47dp">
 
                 <ImageView
                     android:id="@+id/task_info_due_icon"
@@ -195,6 +195,8 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:buttonTint="@color/green"
-            android:focusable="false" />
+            android:focusable="false"
+            android:scaleX="@dimen/checkbox.scale"
+            android:scaleY="@dimen/checkbox.scale" />
     </RelativeLayout>
 </FrameLayout>
