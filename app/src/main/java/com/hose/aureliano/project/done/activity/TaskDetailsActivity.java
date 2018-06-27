@@ -189,15 +189,12 @@ public class TaskDetailsActivity extends AppCompatActivity {
             CheckBox checkBox = findViewById(R.id.task_details_main_checkbox);
             checkBox.setChecked(task.getDone());
             checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (task.getDone() != isChecked) {
-                    task.setDone(buttonView.isChecked());
-                }
+                task.setDone(buttonView.isChecked());
                 if (isChecked) {
-                    AlarmService.cancelTaskReminder(this, task);
                     if (null != task.getRepeatType()) {
                         taskService.createRepetitiveTask(task);
-                        changeRepeatFields(repeatText, repeatIcon, task);
                     }
+                    AlarmService.cancelTaskReminder(this, task);
                 } else {
                     AlarmService.setTaskReminder(this, task);
                 }
@@ -205,6 +202,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
                 doneCancelButtonIcon.setImageDrawable(isChecked ? DRAWABLE_CANCEL : DRAWABLE_DONE);
                 changeRemindDateFields(remindDateText, remindDateIcon, task);
                 changeDueDateFields(dueDateText, dueDateIcon, repeatView, task);
+                changeRepeatFields(repeatText, repeatIcon, task);
                 taskService.update(task);
                 ActivityUtils.vibrate(this);
             });
@@ -280,10 +278,14 @@ public class TaskDetailsActivity extends AppCompatActivity {
             repeatDateText.setTextColor(COLOR_BLACK_SECONDARY);
             repeatDateIcon.setColorFilter(COLOR_BLACK_SECONDARY);
             repeatDateText.setText(getString(R.string.task_repeat));
-            task.setRepeatType(null);
         } else {
-            repeatDateText.setTextColor(COLOR_BLUE);
-            repeatDateIcon.setColorFilter(COLOR_BLUE);
+            if (task.getDone()) {
+                repeatDateText.setTextColor(COLOR_BLACK_SECONDARY);
+                repeatDateIcon.setColorFilter(COLOR_BLACK_SECONDARY);
+            } else {
+                repeatDateText.setTextColor(COLOR_BLUE);
+                repeatDateIcon.setColorFilter(COLOR_BLUE);
+            }
             repeatDateText.setText(getRepeatFieldString(task.getRepeatType()));
         }
     }
@@ -345,12 +347,17 @@ public class TaskDetailsActivity extends AppCompatActivity {
 
     private void changeDueDateFields(TextView dueDateText, ImageView dueDateIcon, View repeatView, Task task) {
         if (null != task.getDueDateTime()) {
-            if (System.currentTimeMillis() > task.getDueDateTime() && !task.getDone()) {
-                dueDateText.setTextColor(COLOR_RED);
-                dueDateIcon.setColorFilter(COLOR_RED);
+            if (task.getDone()) {
+                dueDateText.setTextColor(COLOR_BLACK_SECONDARY);
+                dueDateIcon.setColorFilter(COLOR_BLACK_SECONDARY);
             } else {
-                dueDateText.setTextColor(COLOR_BLUE);
-                dueDateIcon.setColorFilter(COLOR_BLUE);
+                if (System.currentTimeMillis() > task.getDueDateTime() && !task.getDone()) {
+                    dueDateText.setTextColor(COLOR_RED);
+                    dueDateIcon.setColorFilter(COLOR_RED);
+                } else {
+                    dueDateText.setTextColor(COLOR_BLUE);
+                    dueDateIcon.setColorFilter(COLOR_BLUE);
+                }
             }
             repeatView.setVisibility(View.VISIBLE);
             dueDateText.setText(ActivityUtils.getStringDate(this, task.getDueDateTime(), false));

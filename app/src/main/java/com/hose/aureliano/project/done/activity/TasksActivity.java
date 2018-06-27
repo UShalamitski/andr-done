@@ -153,7 +153,8 @@ public class TasksActivity extends AppCompatActivity {
             });
 
             newTaskEditText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
-                if (actionId == EditorInfo.IME_ACTION_DONE && StringUtils.isNotBlank(newTaskEditText.getText().toString())) {
+                if (actionId == EditorInfo.IME_ACTION_DONE
+                        && StringUtils.isNotBlank(newTaskEditText.getText().toString())) {
                     Task task = new Task();
                     task.setListId(listId);
                     task.setListName(listName);

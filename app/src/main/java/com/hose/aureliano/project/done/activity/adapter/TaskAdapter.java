@@ -69,8 +69,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
      * @param context context
      * @param listId  identifier of the list
      */
-    public TaskAdapter(Context context, Integer listId,
-                       TasksViewEnum viewEnum) {
+    public TaskAdapter(Context context, Integer listId, TasksViewEnum viewEnum) {
         taskService = new TaskService(context);
         this.context = context;
         this.listId = listId;
@@ -119,7 +118,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
 
         view.setOnLongClickListener(longClickView -> {
             if (null != actionMode) {
-                if (1 == CollectionUtils.size(selectedIdsSet) && selectedIdsSet.contains(viewHolder.getAdapterPosition())) {
+                if (1 == CollectionUtils.size(selectedIdsSet)
+                        && selectedIdsSet.contains(viewHolder.getAdapterPosition())) {
                     return false;
                 } else {
                     toggleSelection(viewHolder, actionMode);
@@ -153,7 +153,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
             setVisibility(holder.listName, true);
             holder.listName.setText(task.getListName());
         }
-
         if (null != task.getDueDateTime() || null != task.getRemindDateTime() && !task.getDone()) {
             setVisibility(holder.taskInfoLayout, true);
             setVisibility(holder.dueDateIcon, null != task.getDueDateTime());
@@ -168,8 +167,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
                 setVisibility(holder.reminderIcon, false);
                 setVisibility(holder.reminderText, false);
             }
-            setVisibility(holder.repeatDelimiter, null != task.getRepeatType());
-            setVisibility(holder.repeatIcon, null != task.getRepeatType());
+            setVisibility(holder.repeatDelimiter, null != task.getRepeatType() && !task.getDone());
+            setVisibility(holder.repeatIcon, null != task.getRepeatType() && !task.getDone());
             colorDueDate(task, holder, task.getDone());
         } else {
             setVisibility(holder.taskInfoLayout, false);
