@@ -24,7 +24,7 @@ import java.util.Objects;
  */
 public final class ActivityUtils {
 
-    private static long VIBRATE_SHORT = 40L;
+    private static long VIBRATE_SHORT = 10L;
 
     private ActivityUtils() {
         throw new AssertionError();

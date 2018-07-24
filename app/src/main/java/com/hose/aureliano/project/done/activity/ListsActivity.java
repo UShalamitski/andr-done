@@ -25,8 +25,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.ListAdapter;
@@ -48,6 +50,7 @@ import com.hose.aureliano.project.done.utils.PreferencesUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -85,6 +88,13 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        findViewById(R.id.nav_menu_today).setOnClickListener(view -> {});
+        findViewById(R.id.nav_menu_week).setOnClickListener(view -> {});
+        findViewById(R.id.nav_menu_overdue).setOnClickListener(view -> {});
+
+        ListView listView = findViewById(R.id.nav_lists);
+        listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, Arrays.asList("123", "456")));
 
         coordinator = findViewById(R.id.coordinator_layout);
         listsAdapter = new ListAdapter(this, getSupportFragmentManager());
@@ -165,7 +175,6 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
         sortMap.append(R.id.menu_lists_sort_name, true);
         sortMap.append(R.id.menu_lists_sort_progress, true);
         sortMap.append(R.id.menu_lists_sort_creation_date, true);
-
 
         new ItemTouchHelper(new ListItemTouchHelper(this, listsAdapter)).attachToRecyclerView(recyclerView);
         configureApplication();
