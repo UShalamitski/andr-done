@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 import com.hose.aureliano.project.done.R;
-import com.hose.aureliano.project.done.activity.ListsActivity;
 import com.hose.aureliano.project.done.activity.TasksActivity;
 import com.hose.aureliano.project.done.model.TasksViewEnum;
 import com.hose.aureliano.project.done.service.TaskService;

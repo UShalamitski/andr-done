@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="app_name">Done</string>
     <string name="action_settings">Settings</string>
 
@@ -43,6 +43,7 @@
 
     <string name="navbar.overdue">Overdue</string>
     <string name="navbar.folders">Folders</string>
+    <string name="navbar.list.add">Добавить список</string>
     <string name="navbar.my_lists">My lists</string>
     <string name="navbar.today">Today</string>
     <string name="navbar.views">Views</string>
@@ -75,4 +76,8 @@
 
     // Preferences
     <string name="preference.isFirstRunConfigured">isFirstRunConfigured</string>
+    <string name="preference.lastOpenedListId">lastOpenedListId</string>
+    <string name="preference.lastOpenedListName">lastOpenedListName</string>
+    <string name="preference.lastOpenedView">lastOpenedView</string>
+    <string name="preference.lastOpenedViewName">lastOpenedViewName</string>
 </resources>

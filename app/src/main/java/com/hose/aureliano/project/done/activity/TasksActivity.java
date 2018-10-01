@@ -4,30 +4,32 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.SparseBooleanArray;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
-
 import com.hose.aureliano.project.done.R;
+import com.hose.aureliano.project.done.activity.adapter.NavListAdapter;
 import com.hose.aureliano.project.done.activity.adapter.TaskAdapter;
 import com.hose.aureliano.project.done.activity.callback.DiffUtilCallback;
 import com.hose.aureliano.project.done.activity.component.CustomEditText;
@@ -39,17 +41,14 @@ import com.hose.aureliano.project.done.model.TasksViewEnum;
 import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.service.comporator.TaskCreateDateComparator;
 import com.hose.aureliano.project.done.service.comporator.TaskDueDateComparator;
+import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.ActivityUtils;
 import com.hose.aureliano.project.done.utils.AnimationUtil;
 import com.hose.aureliano.project.done.utils.CalendarUtils;
-
+import com.hose.aureliano.project.done.utils.PreferencesUtil;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -62,6 +61,9 @@ import java.util.concurrent.Executors;
  */
 public class TasksActivity extends AppCompatActivity {
 
+    private static int COLOR_LIGHT_GRAY;
+    private static int COLOR_BACKGROUND;
+
     private Integer listId;
     private String listName;
     private View coordinator;
@@ -69,36 +71,45 @@ public class TasksActivity extends AppCompatActivity {
     private View bottomView;
     private ViewGroup decorView;
     private TaskAdapter taskAdapter;
+    private NavListAdapter navListAdapter;
     private TasksViewEnum viewEnum;
     private RecyclerViewEmptySupport recyclerView;
     private FloatingActionButton floatingActionButton;
+    private Toolbar toolbar;
+    private DrawerLayout drawer;
+    private TaskService taskService;
 
     private ExecutorService executor = Executors.newSingleThreadExecutor();
-    private TaskService taskService = new TaskService(this);
     private SparseBooleanArray sortMap = new SparseBooleanArray();
 
     @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tasks);
+        setContentView(R.layout.activity_lists_drawer);
+        taskService = new TaskService(this);
 
-        Toolbar toolbar = findViewById(R.id.tasks_toolbar);
+        toolbar = findViewById(R.id.tasks_toolbar);
         toolbar.setNavigationIcon(R.drawable.icon_arrow_back_white_24);
         setSupportActionBar(toolbar);
 
+        configureApplication();
+        initStaticResources();
+        initNavBar();
+
         Bundle extras = getIntent().getExtras();
-        viewEnum = null != extras.get("view")
-                ? (TasksViewEnum) extras.get("view") : null;
-        if (null != viewEnum) {
-            setTitle(getString(R.string.view));
-            toolbar.setSubtitle(extras.getString("title"));
-        } else {
-            listName = extras.getString("title");
-            setTitle(listName);
+        if (null != extras) {
+            viewEnum = null != extras.get("view") ? (TasksViewEnum) extras.get("view") : null;
+            if (null != viewEnum) {
+                setTitle(getString(R.string.view));
+                toolbar.setSubtitle(extras.getString("title"));
+            } else {
+                listName = extras.getString("title");
+                setTitle(listName);
+            }
+            listId = (Integer) extras.get(Task.Fields.LIST_ID.fieldName());
         }
 
-        listId = (Integer) extras.get(Task.Fields.LIST_ID.fieldName());
         coordinator = findViewById(R.id.tasks_coordinator_layout);
         taskAdapter = new TaskAdapter(this, listId, viewEnum);
 
@@ -201,7 +212,7 @@ public class TasksActivity extends AppCompatActivity {
         sortMap.append(R.id.menu_tasks_sort_completed, true);
         sortMap.append(R.id.menu_tasks_sort_create_date, true);
 
-        if (null != extras.get(Task.Fields.ID.fieldName())) {
+        if (null != extras && null != extras.get(Task.Fields.ID.fieldName())) {
             Intent intent = new Intent(this, TaskDetailsActivity.class);
             intent.putExtras(extras);
             startActivity(intent);
@@ -306,6 +317,101 @@ public class TasksActivity extends AppCompatActivity {
                 taskAdapter.updatePositions();
                 taskService.update(newTasks);
             });
+        }
+    }
+
+    private void initNavBar() {
+        drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle
+                = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.app_name, R.string.app_name);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        findViewById(R.id.nav_add_new_list).setOnClickListener(view -> {
+        });
+
+        View navMenuToday = findViewById(R.id.nav_menu_today);
+        View navMenuWeek = findViewById(R.id.nav_menu_week);
+        View navMenuOverdue = findViewById(R.id.nav_menu_overdue);
+
+        RecyclerView recycler = findViewById(R.id.nav_lists);
+        navListAdapter = new NavListAdapter(this, getSupportFragmentManager(), (listItem) -> {
+            this.viewEnum = null;
+            this.listId = listItem.getId();
+            taskAdapter.refresh(listItem.getId());
+            setTitle(listItem.getName());
+            toolbar.setSubtitle(null);
+            new Handler().postDelayed(() -> drawer.closeDrawer(GravityCompat.START, true), 50);
+            navMenuToday.setBackgroundColor(COLOR_BACKGROUND);
+            navMenuWeek.setBackgroundColor(COLOR_BACKGROUND);
+            navMenuOverdue.setBackgroundColor(COLOR_BACKGROUND);
+            PreferencesUtil.removePreference(this, getString(R.string.preference_lastOpenedView));
+            PreferencesUtil.removePreference(this, getString(R.string.preference_lastOpenedViewName));
+            PreferencesUtil.addIntPreference(this, getString(R.string.preference_lastOpenedListId), listItem.getId());
+            PreferencesUtil.addPreference(this, getString(R.string.preference_lastOpenedListName), listItem.getName());
+        }, listId);
+        recycler.setLayoutManager(new LinearLayoutManager(this));
+        recycler.setAdapter(navListAdapter);
+
+        navMenuToday.setOnClickListener(view -> {
+            navMenuWeek.setBackgroundColor(COLOR_BACKGROUND);
+            navMenuOverdue.setBackgroundColor(COLOR_BACKGROUND);
+            openView(view, TasksViewEnum.TODAY, R.string.navbar_today);
+        });
+        navMenuWeek.setOnClickListener(view -> {
+            navMenuToday.setBackgroundColor(COLOR_BACKGROUND);
+            navMenuOverdue.setBackgroundColor(COLOR_BACKGROUND);
+            openView(view, TasksViewEnum.WEEK, R.string.navbar_week);
+        });
+        navMenuOverdue.setOnClickListener(view -> {
+            navMenuToday.setBackgroundColor(COLOR_BACKGROUND);
+            navMenuWeek.setBackgroundColor(COLOR_BACKGROUND);
+            openView(view, TasksViewEnum.OVERDUE, R.string.navbar_overdue);
+        });
+    }
+
+    private void configureApplication() {
+        String viewName = PreferencesUtil.getPreference(this, getString(R.string.preference_lastOpenedView));
+        if (StringUtils.isNoneBlank(viewName)) {
+            viewEnum = TasksViewEnum.valueOf(viewName);
+            setTitle(getString(R.string.view));
+            toolbar.setSubtitle(PreferencesUtil.getPreference(this, getString(R.string.preference_lastOpenedViewName)));
+        } else {
+            this.listId = PreferencesUtil.getIntPreference(this, getString(R.string.preference_lastOpenedListId));
+            setTitle(PreferencesUtil.getPreference(this, getString(R.string.preference_lastOpenedListName)));
+        }
+        String isFirstRunConfiguredPreferenceName = getString(R.string.preference_isFirstRunConfigured);
+        if (!PreferencesUtil.getBooleanPreference(this, isFirstRunConfiguredPreferenceName)) {
+            AlarmService.setOverdueTasksReminder(this);
+            PreferencesUtil.addPreference(this, isFirstRunConfiguredPreferenceName, true);
+        }
+    }
+
+    private void openView(View view, TasksViewEnum viewEnum, int subtitle) {
+        this.viewEnum = viewEnum;
+        view.setBackgroundColor(COLOR_LIGHT_GRAY);
+        View selectedItem = navListAdapter.getSelectedItem();
+        if (null != selectedItem) {
+            selectedItem.setBackgroundColor(COLOR_BACKGROUND);
+            navListAdapter.setSelectedItem(null);
+        }
+        setTitle(getString(R.string.view));
+        String subtitleString = getString(subtitle);
+        toolbar.setSubtitle(subtitleString);
+        taskAdapter.refresh(viewEnum);
+        PreferencesUtil.addPreference(this, getString(R.string.preference_lastOpenedView), viewEnum.name());
+        PreferencesUtil.addPreference(this, getString(R.string.preference_lastOpenedViewName), subtitleString);
+        PreferencesUtil.removePreference(this, getString(R.string.preference_lastOpenedListId));
+        PreferencesUtil.removePreference(this, getString(R.string.preference_lastOpenedListName));
+        new Handler().postDelayed(() -> drawer.closeDrawer(GravityCompat.START, true), 50);
+    }
+
+    private void initStaticResources() {
+        if (0 == COLOR_LIGHT_GRAY) {
+            COLOR_LIGHT_GRAY = ContextCompat.getColor(this, R.color.lightestGray);
+        }
+        if (0 == COLOR_BACKGROUND) {
+            COLOR_BACKGROUND = ContextCompat.getColor(this, R.color.background);
         }
     }
 }

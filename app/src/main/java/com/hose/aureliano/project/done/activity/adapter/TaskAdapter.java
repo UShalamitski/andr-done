@@ -360,6 +360,24 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     }
 
     /**
+     * Refreshes data on UI.
+     */
+    public void refresh(Integer listId) {
+        this.viewEnum = null;
+        this.listId = listId;
+        refresh();
+    }
+
+    /**
+     * Refreshes data on UI.
+     */
+    public void refresh(TasksViewEnum viewEnum) {
+        this.viewEnum = viewEnum;
+        this.listId = null;
+        refresh();
+    }
+
+    /**
      * Remove {@link Task} from the list.
      *
      * @param position position of the {@link Task} to remove

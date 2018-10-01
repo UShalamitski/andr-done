@@ -15,4 +15,6 @@
     <color name="text_color">#808080</color>
     <color name="white">#fff</color>
     <color name="lightGray">#dbdbdb</color>
+    <color name="lightestGray">#ececec</color>
+    <color name="background">#ffFAFAFA</color>
 </resources>

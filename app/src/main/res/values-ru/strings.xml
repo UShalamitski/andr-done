@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Done</string>
+    <string name="app_name">Done!</string>
     <string name="action_settings">Настройки</string>
 
     <string name="confirm">Подтвердить</string>
@@ -43,6 +43,7 @@
 
     <string name="navbar.overdue">Просроченные</string>
     <string name="navbar.folders">Папки</string>
+    <string name="navbar.list.add">Добавить список</string>
     <string name="navbar.my_lists">Мои списки</string>
     <string name="navbar.today">Сегодня</string>
     <string name="navbar.views">Представления</string>
@@ -75,4 +76,8 @@
 
     // Preferences
     <string name="preference.isFirstRunConfigured">isFirstRunConfigured</string>
+    <string name="preference.lastOpenedListId">lastOpenedListId</string>
+    <string name="preference.lastOpenedListName">lastOpenedListName</string>
+    <string name="preference.lastOpenedView">lastOpenedView</string>
+    <string name="preference.lastOpenedViewName">lastOpenedViewName</string>
 </resources>
