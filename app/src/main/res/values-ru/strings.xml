@@ -72,4 +72,7 @@
     <string name="list.add_new">Добавить список</string>
     <string name="list.empty_view">Списков пока нет</string>
     <string name="lists.delete.confirmation">Вы уверены, что хотите удалить выбранные списки?</string>
+
+    // Preferences
+    <string name="preference.isFirstRunConfigured">isFirstRunConfigured</string>
 </resources>

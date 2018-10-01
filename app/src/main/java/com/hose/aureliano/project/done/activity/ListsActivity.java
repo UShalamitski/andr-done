@@ -69,13 +69,14 @@ public class ListsActivity extends AppCompatActivity implements ListModal.Notice
     private View coordinator;
     private DrawerLayout drawer;
     private ListAdapter listsAdapter;
-    private ListService listService = new ListService(this);
+    private ListService listService ;
     private SparseBooleanArray sortMap = new SparseBooleanArray();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lists_drawer);
+        listService = new ListService(this);
 
         Toolbar toolbar = findViewById(R.id.lists_toolbar);
         setSupportActionBar(toolbar);

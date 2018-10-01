@@ -1,5 +1,6 @@
 package com.hose.aureliano.project.done.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -76,6 +77,7 @@ public class TasksActivity extends AppCompatActivity {
     private TaskService taskService = new TaskService(this);
     private SparseBooleanArray sortMap = new SparseBooleanArray();
 
+    @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
