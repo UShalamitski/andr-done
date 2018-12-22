@@ -15,7 +15,7 @@ import java.util.List;
  * <p>
  * Date: 12.02.2018.
  *
- * @author evere
+ * @author Uladzislau Shalamitski
  */
 @Dao
 public interface DoneListDao {
@@ -26,8 +26,8 @@ public interface DoneListDao {
     @Update
     int update(DoneList doneList);
 
-    @Query("DELETE FROM lists")
-    int delete();
+    @Query("DELETE FROM lists WHERE id = :id")
+    int delete(Integer id);
 
     @Delete
     int delete(DoneList doneList);

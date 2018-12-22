@@ -30,4 +30,9 @@
                 app:showAsAction="never" />
         </menu>
     </item>
+    <item
+          android:id="@+id/menu_list_delete"
+          android:orderInCategory="110"
+          app:showAsAction="never"
+          android:title="@string/menu.list.delete" />
 </menu>

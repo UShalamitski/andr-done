@@ -27,17 +27,22 @@ import android.util.SparseBooleanArray;
 import android.view.*;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import com.hose.aureliano.project.done.R;
 import com.hose.aureliano.project.done.activity.adapter.NavListAdapter;
 import com.hose.aureliano.project.done.activity.adapter.TaskAdapter;
 import com.hose.aureliano.project.done.activity.callback.DiffUtilCallback;
 import com.hose.aureliano.project.done.activity.component.CustomEditText;
+import com.hose.aureliano.project.done.activity.component.CustomTextWatcher;
 import com.hose.aureliano.project.done.activity.component.RecyclerViewEmptySupport;
+import com.hose.aureliano.project.done.activity.dialog.ListModal;
 import com.hose.aureliano.project.done.activity.dialog.SelectListModal;
 import com.hose.aureliano.project.done.activity.helper.TaskItemTouchHelper;
+import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.model.TasksViewEnum;
+import com.hose.aureliano.project.done.service.ListService;
 import com.hose.aureliano.project.done.service.TaskService;
 import com.hose.aureliano.project.done.service.comporator.TaskCreateDateComparator;
 import com.hose.aureliano.project.done.service.comporator.TaskDueDateComparator;
@@ -46,6 +51,7 @@ import com.hose.aureliano.project.done.utils.ActivityUtils;
 import com.hose.aureliano.project.done.utils.AnimationUtil;
 import com.hose.aureliano.project.done.utils.CalendarUtils;
 import com.hose.aureliano.project.done.utils.PreferencesUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -77,7 +83,9 @@ public class TasksActivity extends AppCompatActivity {
     private FloatingActionButton floatingActionButton;
     private Toolbar toolbar;
     private DrawerLayout drawer;
+
     private TaskService taskService;
+    private ListService listService;
 
     private ExecutorService executor = Executors.newSingleThreadExecutor();
     private SparseBooleanArray sortMap = new SparseBooleanArray();
@@ -88,13 +96,14 @@ public class TasksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lists_drawer);
         taskService = new TaskService(this);
+        listService = new ListService(this);
 
         toolbar = findViewById(R.id.tasks_toolbar);
         toolbar.setNavigationIcon(R.drawable.icon_arrow_back_white_24);
         setSupportActionBar(toolbar);
 
-        configureApplication();
         initStaticResources();
+        configureApplication();
         initNavBar();
 
         Bundle extras = getIntent().getExtras();
@@ -146,24 +155,10 @@ public class TasksActivity extends AppCompatActivity {
                 });
             });
 
-            newTaskEditText.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    if (StringUtils.isNoneBlank(s)) {
-                        newIcon.setColorFilter(getResources().getColor(R.color.green));
-                    } else if (StringUtils.isBlank(s)) {
-                        newIcon.setColorFilter(getResources().getColor(R.color.darker_gray));
-                    }
-                }
-            });
+            newTaskEditText.addTextChangedListener(new CustomTextWatcher(text -> {
+                newIcon.setColorFilter(getResources().getColor(
+                        StringUtils.isBlank(text) ? R.color.darker_gray : R.color.green));
+            }));
 
             newTaskEditText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
                 if (actionId == EditorInfo.IME_ACTION_DONE
@@ -245,6 +240,8 @@ public class TasksActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_tasks, menu);
+        MenuItem item = menu.findItem(R.id.menu_list_delete);
+        item.setVisible(null == viewEnum);
         return true;
     }
 
@@ -254,23 +251,33 @@ public class TasksActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_tasks_sort_name:
                 sortDirection = getAndRevertSortDirection(R.id.menu_tasks_sort_name);
-                applySortChanges((task1, task2) -> sortDirection
+                executor.submit(() -> this.runOnUiThread(() -> applySortChanges((task1, task2) -> sortDirection
                         ? StringUtils.compare(task1.getName(), task2.getName())
-                        : StringUtils.compare(task2.getName(), task1.getName()));
+                        : StringUtils.compare(task2.getName(), task1.getName()))));
                 break;
             case R.id.menu_tasks_sort_completed:
                 sortDirection = getAndRevertSortDirection(R.id.menu_tasks_sort_completed);
-                applySortChanges((task1, task2) -> sortDirection
+                executor.submit(() -> this.runOnUiThread(() -> applySortChanges((task1, task2) -> sortDirection
                         ? Boolean.compare(task1.getDone(), task2.getDone())
-                        : Boolean.compare(task2.getDone(), task1.getDone()));
+                        : Boolean.compare(task2.getDone(), task1.getDone()))));
                 break;
             case R.id.menu_tasks_sort_due_date:
                 sortDirection = getAndRevertSortDirection(R.id.menu_tasks_sort_due_date);
-                applySortChanges(new TaskDueDateComparator(sortDirection));
+                executor.submit(() -> this.runOnUiThread(
+                        () -> applySortChanges(new TaskDueDateComparator(sortDirection))));
                 break;
             case R.id.menu_tasks_sort_create_date:
                 sortDirection = getAndRevertSortDirection(R.id.menu_tasks_sort_create_date);
-                applySortChanges(new TaskCreateDateComparator(sortDirection));
+                executor.submit(() -> this.runOnUiThread(
+                        () -> applySortChanges(new TaskCreateDateComparator(sortDirection))));
+                break;
+            case R.id.menu_list_delete:
+                ActivityUtils.showConfirmationDialog(this, R.string.list_delete_confirmation, (dialogInterface, i) -> {
+                    listService.delete(listId);
+                    drawer.openDrawer(Gravity.START);
+                    navListAdapter.refresh();
+                    openView(findViewById(R.id.nav_menu_today), TasksViewEnum.TODAY, R.string.navbar_today);
+                });
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -305,19 +312,19 @@ public class TasksActivity extends AppCompatActivity {
         List<Task> newTasks = taskAdapter.getItems();
         List<Task> oldTasks = new ArrayList<>(newTasks);
         Collections.sort(newTasks, comparator);
-
-        Parcelable recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
-        DiffUtil.DiffResult diffResult =
-                DiffUtil.calculateDiff(new DiffUtilCallback<>(oldTasks, newTasks), newTasks.size() < 20);
-        diffResult.dispatchUpdatesTo(taskAdapter);
-        recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
-
-        if (null == viewEnum) {
-            executor.submit(() -> {
-                taskAdapter.updatePositions();
-                taskService.update(newTasks);
-            });
+        if (50 < CollectionUtils.size(newTasks)) {
+            taskAdapter.refresh(newTasks);
+        } else {
+            Parcelable recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
+            DiffUtil.DiffResult diffResult =
+                    DiffUtil.calculateDiff(new DiffUtilCallback<>(oldTasks, newTasks), true);
+            diffResult.dispatchUpdatesTo(taskAdapter);
+            recyclerView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
         }
+        if (null == viewEnum) {
+            taskService.updatePositions(newTasks);
+        }
+        ActivityUtils.showSnackBar(coordinator, this.getString(R.string.tasks_sorted));
     }
 
     private void initNavBar() {
@@ -327,28 +334,44 @@ public class TasksActivity extends AppCompatActivity {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        findViewById(R.id.nav_add_new_list).setOnClickListener(view -> {
+        View newTaskButton = findViewById(R.id.nav_add_new_list);
+        newTaskButton.setOnClickListener(view -> {
+            ListModal dialog = new ListModal();
+            dialog.setListener((dialogFragment) -> {
+                EditText name = dialogFragment.getDialog().findViewById(R.id.list_name);
+                DoneList list = new DoneList();
+                String listName = name.getText().toString();
+                list.setName(listName);
+                list.setCreatedDateTime(new Date().getTime());
+                listId = (int) listService.insert(list);
+                navListAdapter.setSelectedItem(null);
+                navListAdapter.setCurrentListId(listId);
+                navListAdapter.refresh();
+                selectList(listId, listName);
+            });
+            dialog.show(getSupportFragmentManager(), "tag");
         });
 
         View navMenuToday = findViewById(R.id.nav_menu_today);
         View navMenuWeek = findViewById(R.id.nav_menu_week);
         View navMenuOverdue = findViewById(R.id.nav_menu_overdue);
 
+        if (null != viewEnum) {
+            if (TasksViewEnum.TODAY == viewEnum) {
+                navMenuToday.setBackgroundColor(COLOR_LIGHT_GRAY);
+            } else if (TasksViewEnum.WEEK == viewEnum) {
+                navMenuWeek.setBackgroundColor(COLOR_LIGHT_GRAY);
+            } else if (TasksViewEnum.OVERDUE == viewEnum) {
+                navMenuOverdue.setBackgroundColor(COLOR_LIGHT_GRAY);
+            }
+        }
+
         RecyclerView recycler = findViewById(R.id.nav_lists);
         navListAdapter = new NavListAdapter(this, getSupportFragmentManager(), (listItem) -> {
-            this.viewEnum = null;
-            this.listId = listItem.getId();
-            taskAdapter.refresh(listItem.getId());
-            setTitle(listItem.getName());
-            toolbar.setSubtitle(null);
-            new Handler().postDelayed(() -> drawer.closeDrawer(GravityCompat.START, true), 50);
             navMenuToday.setBackgroundColor(COLOR_BACKGROUND);
             navMenuWeek.setBackgroundColor(COLOR_BACKGROUND);
             navMenuOverdue.setBackgroundColor(COLOR_BACKGROUND);
-            PreferencesUtil.removePreference(this, getString(R.string.preference_lastOpenedView));
-            PreferencesUtil.removePreference(this, getString(R.string.preference_lastOpenedViewName));
-            PreferencesUtil.addIntPreference(this, getString(R.string.preference_lastOpenedListId), listItem.getId());
-            PreferencesUtil.addPreference(this, getString(R.string.preference_lastOpenedListName), listItem.getName());
+            selectList(listItem.getId(), listItem.getName());
         }, listId);
         recycler.setLayoutManager(new LinearLayoutManager(this));
         recycler.setAdapter(navListAdapter);
@@ -357,17 +380,34 @@ public class TasksActivity extends AppCompatActivity {
             navMenuWeek.setBackgroundColor(COLOR_BACKGROUND);
             navMenuOverdue.setBackgroundColor(COLOR_BACKGROUND);
             openView(view, TasksViewEnum.TODAY, R.string.navbar_today);
+            new Handler().postDelayed(() -> drawer.closeDrawer(GravityCompat.START, true), 50);
         });
         navMenuWeek.setOnClickListener(view -> {
             navMenuToday.setBackgroundColor(COLOR_BACKGROUND);
             navMenuOverdue.setBackgroundColor(COLOR_BACKGROUND);
             openView(view, TasksViewEnum.WEEK, R.string.navbar_week);
+            new Handler().postDelayed(() -> drawer.closeDrawer(GravityCompat.START, true), 50);
         });
         navMenuOverdue.setOnClickListener(view -> {
             navMenuToday.setBackgroundColor(COLOR_BACKGROUND);
             navMenuWeek.setBackgroundColor(COLOR_BACKGROUND);
             openView(view, TasksViewEnum.OVERDUE, R.string.navbar_overdue);
+            new Handler().postDelayed(() -> drawer.closeDrawer(GravityCompat.START, true), 50);
         });
+    }
+
+    private void selectList(Integer id, String listName) {
+        listId = id;
+        viewEnum = null;
+        setTitle(listName);
+        toolbar.setSubtitle(null);
+        taskAdapter.refresh(listId);
+        new Handler().postDelayed(() -> drawer.closeDrawer(GravityCompat.START, true), 25);
+        PreferencesUtil.removePreference(this, getString(R.string.preference_lastOpenedView));
+        PreferencesUtil.removePreference(this, getString(R.string.preference_lastOpenedViewName));
+        PreferencesUtil.addIntPreference(this, getString(R.string.preference_lastOpenedListId), listId);
+        PreferencesUtil.addPreference(this, getString(R.string.preference_lastOpenedListName), listName);
+        toolbar.getMenu().getItem(1).setVisible(true);
     }
 
     private void configureApplication() {
@@ -393,7 +433,8 @@ public class TasksActivity extends AppCompatActivity {
         View selectedItem = navListAdapter.getSelectedItem();
         if (null != selectedItem) {
             selectedItem.setBackgroundColor(COLOR_BACKGROUND);
-            navListAdapter.setSelectedItem(null);
+            //navListAdapter.setSelectedItem(null);
+            // navListAdapter.setCurrentListId(null);
         }
         setTitle(getString(R.string.view));
         String subtitleString = getString(subtitle);

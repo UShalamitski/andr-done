@@ -1,14 +1,12 @@
 package com.hose.aureliano.project.done.service;
 
 import android.content.Context;
-
 import com.hose.aureliano.project.done.model.Task;
 import com.hose.aureliano.project.done.model.TasksViewEnum;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.TaskDao;
 import com.hose.aureliano.project.done.service.schedule.alarm.AlarmService;
 import com.hose.aureliano.project.done.utils.CalendarUtils;
-
 import org.apache.commons.collections4.ListUtils;
 
 import java.util.ArrayList;
@@ -150,7 +148,20 @@ public class TaskService {
      * @param tasks list of {@link Task} to update
      */
     public void update(List<Task> tasks) {
-        taskDao.update(tasks);
+        DatabaseCreator.getDatabase(context).runInTransaction(() -> taskDao.update(tasks));
+    }
+
+    /**
+     * Updates positions of {@link Task}s.
+     *
+     * @param tasks list of {@link Task} to update
+     */
+    public void updatePositions(List<Task> tasks) {
+        int position = 0;
+        for (Task task : tasks) {
+            task.setPosition(position++);
+        }
+        update(tasks);
     }
 
     /**

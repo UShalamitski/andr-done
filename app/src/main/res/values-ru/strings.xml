@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ExtraTranslation">
     <string name="app_name">Done!</string>
     <string name="action_settings">Настройки</string>
 
@@ -16,7 +16,13 @@
     <string name="no">Нет</string>
     <string name="ok">Ok</string>
 
+    <string name="menu.due_date.clear">Без даты исполнения</string>
+    <string name="menu.due_date.today">Сегодня</string>
+    <string name="menu.due_date.tomorrow">Завтра</string>
+    <string name="menu.due_date.next_week">Следующая неделя</string>
+    <string name="menu.due_date.select">Выбрать дату исполнения</string>
     <string name="menu.duplicate">Дублировать</string>
+    <string name="menu.list.delete">Удалить список</string>
     <string name="menu.select_all">Выбрать все</string>
     <string name="menu.sort.completed">По завершенным</string>
     <string name="menu.sort.create_date">По дате создания</string>
@@ -24,11 +30,6 @@
     <string name="menu.sort.name">По имени</string>
     <string name="menu.sort.progress">По прогрессу</string>
     <string name="menu.unselect_all">Очистить все</string>
-    <string name="menu.due_date.clear">Без даты исполнения</string>
-    <string name="menu.due_date.today">Сегодня</string>
-    <string name="menu.due_date.tomorrow">Завтра</string>
-    <string name="menu.due_date.next_week">Следующая неделя</string>
-    <string name="menu.due_date.select">Выбрать дату исполнения</string>
     <string name="menu.remind_date.tomorrow">Завтра в 9:00</string>
     <string name="menu.remind_date.next_monday">Следующий понедельник в 9:00</string>
     <string name="menu.remind_date.select">Выбрать дaту и время</string>
@@ -65,13 +66,15 @@
     <string name="task.removed">Задача удалена</string>
     <string name="task.repeat">Повторять</string>
     <string name="task.selected">Выбрано: %s</string>
+    <string name="tasks.sorted">Порядок задач изменен</string>
     <string name="tasks.overdue.notification.title">Просроченные задачи: %s</string>
     <string name="tasks.overdue.notification.text">Нажмите, чтобы просмотреть</string>
     <string name="task_details.delete.confirmation">Вы уверены, что хотите удалить задачу?</string>
 
-    <string name="list.delete.confirmation">Вы уверены, что хотите удалить выбранный список?</string>
+    <string name="list.delete.confirmation">Вы уверены, что хотите удалить список?</string>
     <string name="list.add_new">Добавить список</string>
     <string name="list.empty_view">Списков пока нет</string>
+    <string name="list.new">Новый список</string>
     <string name="lists.delete.confirmation">Вы уверены, что хотите удалить выбранные списки?</string>
 
     // Preferences

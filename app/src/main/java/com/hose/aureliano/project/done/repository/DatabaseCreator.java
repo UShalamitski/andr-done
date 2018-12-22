@@ -8,7 +8,7 @@ import android.content.Context;
  * <p>
  * Date: 12.02.2018.
  *
- * @author evere
+ * @author Uladzislau Shalamitski
  */
 public class DatabaseCreator {
 

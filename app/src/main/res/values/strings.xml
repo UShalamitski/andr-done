@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ExtraTranslation">
     <string name="app_name">Done</string>
     <string name="action_settings">Settings</string>
 
@@ -16,12 +16,13 @@
     <string name="no">No</string>
     <string name="ok">Ok</string>
 
-    <string name="menu.due_date.clear">Without due date</string>
+    <string name="menu.due_date.clear" tools:ignore="ExtraTranslation">Without due date</string>
     <string name="menu.due_date.today">Today</string>
     <string name="menu.due_date.tomorrow">Tomorrow</string>
     <string name="menu.due_date.next_week">Next week</string>
     <string name="menu.due_date.select">Select due date</string>
     <string name="menu.duplicate">Duplicate</string>
+    <string name="menu.list.delete">Delete list</string>
     <string name="menu.select_all">Select all</string>
     <string name="menu.sort.completed">By completed</string>
     <string name="menu.sort.create_date">By name</string>
@@ -65,13 +66,15 @@
     <string name="task.removed">Task was removed</string>
     <string name="task.repeat">Repeat</string>
     <string name="task.selected">Selected: %s</string>
+    <string name="tasks.sorted">Tasks order has been changed</string>
     <string name="tasks.overdue.notification.title">%s overdue task(s) for today</string>
     <string name="tasks.overdue.notification.text">Press to view</string>
     <string name="task_details.delete.confirmation">Are you sure you want to delete this task?</string>
 
-    <string name="list.delete.confirmation">Are you sure you want to delete selected list?</string>
+    <string name="list.delete.confirmation">Are you sure you want to delete list?</string>
     <string name="list.add_new">Add new list</string>
     <string name="list.empty_view">There are no lists yet</string>
+    <string name="list.new">New list</string>
     <string name="lists.delete.confirmation">Are you sure you want to delete selected lists?</string>
 
     // Preferences

@@ -72,7 +72,18 @@ public class NavListAdapter extends RecyclerView.Adapter<NavListAdapter.ViewHold
         if (null != currentListId && currentListId.equals(holder.id)) {
             selectedItem = holder.itemView;
             holder.itemView.setBackgroundColor(context.getResources().getColor(R.color.lightestGray));
+        } else {
+            holder.itemView.setBackgroundColor(context.getResources().getColor(R.color.background));
         }
+    }
+
+    public void refresh() {
+        doneLists = doneListDao.read();
+        notifyDataSetChanged();
+    }
+
+    public void setCurrentListId(Integer currentListId) {
+        this.currentListId = currentListId;
     }
 
     public void setSelectedItem(View selectedItem) {
@@ -111,7 +122,6 @@ public class NavListAdapter extends RecyclerView.Adapter<NavListAdapter.ViewHold
         }
         notifyDataSetChanged();
     }
-
 
     private DoneList getItem(int position) {
         return doneLists.get(position);

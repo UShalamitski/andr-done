@@ -1,7 +1,6 @@
 package com.hose.aureliano.project.done.service;
 
 import android.content.Context;
-
 import com.hose.aureliano.project.done.model.DoneList;
 import com.hose.aureliano.project.done.repository.DatabaseCreator;
 import com.hose.aureliano.project.done.repository.dao.DoneListDao;
@@ -18,9 +17,13 @@ import java.util.List;
 public class ListService {
 
     private DoneListDao listDao;
+    private TaskService taskService;
+    private Context context;
 
     public ListService(Context context) {
-        listDao = DatabaseCreator.getDatabase(context).getDoneListDao();
+        this.context = context;
+        this.listDao = DatabaseCreator.getDatabase(context).getDoneListDao();
+        this.taskService = new TaskService(context);
     }
 
     /**
@@ -64,14 +67,15 @@ public class ListService {
     }
 
     /**
-     * Deletes specified {@link DoneList}s.
+     * Deletes specified {@link DoneList} by its identifier.
      *
-     * @param lists lists to delete
+     * @param listId list identifier
      */
-    public void delete(List<DoneList> lists) {
-        for (DoneList list : lists) {
-            delete(list);
-        }
+    public void delete(Integer listId) {
+        DatabaseCreator.getDatabase(context).runInTransaction(() -> {
+            taskService.deleteByListId(listId);
+            listDao.delete(listId);
+        });
     }
 
     /**

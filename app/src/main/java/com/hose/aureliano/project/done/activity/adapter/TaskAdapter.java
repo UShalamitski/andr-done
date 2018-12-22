@@ -326,16 +326,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         return ++position;
     }
 
-    /**
-     * Sets position for tasks as their index.
-     */
-    public void updatePositions() {
-        int position = 0;
-        for (Task task : getItems()) {
-            task.setPosition(position++);
-        }
-    }
-
     @Override
     public List<Task> getItems() {
         return taskList;
@@ -356,6 +346,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         } else if (null != viewEnum) {
             taskList = taskService.getTasksForView(viewEnum);
         }
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Refreshes data on UI.
+     */
+    public void refresh(List<Task> items) {
+        taskList = new ArrayList<>(items);
         notifyDataSetChanged();
     }
 
@@ -423,17 +421,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
             if (task.getId().equals(taskId)) {
                 return task;
             }
-        }
-        throw new NoSuchElementException();
-    }
-
-    private int getPosition(View view) {
-        int position = 0;
-        for (Task task : taskList) {
-            if (task.getId().equals(view.getTag())) {
-                return position;
-            }
-            position++;
         }
         throw new NoSuchElementException();
     }
