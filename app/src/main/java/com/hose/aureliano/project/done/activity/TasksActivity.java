@@ -21,8 +21,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.SparseBooleanArray;
 import android.view.*;
 import android.view.inputmethod.EditorInfo;
@@ -444,7 +442,6 @@ public class TasksActivity extends AppCompatActivity {
         PreferencesUtil.addPreference(this, getString(R.string.preference_lastOpenedViewName), subtitleString);
         PreferencesUtil.removePreference(this, getString(R.string.preference_lastOpenedListId));
         PreferencesUtil.removePreference(this, getString(R.string.preference_lastOpenedListName));
-        new Handler().postDelayed(() -> drawer.closeDrawer(GravityCompat.START, true), 50);
     }
 
     private void initStaticResources() {
